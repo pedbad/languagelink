@@ -1,0 +1,23 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Django
+db.sqlite3
+# Ignore the output of the collectstatic command
+/staticfiles/
+# If you use Django's WhiteNoise to compress static files
+/staticfiles_storage/
+
+# Tailwind CSS
+node_modules/
+
+# Miscellaneous
+*.log
+*.sqlite3
+.DS_Store
+.env
+*.bak
