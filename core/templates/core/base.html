@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% include 'core/partials/head.html' %}
+</head>
+
+<body>
+    {% include 'core/partials/header.html' %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'core/partials/footer.html' %}
+
+    {% include 'core/partials/scripts.html' %}
+</body>
+
+</html>
