@@ -119,7 +119,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # This includes the static directory at the root level (languagelink/static/)
+    BASE_DIR / 'core/static',  # This includes the static directory inside your core app
+]
 
 
 # Default primary key field type

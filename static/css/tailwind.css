@@ -1,3 +1,34 @@
+/* Declare your custom CSS variables */
+:root {
+    /* Warm Tones */
+    --color-warm-brown: #662400;
+    /* Brownish color */
+    --color-dark-orange: #B33F00;
+    /* Dark Orange */
+    --color-vibrant-orange: #FF6B1A;
+    /* Bright Orange */
+    --color-deep-teal: #006663;
+    /* Dark Teal/Blue */
+    --color-bright-teal: #00B3AD;
+    /* Lighter Teal */
+
+    /* Cool Tones */
+    --color-primary-dark-teal: #10454F;
+    /* Dark Teal - Primary Dark */
+    --color-secondary-slate-gray: #506266;
+    /* Slate Gray - Secondary Dark */
+    --color-neutral-gray-brown: #818274;
+    /* Grayish Brown - Neutral */
+    --color-accent-olive-green: #AAB77B;
+    /* Olive Green - Light Accent */
+    --color-accent-bright-lime: #BDE038;
+    /* Bright Lime Green - Bright Accent */
+}
+
+
+/* Tailwind directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Any additional custom CSS styles */

@@ -1,9 +1,54 @@
-<header>
-    <h1>Welcome to LanguageLink</h1>
-    <nav>
-        <ul>
-            <li><a href="{% url 'landing_page' %}">Home</a></li>
-            <li><a href="{% url 'about_page' %}">About</a></li>
+{% load static %}
+<header class="bg-primary-dark-teal text-accent-bright-lime fixed w-full top-0 z-50">
+    <div class="container mx-auto flex justify-between items-center p-4">
+        <!-- Logo and Title Inline -->
+        <div class="flex items-center space-x-3">
+            <img src="{% static 'core/img/logo.png' %}" alt="Language Link" class="h-8 w-8">
+            <span class="text-2xl font-bold">LanguageLink</span>
+        </div>
+
+        <!-- Navigation Links for Large Screens -->
+        <nav class="hidden lg:flex space-x-6">
+            <ul class="flex space-x-6">
+                <li>
+                    <a href="{% url 'landing_page' %}"
+                        class="text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange">
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'about_page' %}"
+                        class="text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange">
+                        About Us
+                    </a>
+                </li>
+                <!-- Add more links as needed -->
+            </ul>
+        </nav>
+
+        <!-- Hamburger Icon for Mobile -->
+        <div class="block lg:hidden">
+            <button id="hamburger" class="text-white">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Navigation Links -->
+    <nav id="mobileMenu" class="hidden lg:hidden bg-primary-dark-teal">
+        <ul class="flex flex-col space-y-4 p-4">
+            <li
+                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
+                <a href="{% url 'landing_page' %}" class="block w-full h-full text-inherit">Home</a>
+            </li>
+            <li
+                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
+                <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit">About Us</a>
+            </li>
+            <!-- Add more links as needed -->
         </ul>
     </nav>
 </header>

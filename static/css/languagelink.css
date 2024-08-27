@@ -1,6 +1,33 @@
-/*
-! tailwindcss v3.4.10 | MIT License | https://tailwindcss.com
-*/
+/* Declare your custom CSS variables */
+
+:root {
+  /* Warm Tones */
+  --color-warm-brown: #662400;
+  /* Brownish color */
+  --color-dark-orange: #B33F00;
+  /* Dark Orange */
+  --color-vibrant-orange: #FF6B1A;
+  /* Bright Orange */
+  --color-deep-teal: #006663;
+  /* Dark Teal/Blue */
+  --color-bright-teal: #00B3AD;
+  /* Lighter Teal */
+  /* Cool Tones */
+  --color-primary-dark-teal: #10454F;
+  /* Dark Teal - Primary Dark */
+  --color-secondary-slate-gray: #506266;
+  /* Slate Gray - Secondary Dark */
+  --color-neutral-gray-brown: #818274;
+  /* Grayish Brown - Neutral */
+  --color-accent-olive-green: #AAB77B;
+  /* Olive Green - Light Accent */
+  --color-accent-bright-lime: #BDE038;
+  /* Bright Lime Green - Bright Accent */
+}
+
+/* Tailwind directives */
+
+/* ! tailwindcss v3.4.10 | MIT License | https://tailwindcss.com */
 
 /*
 1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
@@ -554,17 +581,150 @@ video {
   --tw-contain-style:  ;
 }
 
+.container {
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
 .static {
   position: static;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.top-0 {
+  top: 0px;
+}
+
+.z-50 {
+  z-index: 50;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .block {
   display: block;
 }
 
-.text-red-700 {
-  --tw-text-opacity: 1;
-  color: rgb(185 28 28 / var(--tw-text-opacity));
+.flex {
+  display: flex;
+}
+
+.hidden {
+  display: none;
+}
+
+.h-8 {
+  height: 2rem;
+}
+
+.h-full {
+  height: 100%;
+}
+
+.w-8 {
+  width: 2rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.space-x-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.space-x-6 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(1.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(1.5rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+
+.border-b-2 {
+  border-bottom-width: 2px;
+}
+
+.border-transparent {
+  border-color: transparent;
+}
+
+.bg-primary-dark-teal {
+  background-color: var(--color-primary-dark-teal);
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.pt-16 {
+  padding-top: 4rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.font-bold {
+  font-weight: 700;
 }
 
 .text-blue-700 {
@@ -572,12 +732,57 @@ video {
   color: rgb(29 78 216 / var(--tw-text-opacity));
 }
 
-.text-pink-700 {
+.text-white {
   --tw-text-opacity: 1;
-  color: rgb(190 24 93 / var(--tw-text-opacity));
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.text-teal-700 {
-  --tw-text-opacity: 1;
-  color: rgb(15 118 110 / var(--tw-text-opacity));
+.text-secondary-slate-gray {
+  color: var(--color-secondary-slate-gray);
+}
+
+.text-neutral-gray-brown {
+  color: var(--color-neutral-gray-brown);
+}
+
+.text-accent-bright-lime {
+  color: var(--color-accent-bright-lime);
+}
+
+.text-inherit {
+  color: inherit;
+}
+
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.duration-300 {
+  transition-duration: 300ms;
+}
+
+/* Any additional custom CSS styles */
+
+.hover\:border-vibrant-orange:hover {
+  border-color: var(--color-vibrant-orange);
+}
+
+.hover\:text-dark-orange:hover {
+  color: var(--color-dark-orange);
+}
+
+.hover\:text-vibrant-orange:hover {
+  color: var(--color-vibrant-orange);
+}
+
+@media (min-width: 1024px) {
+  .lg\:flex {
+    display: flex;
+  }
+
+  .lg\:hidden {
+    display: none;
+  }
 }
