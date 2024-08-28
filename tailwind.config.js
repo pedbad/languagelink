@@ -18,6 +18,9 @@ module.exports = {
         'accent-olive-green': 'var(--color-accent-olive-green)',
         'accent-bright-lime': 'var(--color-accent-bright-lime)',
       },
+      margin: {
+        '-150px': '-150px',
+      },
     },
   },
   plugins: [],

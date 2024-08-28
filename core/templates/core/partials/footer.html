@@ -1,3 +1,35 @@
-<footer>
-    <p>&copy; 2024 LanguageLink</p>
+{% load static %}
+<footer class="bg-primary-dark-teal text-slate-400 py-8 relative">
+    <!-- Skyline Image -->
+    <img src="{% static 'core/img/footer/cambridge-skyline.png' %}" alt="Cambridge Skyline"
+        class="absolute right-0 -mt-150px">
+
+    <!-- Content Container -->
+    <div class="container mx-auto relative z-10 flex flex-col lg:flex-row justify-between items-center px-4">
+
+        <!-- Text Content -->
+        <div class="text-center lg:text-left mb-4 lg:mb-0">
+            <p class="text-sm">2024 © University of Cambridge. Developed by the
+                <a href="#"
+                    class="text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange">
+                    The Language Centre
+                </a>.
+            </p>
+            <p class="text-sm">This work is licensed under the Creative Commons Attribution-NonCommercial-NoDerivs 4.0
+                International Licence. </p>
+            <p class="text-sm">To view a copy of this licence, visit
+                <a href="https://creativecommons.org"
+                    class="text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange">
+                    creativecommons.org
+                </a>.
+            </p>
+        </div>
+
+        <!-- Logos -->
+        <div class="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-16">
+            <img src="{% static 'core/img/footer/lc-logo.png' %}" alt="University of Cambridge Language Centre"
+                class="h-12">
+            <img src="{% static 'core/img/footer/creative-commons.png' %}" alt="Creative Commons" class="h-12">
+        </div>
+    </div>
 </footer>
