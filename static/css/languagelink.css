@@ -730,12 +730,24 @@ video {
   margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
+.text-pretty {
+  text-wrap: pretty;
+}
+
 .border-b-2 {
   border-bottom-width: 2px;
 }
 
 .border-transparent {
   border-color: transparent;
+}
+
+.border-vibrant-orange {
+  border-color: var(--color-vibrant-orange);
+}
+
+.border-accent-bright-lime {
+  border-color: var(--color-accent-bright-lime);
 }
 
 .bg-primary-dark-teal {
@@ -871,6 +883,10 @@ video {
 .text-slate-500 {
   --tw-text-opacity: 1;
   color: rgb(100 116 139 / var(--tw-text-opacity));
+}
+
+.text-secondary-slate-gray {
+  color: var(--color-secondary-slate-gray);
 }
 
 .transition-colors {

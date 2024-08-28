@@ -12,17 +12,17 @@
             <ul class="flex space-x-6">
                 <li>
                     <a href="{% url 'landing_page' %}"
-                        class="text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange">
+                        class="{% if request.path == '/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
                         Home
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'about_page' %}"
-                        class="text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange">
+                        class="{% if request.path == '/about/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
                         About Us
                     </a>
                 </li>
-                <!-- Add more links as needed -->
+                <!-- Add more links as needed with similar logic -->
             </ul>
         </nav>
 
@@ -41,14 +41,14 @@
     <nav id="mobileMenu" class="hidden lg:hidden bg-primary-dark-teal">
         <ul class="flex flex-col space-y-4 p-4">
             <li
-                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
+                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/' %}border-vibrant-orange{% endif %}">
                 <a href="{% url 'landing_page' %}" class="block w-full h-full text-inherit">Home</a>
             </li>
             <li
-                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
+                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/about/' %}border-vibrant-orange{% endif %}">
                 <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit">About Us</a>
             </li>
-            <!-- Add more links as needed -->
+            <!-- Add more links as needed with similar logic -->
         </ul>
     </nav>
 </header>
