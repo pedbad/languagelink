@@ -1,0 +1,39 @@
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import CustomUser, LanguageCompetency, StudentProfile, TeacherProfile, Questionnaire
+from django.forms import modelformset_factory
+
+# User Registration Form
+class CustomUserCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = CustomUser
+        fields = ('email',)
+
+# Form for managing Language Competencies
+class LanguageCompetencyForm(forms.ModelForm):
+    class Meta:
+        model = LanguageCompetency
+        fields = ['language', 'competency_level']
+
+# Formset for managing multiple LanguageCompetency entries
+LanguageCompetencyFormSet = modelformset_factory(LanguageCompetency, form=LanguageCompetencyForm, extra=1)
+
+# Profile Update Form for Students
+class StudentProfileForm(forms.ModelForm):
+    class Meta:
+        model = StudentProfile
+        fields = ['biography', 'languages_of_interest', 'profile_picture']
+
+# Profile Update Form for Teachers
+class TeacherProfileForm(forms.ModelForm):
+    class Meta:
+        model = TeacherProfile
+        fields = ['biography', 'languages_taught', 'profile_picture']
+
+
+# Questionnaire Form
+# This form is used to handle the questionnaire that students fill out.
+class QuestionnaireForm(forms.ModelForm):
+    class Meta:
+        model = Questionnaire
+        fields = ['question1', 'question2']  # Add all the fields you want to include in the form

@@ -23,6 +23,26 @@
                     </a>
                 </li>
                 <!-- Add more links as needed with similar logic -->
+
+                <!-- Conditional Login/Logout Link -->
+                {% if user.is_authenticated %}
+                <li>
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{% url 'login' %}"
+                        class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+                        Login
+                    </a>
+                </li>
+                {% endif %}
             </ul>
         </nav>
 
@@ -48,7 +68,21 @@
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/about/' %}border-vibrant-orange{% endif %}">
                 <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit">About Us</a>
             </li>
-            <!-- Add more links as needed with similar logic -->
+            <!-- Conditional Login/Logout Link for Mobile -->
+            {% if user.is_authenticated %}
+            <li
+                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="block w-full h-full text-inherit">Logout</button>
+                </form>
+            </li>
+            {% else %}
+            <li
+                class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
+                <a href="{% url 'login' %}" class="block w-full h-full text-inherit">Login</a>
+            </li>
+            {% endif %}
         </ul>
     </nav>
 </header>
