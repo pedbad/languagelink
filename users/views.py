@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser, Questionnaire
+from .models import CustomUser, Questionnaire, TeacherProfile
 from .forms import CustomUserCreationForm, TeacherProfileForm, StudentProfileForm, QuestionnaireForm
 
 # Registration View
@@ -100,6 +100,16 @@ def questionnaire_view(request):
     
     return render(request, 'users/questionnaire.html', {'form': form})
 
+# Admin dashboard
+@login_required
+def student_resource_view(request):
+    return render(request, 'users/student_resources.html')
+
+# See All teachers / advisors
+@login_required
+def student_advisors_view(request):
+    teachers = TeacherProfile.objects.all()  # Fetch all teacher profiles
+    return render(request, 'users/advisors.html', {'teachers': teachers})
 
 # Admin dashboard
 @login_required

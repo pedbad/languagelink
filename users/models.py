@@ -79,11 +79,14 @@ class StudentProfile(models.Model):
 class TeacherProfile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     biography = models.TextField(blank=True, null=True)
-    languages_taught = models.CharField(max_length=255, blank=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+    can_host_in_person = models.BooleanField(default=False)
+    can_host_online = models.BooleanField(default=False)
+    bookings_link = models.URLField(max_length=250, blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.email} - Teacher Profile"
+
     
 '''
 Create a Questionnaire model to store the responses from students after they register. 

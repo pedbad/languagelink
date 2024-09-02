@@ -28,8 +28,7 @@ class StudentProfileForm(forms.ModelForm):
 class TeacherProfileForm(forms.ModelForm):
     class Meta:
         model = TeacherProfile
-        fields = ['biography', 'languages_taught', 'profile_picture']
-
+        fields = ['biography', 'profile_picture', 'can_host_in_person', 'can_host_online']
 
 # Questionnaire Form
 # This form is used to handle the questionnaire that students fill out.

@@ -10,6 +10,7 @@
         <!-- Navigation Links for Large Screens -->
         <nav class="hidden lg:flex space-x-6">
             <ul class="flex space-x-6">
+                {% if not request.user.is_authenticated %}
                 <li>
                     <a href="{% url 'landing_page' %}"
                         class="{% if request.path == '/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
@@ -22,7 +23,32 @@
                         About Us
                     </a>
                 </li>
+                {% endif %}
                 <!-- Add more links as needed with similar logic -->
+                {% if request.user.is_authenticated and request.user.role == 'student' %}
+                <li>
+                    <a href="{% url 'student_profile' %}"
+                        class="{% if request.path == '/users/student/profile/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+                        Profile </a>
+                </li>
+                <li>
+                    <a href="{% url 'student_resource' %}"
+                        class="{% if request.path == '/users/student/resource/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+                        Resources </a>
+                </li>
+                <li>
+                    <a href="{% url 'questionnaire' %}"
+                        class="{% if request.path == '/users/student/questionnaire/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+                        Questionnaire
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'advisors' %}"
+                        class="{% if request.path == '/users/student/advisors/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+                        Advisors
+                    </a>
+                </li>
+                {% endif %}
 
                 <!-- Conditional Login/Logout Link -->
                 {% if user.is_authenticated %}
@@ -60,6 +86,7 @@
     <!-- Mobile Navigation Links -->
     <nav id="mobileMenu" class="hidden lg:hidden bg-primary-dark-teal">
         <ul class="flex flex-col space-y-4 p-4">
+            {% if not request.user.is_authenticated %}
             <li
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/' %}border-vibrant-orange{% endif %}">
                 <a href="{% url 'landing_page' %}" class="block w-full h-full text-inherit">Home</a>
@@ -68,6 +95,7 @@
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/about/' %}border-vibrant-orange{% endif %}">
                 <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit">About Us</a>
             </li>
+            {% endif %}
             <!-- Conditional Login/Logout Link for Mobile -->
             {% if user.is_authenticated %}
             <li
