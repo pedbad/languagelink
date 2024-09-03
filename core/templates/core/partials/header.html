@@ -3,8 +3,9 @@
     <div class="container mx-auto flex justify-between items-center p-4">
         <!-- Logo and Title Inline -->
         <div class="flex items-center space-x-3">
-            <img src="{% static 'core/img/languagelink-logo.png' %}" alt="Language Link" class="h-8 w-8">
-            <span class="text-2xl font-bold">LanguageLink</span>
+            <img src="{% static 'core/img/languagelink-logo.png' %}" alt="Language Link"
+                class="hidden sm:block h-8 w-8">
+            <span class="text-2xl font-bold lg:text-2xl md:text-xl sm:text-lg xs:text-base">LanguageLink</span>
         </div>
 
         <!-- Navigation Links for Large Screens -->
@@ -73,7 +74,7 @@
         </nav>
 
         <!-- Hamburger Icon for Mobile -->
-        <div class="block lg:hidden">
+        <div class="block lg:hidden ml-auto">
             <button id="hamburger" class="text-white">
                 <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16">

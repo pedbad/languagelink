@@ -9,7 +9,7 @@
     {% include 'core/partials/header.html' %}
 
     <!-- Main content -->
-    <main class="pt-16 flex-grow">
+    <main class="pt-16 flex-grow bg-slate-100">
         <div class="container mx-auto p-4">
             <!-- Your content goes here -->
             {% block content %}{% endblock %}
@@ -21,13 +21,7 @@
     {% include 'core/partials/scripts.html' %}
 
 
-    <!-- Include this script at the bottom of your base.html or inside your scripts.html partial -->
-    <script>
-        document.getElementById('hamburger').addEventListener('click', function () {
-            var menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        });
-    </script>
+
 </body>
 
 </html>

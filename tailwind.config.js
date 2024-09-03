@@ -2,7 +2,9 @@
 module.exports = {
   content: [
     './templates/**/*.html',
-    './core/templates/**/*.html',  // Add other paths as needed
+    './core/templates/**/*.html',
+    './users/templates/**/*.html',
+    './node_modules/tw-elements/dist/js/**/*.js'
   ],
   theme: {
     extend: {

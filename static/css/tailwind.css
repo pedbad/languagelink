@@ -31,6 +31,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Tailwind Elements */
+@import 'tw-elements';
+
 /* Any additional custom CSS styles */
 footer {
     flex-shrink: 0;
