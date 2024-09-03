@@ -33,8 +33,16 @@ def login_view(request):
         email = request.POST['email']
         password = request.POST['password']
         user = authenticate(request, email=email, password=password)
+
         if user is not None:
             login(request, user)
+
+            # Check if "Remember me" was checked
+            if 'remember_me' in request.POST:
+                request.session.set_expiry(1209600)  # 2 weeks
+            else:
+                request.session.set_expiry(0)  # Browser close
+
             # Check if the user is a student and has completed the questionnaire
             if user.role == 'student':
                 questionnaire = Questionnaire.objects.filter(student_profile__user=user).first()
