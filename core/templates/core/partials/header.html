@@ -14,59 +14,60 @@
                 {% if not request.user.is_authenticated %}
                 <li>
                     <a href="{% url 'landing_page' %}"
-                        class="{% if request.path == '/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        Home
+                        class="{% if request.path == '/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg>
+                        <span>Home</span>
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'about_page' %}"
-                        class="{% if request.path == '/about/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        About Us
-                    </a>
-                </li>
-                {% endif %}
-                <!-- Add more links as needed with similar logic -->
-                {% if request.user.is_authenticated and request.user.role == 'student' %}
-                <li>
-                    <a href="{% url 'student_profile' %}"
-                        class="{% if request.path == '/users/student/profile/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        Profile </a>
-                </li>
-                <li>
-                    <a href="{% url 'student_resource' %}"
-                        class="{% if request.path == '/users/student/resource/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        Resources </a>
-                </li>
-                <li>
-                    <a href="{% url 'questionnaire' %}"
-                        class="{% if request.path == '/users/student/questionnaire/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        Questionnaire
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'advisors' %}"
-                        class="{% if request.path == '/users/student/advisors/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        Advisors
+                        class="{% if request.path == '/about/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                        </svg>
+                        <span>About Us</span>
                     </a>
                 </li>
                 {% endif %}
 
-                <!-- Conditional Login/Logout Link -->
-                {% if user.is_authenticated %}
+                {% if request.user.is_authenticated %}
                 <li>
                     <form action="{% url 'logout' %}" method="post" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit"
-                            class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                            Logout
+                            class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                class="h-5 w-5">
+                                <path fill-rule="evenodd"
+                                    d="M17 4.25A2.25 2.25 0 0 0 14.75 2h-5.5A2.25 2.25 0 0 0 7 4.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1-.75-.75v-2a.75.75 0 0 0-1.5 0v2A2.25 2.25 0 0 0 9.25 18h5.5A2.25 2.25 0 0 0 17 15.75V4.25Z"
+                                    clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M14 10a.75.75 0 0 0-.75-.75H3.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 14 10Z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>Logout</span>
                         </button>
                     </form>
                 </li>
                 {% else %}
                 <li>
                     <a href="{% url 'login' %}"
-                        class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
-                        Login
+                        class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                            <path fill-rule="evenodd"
+                                d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
+                                clip-rule="evenodd" />
+                            <path fill-rule="evenodd"
+                                d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span>Login</span>
                     </a>
                 </li>
                 {% endif %}
@@ -90,11 +91,25 @@
             {% if not request.user.is_authenticated %}
             <li
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/' %}border-vibrant-orange{% endif %}">
-                <a href="{% url 'landing_page' %}" class="block w-full h-full text-inherit">Home</a>
+                <a href="{% url 'landing_page' %}" class="block w-full h-full text-inherit flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="h-5 w-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                    </svg>
+                    <span>Home</span>
+                </a>
             </li>
             <li
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/about/' %}border-vibrant-orange{% endif %}">
-                <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit">About Us</a>
+                <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="h-5 w-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                    </svg>
+                    <span>About Us</span>
+                </a>
             </li>
             {% endif %}
             <!-- Conditional Login/Logout Link for Mobile -->
@@ -103,13 +118,33 @@
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
                 <form action="{% url 'logout' %}" method="post" style="display: inline;">
                     {% csrf_token %}
-                    <button type="submit" class="block w-full h-full text-inherit">Logout</button>
+                    <button type="submit" class="block w-full h-full text-inherit flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                            <path fill-rule="evenodd"
+                                d="M17 4.25A2.25 2.25 0 0 0 14.75 2h-5.5A2.25 2.25 0 0 0 7 4.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1-.75-.75v-2a.75.75 0 0 0-1.5 0v2A2.25 2.25 0 0 0 9.25 18h5.5A2.25 2.25 0 0 0 17 15.75V4.25Z"
+                                clip-rule="evenodd" />
+                            <path fill-rule="evenodd"
+                                d="M14 10a.75.75 0 0 0-.75-.75H3.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 14 10Z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span>Logout</span>
+                    </button>
                 </form>
             </li>
             {% else %}
             <li
                 class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
-                <a href="{% url 'login' %}" class="block w-full h-full text-inherit">Login</a>
+                <a href="{% url 'login' %}" class="block w-full h-full text-inherit flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                        <path fill-rule="evenodd"
+                            d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
+                            clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <span>Login</span>
+                </a>
             </li>
             {% endif %}
         </ul>
