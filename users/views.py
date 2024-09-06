@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser, Questionnaire, TeacherProfile
+from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
 from .forms import CustomUserCreationForm, TeacherProfileForm, StudentProfileForm, QuestionnaireForm
 
 # Registration View
@@ -10,18 +10,14 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()  # Save the new user to the database
-            login(request, user)  # Log the user in immediately after registration
 
-            # Redirect based on user role
-            if user.role == CustomUser.Role.STUDENT:
-                # No need to manually create StudentProfile; it will be created automatically by the signal
-                return redirect('questionnaire')  # Redirect student to questionnaire
-            elif user.role == CustomUser.Role.TEACHER:
-                # Redirect teacher to their profile page
-                return redirect('teacher_profile')
-            else:
-                # Redirect admin or any other role to a generic profile page
-                return redirect('profile')
+            # Check if the current user is an admin
+            if request.user.is_authenticated and request.user.role == 'admin':
+                # Redirect based on the new user's role
+                if user.role == 'student':
+                    return redirect('teacher_student_list')  # Redirect to the student list
+                elif user.role == 'teacher':
+                    return redirect('advisors')  # Redirect to the advisor list (teachers)
     else:
         form = CustomUserCreationForm()  # Display the empty registration form
     return render(request, 'users/register.html', {'form': form})

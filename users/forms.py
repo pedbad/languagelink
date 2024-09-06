@@ -5,9 +5,26 @@ from django.forms import modelformset_factory
 
 # User Registration Form
 class CustomUserCreationForm(UserCreationForm):
+    # Define the role field with restricted choices
+    role = forms.ChoiceField(choices=[('student', 'Student'), ('teacher', 'Teacher')], label="Role")
+    
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = ('email',)
+        fields = ('email', 'role',)  # Only allow selection of email and role (no admin role)
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = self.cleaned_data['role']
+        
+        # Make sure the user is not an admin
+        user.is_staff = False
+        user.is_superuser = False
+        
+        if commit:
+            user.save()
+        return user
+
+
 
 # Form for managing Language Competencies
 class LanguageCompetencyForm(forms.ModelForm):
