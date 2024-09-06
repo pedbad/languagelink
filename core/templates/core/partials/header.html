@@ -17,20 +17,22 @@
         <!-- Student-specific links -->
           <!-- Student-Profile link -->
           <li>
-            <a href="{% url 'student_profile' %}"
-                class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                    <path fill-rule="evenodd"
+            <a href="{% url 'student_profile' %}" 
+              class="{% if request.path == '/users/student/profile/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                      text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                  <path fill-rule="evenodd"
                         d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z"
                         clip-rule="evenodd" />
-                </svg>
-                <span>Profile</span>
+              </svg>
+              <span>Profile</span>
             </a>
           </li>
           <!-- Student-Resources link -->
           <li>
             <a href="{% url 'student_resource' %}" 
-               class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/users/student/resource/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                     <path fill-rule="evenodd"
                         d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v11.75A2.75 2.75 0 0 0 16.75 18h-12A2.75 2.75 0 0 1 2 15.25V3.5Zm3.75 7a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Zm0 3a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5ZM5 5.75A.75.75 0 0 1 5.75 5h4.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 5 8.25v-2.5Z" clip-rule="evenodd" />
@@ -41,7 +43,9 @@
           </li>
           <!-- Student-Questionnaire link -->
           <li>
-            <a href="{% url 'questionnaire' %}" class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+            <a href="{% url 'questionnaire' %}"
+              class="{% if request.path == '/users/student/questionnaire/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                   text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
                 <path fill-rule="evenodd" d="M15.988 3.012A2.25 2.25 0 0 1 18 5.25v6.5A2.25 2.25 0 0 1 15.75 14H13.5V7A2.5 2.5 0 0 0 11 4.5H8.128a2.252 2.252 0 0 1 1.884-1.488A2.25 2.25 0 0 1 12.25 1h1.5a2.25 2.25 0 0 1 2.238 2.012ZM11.5 3.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.25h-3v-.25Z" clip-rule="evenodd" />
                 <path fill-rule="evenodd" d="M2 7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7Zm2 3.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Zm0 3.5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
@@ -52,7 +56,8 @@
           <!-- Student-Advisors link -->
           <li>
             <a href="{% url 'advisors' %}" 
-              class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/users/student/advisors/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">    
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
                 <path fill-rule="evenodd" d="M9.664 1.319a.75.75 0 0 1 .672 0 41.059 41.059 0 0 1 8.198 5.424.75.75 0 0 1-.254 1.285 31.372 31.372 0 0 0-7.86 3.83.75.75 0 0 1-.84 0 31.508 31.508 0 0 0-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 0 1 3.305-2.033.75.75 0 0 0-.714-1.319 37 37 0 0 0-3.446 2.12A2.216 2.216 0 0 0 6 9.393v.38a31.293 31.293 0 0 0-4.28-1.746.75.75 0 0 1-.254-1.285 41.059 41.059 0 0 1 8.198-5.424ZM6 11.459a29.848 29.848 0 0 0-2.455-1.158 41.029 41.029 0 0 0-.39 3.114.75.75 0 0 0 .419.74c.528.256 1.046.53 1.554.82-.21.324-.455.63-.739.914a.75.75 0 1 0 1.06 1.06c.37-.369.69-.77.96-1.193a26.61 26.61 0 0 1 3.095 2.348.75.75 0 0 0 .992 0 26.547 26.547 0 0 1 5.93-3.95.75.75 0 0 0 .42-.739 41.053 41.053 0 0 0-.39-3.114 29.925 29.925 0 0 0-5.199 2.801 2.25 2.25 0 0 1-2.514 0c-.41-.275-.826-.541-1.25-.797a6.985 6.985 0 0 1-1.084 3.45 26.503 26.503 0 0 0-1.281-.78A5.487 5.487 0 0 0 6 12v-.54Z" clip-rule="evenodd" />
               </svg>
@@ -64,7 +69,8 @@
           <!-- Teacher-Profile link -->
           <li>
             <a href="{% url 'teacher_profile' %}"
-                class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/users/teacher/profile/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">     
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                     <path fill-rule="evenodd"
                         d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z"
@@ -76,7 +82,8 @@
           <!-- Teacher-Student link -->
           <li>
             <a href="{% url 'teacher_student_list' %}" 
-              class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/users/teacher/students/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">     
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                 <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z" />
               </svg>
@@ -88,7 +95,8 @@
           <!-- Admin-Dashboard link -->
           <li>
             <a href="{% url 'admin_dashboard' %}" 
-              class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/users/admin/dashboard/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">    
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                 <path d="M16.555 5.412a8.028 8.028 0 0 0-3.503-2.81 14.899 14.899 0 0 1 1.663 4.472 8.547 8.547 0 0 0 1.84-1.662ZM13.326 7.825a13.43 13.43 0 0 0-2.413-5.773 8.087 8.087 0 0 0-1.826 0 13.43 13.43 0 0 0-2.413 5.773A8.473 8.473 0 0 0 10 8.5c1.18 0 2.304-.24 3.326-.675ZM6.514 9.376A9.98 9.98 0 0 0 10 10c1.226 0 2.4-.22 3.486-.624a13.54 13.54 0 0 1-.351 3.759A13.54 13.54 0 0 1 10 13.5c-1.079 0-2.128-.127-3.134-.366a13.538 13.538 0 0 1-.352-3.758ZM5.285 7.074a14.9 14.9 0 0 1 1.663-4.471 8.028 8.028 0 0 0-3.503 2.81c.529.638 1.149 1.199 1.84 1.66ZM17.334 6.798a7.973 7.973 0 0 1 .614 4.115 13.47 13.47 0 0 1-3.178 1.72 15.093 15.093 0 0 0 .174-3.939 10.043 10.043 0 0 0 2.39-1.896ZM2.666 6.798a10.042 10.042 0 0 0 2.39 1.896 15.196 15.196 0 0 0 .174 3.94 13.472 13.472 0 0 1-3.178-1.72 7.973 7.973 0 0 1 .615-4.115ZM10 15c.898 0 1.778-.079 2.633-.23a13.473 13.473 0 0 1-1.72 3.178 8.099 8.099 0 0 1-1.826 0 13.47 13.47 0 0 1-1.72-3.178c.855.151 1.735.23 2.633.23ZM14.357 14.357a14.912 14.912 0 0 1-1.305 3.04 8.027 8.027 0 0 0 4.345-4.345c-.953.542-1.971.981-3.04 1.305ZM6.948 17.397a8.027 8.027 0 0 1-4.345-4.345c.953.542 1.971.981 3.04 1.305a14.912 14.912 0 0 0 1.305 3.04Z" />
               </svg>
@@ -98,7 +106,8 @@
           <!-- Django-Admin link -->
           <li>
             <a href="{% url 'admin:index' %}" 
-              class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/admin/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">    
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                 <path fill-rule="evenodd" d="M14.5 10a4.5 4.5 0 0 0 4.284-5.882c-.105-.324-.51-.391-.752-.15L15.34 6.66a.454.454 0 0 1-.493.11 3.01 3.01 0 0 1-1.618-1.616.455.455 0 0 1 .11-.494l2.694-2.692c.24-.241.174-.647-.15-.752a4.5 4.5 0 0 0-5.873 4.575c.055.873-.128 1.808-.8 2.368l-7.23 6.024a2.724 2.724 0 1 0 3.837 3.837l6.024-7.23c.56-.672 1.495-.855 2.368-.8.096.007.193.01.291.01ZM5 16a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clip-rule="evenodd" />
                 <path d="M14.5 11.5c.173 0 .345-.007.514-.022l3.754 3.754a2.5 2.5 0 0 1-3.536 3.536l-4.41-4.41 2.172-2.607c.052-.063.147-.138.342-.196.202-.06.469-.087.777-.067.128.008.257.012.387.012ZM6 4.586l2.33 2.33a.452.452 0 0 1-.08.09L6.8 8.214 4.586 6H3.309a.5.5 0 0 1-.447-.276l-1.7-3.402a.5.5 0 0 1 .093-.577l.49-.49a.5.5 0 0 1 .577-.094l3.402 1.7A.5.5 0 0 1 6 3.31v1.277Z" />
@@ -109,7 +118,8 @@
           <!-- Only admins can register new users -->
           <li>
             <a href="{% url 'register' %}" 
-              class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              class="{% if request.path == '/users/register/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">   
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
                 <path d="M10 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM16.25 5.75a.75.75 0 0 0-1.5 0v2h-2a.75.75 0 0 0 0 1.5h2v2a.75.75 0 0 0 1.5 0v-2h2a.75.75 0 0 0 0-1.5h-2v-2Z" />
               </svg>
@@ -139,23 +149,39 @@
             </form>
         </li>
       {% else %}
-          <li>
-              <a href="{% url 'login' %}"
-                  class="border-b-2 border-transparent text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
-                      <path fill-rule="evenodd"
-                          d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
-                          clip-rule="evenodd" />
-                      <path fill-rule="evenodd"
-                          d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
-                          clip-rule="evenodd" />
-                  </svg>
-                  <span>Login</span>
-              </a>
-          </li>
+        <li>
+          <a href="{% url 'landing_page' %}"
+              class="{% if request.path == '/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+              Home
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'about_page' %}"
+              class="{% if request.path == '/about/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+              About Us
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'login' %}"
+            class="{% if request.path == '/users/login/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                  text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">  
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+              <path fill-rule="evenodd"
+                  d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
+                  clip-rule="evenodd" />
+              <path fill-rule="evenodd"
+                  d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
+                  clip-rule="evenodd" />
+            </svg>
+            <span>Login</span>
+          </a>
+        </li>
       {% endif %}
       </ul>
     </nav>
+
+
+
 
     <!-- Hamburger Icon for Mobile -->
     <div class="block lg:hidden ml-auto">
@@ -171,65 +197,154 @@
   <!-- Mobile Navigation Links -->
   <nav id="mobileMenu" class="hidden lg:hidden bg-primary-dark-teal">
     <ul class="flex flex-col space-y-4 p-4">
-        {% if not request.user.is_authenticated %}
-        <li
-            class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/' %}border-vibrant-orange{% endif %}">
-            <a href="{% url 'landing_page' %}" class="block w-full h-full text-inherit flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="h-5 w-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                </svg>
-                <span>Home</span>
+      {% if request.user.is_authenticated %}
+        {% if request.user.role == 'student' %}
+        <!-- Student-specific links -->
+          <li>
+            <a href="{% url 'student_profile' %}" 
+              class="{% if request.path == '/users/student/profile/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                      text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z" clip-rule="evenodd" />
+              </svg>
+              <span>Profile</span>
             </a>
-        </li>
-        <li
-            class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2 {% if request.path == '/about/' %}border-vibrant-orange{% endif %}">
-            <a href="{% url 'about_page' %}" class="block w-full h-full text-inherit flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="h-5 w-5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
-                </svg>
-                <span>About Us</span>
+          </li>
+          <li>
+            <a href="{% url 'student_resource' %}" 
+              class="{% if request.path == '/users/student/resource/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v11.75A2.75 2.75 0 0 0 16.75 18h-12A2.75 2.75 0 0 1 2 15.25V3.5Zm3.75 7a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5Zm0 3a.75.75 0 0 0 0 1.5h4.5a.75.75 0 0 0 0-1.5h-4.5ZM5 5.75A.75.75 0 0 1 5.75 5h4.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-.75.75h-4.5A.75.75 0 0 1 5 8.25v-2.5Z" clip-rule="evenodd" />
+              </svg>
+              <span>Resources</span>
             </a>
-        </li>
+          </li>
+          <li>
+            <a href="{% url 'questionnaire' %}"
+              class="{% if request.path == '/users/student/questionnaire/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                <path fill-rule="evenodd" d="M15.988 3.012A2.25 2.25 0 0 1 18 5.25v6.5A2.25 2.25 0 0 1 15.75 14H13.5V7A2.5 2.5 0 0 0 11 4.5H8.128a2.252 2.252 0 0 1 1.884-1.488A2.25 2.25 0 0 1 12.25 1h1.5a2.25 2.25 0 0 1 2.238 2.012ZM11.5 3.25a.75.75 0 0 1 .75-.75h1.5a.75.75 0 0 1 .75.75v.25h-3v-.25Z" clip-rule="evenodd" />
+                <path fill-rule="evenodd" d="M2 7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7Zm2 3.25a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Zm0 3.5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+              </svg>
+              <span>Questionnaire</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'advisors' %}"
+              class="{% if request.path == '/users/student/advisors/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                <path fill-rule="evenodd" d="M9.664 1.319a.75.75 0 0 1 .672 0 41.059 41.059 0 0 1 8.198 5.424.75.75 0 0 1-.254 1.285 31.372 31.372 0 0 0-7.86 3.83.75.75 0 0 1-.84 0 31.508 31.508 0 0 0-2.08-1.287V9.394c0-.244.116-.463.302-.592a35.504 35.504 0 0 1 3.305-2.033.75.75 0 0 0-.714-1.319 37 37 0 0 0-3.446 2.12A2.216 2.216 0 0 0 6 9.393v.38a31.293 31.293 0 0 0-4.28-1.746.75.75 0 0 1-.254-1.285 41.059 41.059 0 0 1 8.198-5.424ZM6 11.459a29.848 29.848 0 0 0-2.455-1.158 41.029 41.029 0 0 0-.39 3.114.75.75 0 0 0 .419.74c.528.256 1.046.53 1.554.82-.21.324-.455.63-.739.914a.75.75 0 1 0 1.06 1.06c.37-.369.69-.77.96-1.193a26.61 26.61 0 0 1 3.095 2.348.75.75 0 0 0 .992 0 26.547 26.547 0 0 1 5.93-3.95.75.75 0 0 0 .42-.739 41.053 41.053 0 0 0-.39-3.114 29.925 29.925 0 0 0-5.199 2.801 2.25 2.25 0 0 1-2.514 0c-.41-.275-.826-.541-1.25-.797a6.985 6.985 0 0 1-1.084 3.45 26.503 26.503 0 0 0-1.281-.78A5.487 5.487 0 0 0 6 12v-.54Z" clip-rule="evenodd" />
+              </svg>
+              <span>Advisors</span>
+            </a>
+          </li>
+
+        {% elif request.user.role == 'teacher' %}
+        <!-- Teacher-specific links -->
+          <li>
+            <a href="{% url 'teacher_profile' %}"
+              class="{% if request.path == '/users/teacher/profile/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-5.5-2.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0ZM10 12a5.99 5.99 0 0 0-4.793 2.39A6.483 6.483 0 0 0 10 16.5a6.483 6.483 0 0 0 4.793-2.11A5.99 5.99 0 0 0 10 12Z" clip-rule="evenodd" />
+              </svg>
+              <span>Profile</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'teacher_student_list' %}" 
+              class="{% if request.path == '/users/teacher/students/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM14.5 16h-.106c.07-.297.088-.611.048-.933a7.47 7.47 0 0 0-1.588-3.755 4.502 4.502 0 0 1 5.874 2.636.818.818 0 0 1-.36.98A7.465 7.465 0 0 1 14.5 16Z" />
+              </svg>
+              <span>Students</span>
+            </a>
+          </li>
+
+        {% elif request.user.role == 'admin' %}
+        <!-- Admin-specific links -->
+          <li>
+            <a href="{% url 'admin_dashboard' %}" 
+              class="{% if request.path == '/users/admin/dashboard/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path d="M16.555 5.412a8.028 8.028 0 0 0-3.503-2.81 14.899 14.899 0 0 1 1.663 4.472 8.547 8.547 0 0 0 1.84-1.662ZM13.326 7.825a13.43 13.43 0 0 0-2.413-5.773 8.087 8.087 0 0 0-1.826 0 13.43 13.43 0 0 0-2.413 5.773A8.473 8.473 0 0 0 10 8.5c1.18 0 2.304-.24 3.326-.675ZM6.514 9.376A9.98 9.98 0 0 0 10 10c1.226 0 2.4-.22 3.486-.624a13.54 13.54 0 0 1-.351 3.759A13.54 13.54 0 0 1 10 13.5c-1.079 0-2.128-.127-3.134-.366a13.538 13.538 0 0 1-.352-3.758ZM5.285 7.074a14.9 14.9 0 0 1 1.663-4.471 8.028 8.028 0 0 0-3.503 2.81c.529.638 1.149 1.199 1.84 1.66ZM17.334 6.798a7.973 7.973 0 0 1 .614 4.115 13.47 13.47 0 0 1-3.178 1.72 15.093 15.093 0 0 0 .174-3.939 10.043 10.043 0 0 0 2.39-1.896ZM2.666 6.798a10.042 10.042 0 0 0 2.39 1.896 15.196 15.196 0 0 0 .174 3.94 13.472 13.472 0 0 1-3.178-1.72 7.973 7.973 0 0 1 .615-4.115ZM10 15c.898 0 1.778-.079 2.633-.23a13.473 13.473 0 0 1-1.72 3.178 8.099 8.099 0 0 1-1.826 0 13.47 13.47 0 0 1-1.72-3.178c.855.151 1.735.23 2.633.23ZM14.357 14.357a14.912 14.912 0 0 1-1.305 3.04 8.027 8.027 0 0 0 4.345-4.345c-.953.542-1.971.981-3.04 1.305ZM6.948 17.397a8.027 8.027 0 0 1-4.345-4.345c.953.542 1.971.981 3.04 1.305a14.912 14.912 0 0 0 1.305 3.04Z" />
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'admin:index' %}"
+              class="{% if request.path == '/admin/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path fill-rule="evenodd" d="M14.5 10a4.5 4.5 0 0 0 4.284-5.882c-.105-.324-.51-.391-.752-.15L15.34 6.66a.454.454 0 0 1-.493.11 3.01 3.01 0 0 1-1.618-1.616.455.455 0 0 1 .11-.494l2.694-2.692c.24-.241.174-.647-.15-.752a4.5 4.5 0 0 0-5.873 4.575c.055.873-.128 1.808-.8 2.368l-7.23 6.024a2.724 2.724 0 1 0 3.837 3.837l6.024-7.23c.56-.672 1.495-.855 2.368-.8.096.007.193.01.291.01ZM5 16a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z" clip-rule="evenodd" />
+                <path d="M14.5 11.5c.173 0 .345-.007.514-.022l3.754 3.754a2.5 2.5 0 0 1-3.536 3.536l-4.41-4.41 2.172-2.607c.052-.063.147-.138.342-.196.202-.06.469-.087.777-.067.128.008.257.012.387.012ZM6 4.586l2.33 2.33a.452.452 0 0 1-.08.09L6.8 8.214 4.586 6H3.309a.5.5 0 0 1-.447-.276l-1.7-3.402a.5.5 0 0 1 .093-.577l.49-.49a.5.5 0 0 1 .577-.094l3.402 1.7A.5.5 0 0 1 6 3.31v1.277Z" />
+              </svg>
+              <span>Admin Site</span>
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'register' %}" 
+              class="{% if request.path == '/users/register/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                    text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+                <path d="M10 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.908 0c.058.467-.172.92-.57 1.174A9.953 9.953 0 0 1 7 18a9.953 9.953 0 0 1-5.385-1.572ZM16.25 5.75a.75.75 0 0 0-1.5 0v2h-2a.75.75 0 0 0 0 1.5h2v2a.75.75 0 0 0 1.5 0v-2h2a.75.75 0 0 0 0-1.5h-2v-2Z" />
+              </svg>
+              <span>Register User</span>
+            </a>
+          </li>
         {% endif %}
-        <!-- Conditional Login/Logout Link for Mobile -->
-        {% if user.is_authenticated %}
-        <li
-            class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
-            <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="block w-full h-full text-inherit flex items-center space-x-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
-                        <path fill-rule="evenodd"
-                            d="M17 4.25A2.25 2.25 0 0 0 14.75 2h-5.5A2.25 2.25 0 0 0 7 4.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1-.75-.75v-2a.75.75 0 0 0-1.5 0v2A2.25 2.25 0 0 0 9.25 18h5.5A2.25 2.25 0 0 0 17 15.75V4.25Z"
-                            clip-rule="evenodd" />
-                        <path fill-rule="evenodd"
-                            d="M14 10a.75.75 0 0 0-.75-.75H3.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 14 10Z"
-                            clip-rule="evenodd" />
-                    </svg>
-                    <span>Logout</span>
-                </button>
-            </form>
+      {% endif %}
+
+      <!-- Logout Button -->
+      <li>
+        <form action="{% url 'logout' %}" method="post">
+          {% csrf_token %}
+          <button type="submit" class="block w-full h-full text-inherit flex items-center space-x-2 text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+              <path fill-rule="evenodd" d="M14 10a.75.75 0 0 0-.75-.75H3.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114l-1.048-.943h9.546A.75.75 0 0 0 14 10Z" clip-rule="evenodd" />
+              <path fill-rule="evenodd" d="M17 4.25A2.25 2.25 0 0 0 14.75 2h-5.5A2.25 2.25 0 0 0 7 4.25v2a.75.75 0 0 0 1.5 0v-2a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 .75.75v11.5a.75.75 0 0 1-.75.75h-5.5a.75.75 0 0 1-.75-.75v-2a.75.75 0 0 0-1.5 0v2A2.25 2.25 0 0 0 9.25 18h5.5A2.25 2.25 0 0 0 17 15.75V4.25Z" clip-rule="evenodd" />
+            </svg>
+            <span>Logout</span>
+          </button>
+        </form>
+      </li>
+      
+      {% if not request.user.is_authenticated %}
+        <li>
+          <a href="{% url 'landing_page' %}"
+              class="{% if request.path == '/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+              Home
+          </a>
         </li>
-        {% else %}
-        <li
-            class="hover:text-vibrant-orange transition-colors duration-300 border-b-2 border-transparent hover:border-vibrant-orange p-2">
-            <a href="{% url 'login' %}" class="block w-full h-full text-inherit flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
-                    <path fill-rule="evenodd"
-                        d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
-                        clip-rule="evenodd" />
-                    <path fill-rule="evenodd"
-                        d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
-                        clip-rule="evenodd" />
-                </svg>
-                <span>Login</span>
-            </a>
+        <li>
+          <a href="{% url 'about_page' %}"
+              class="{% if request.path == '/about/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange">
+              About Us
+          </a>
         </li>
-        {% endif %}
+        <li>
+          <a href="{% url 'login' %}"
+            class="{% if request.path == '/users/login/' %}border-b-2 border-accent-bright-lime{% else %}border-b-2 border-transparent{% endif %} 
+                  text-accent-bright-lime hover:text-vibrant-orange transition-colors duration-300 hover:border-vibrant-orange flex items-center space-x-2">  
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
+              <path fill-rule="evenodd"
+                  d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
+                  clip-rule="evenodd" />
+              <path fill-rule="evenodd"
+                  d="M6 10a.75.75 0 0 1 .75-.75h9.546l-1.048-.943a.75.75 0 1 1 1.004-1.114l2.5 2.25a.75.75 0 0 1 0 1.114l-2.5 2.25a.75.75 0 1 1-1.004-1.114l1.048-.943H6.75A.75.75 0 0 1 6 10Z"
+                  clip-rule="evenodd" />
+            </svg>
+            <span>Login</span>
+          </a>
+        </li>
+      {% endif %}
     </ul>
   </nav>
+
 </header>
