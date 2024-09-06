@@ -1,0 +1,31 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">List of Students</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for student in students %}
+        <div class="bg-white shadow-md rounded-lg p-4">
+            {% if student.studentprofile.profile_picture %}
+            <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}"
+                class="h-32 w-32 object-cover rounded-full mx-auto">
+            {% else %}
+            <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile"
+                class="h-32 w-32 object-cover rounded-full mx-auto">
+            {% endif %}
+            <h2 class="text-xl font-semibold mt-4 text-center">{{ student.email }}</h2>
+            
+            <p class="text-center">
+                {% if student.studentprofile.biography %}
+                    {{ student.studentprofile.biography }}
+                {% else %}
+                    Biography not provided
+                {% endif %}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,23 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block content %}
-<h1 class="text-secondary-slate-gray text-2xl">Admin Dashboard</h1>
-<p>Welcome, {{ request.user.email }}!</p>
-<!-- Add any additional admin-specific content here -->
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+    <p>Welcome, {{ request.user.email }}!</p>
+
+    <!-- Link to list all students -->
+    <div class="mb-4">
+        <a href="{% url 'teacher_student_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
+            List All Students
+        </a>
+    </div>
+
+    <!-- Link to list all teachers (advisors) -->
+    <div class="mb-4">
+        <a href="{% url 'advisors' %}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
+            List All Advisors
+        </a>
+    </div>
+</div>
 {% endblock %}

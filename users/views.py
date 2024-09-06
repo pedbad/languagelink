@@ -113,13 +113,24 @@ def questionnaire_view(request):
 def student_resource_view(request):
     return render(request, 'users/student_resources.html')
 
-# See All teachers / advisors
+# View for Listing All teachers / advisors
 @login_required
 def student_advisors_view(request):
     teachers = TeacherProfile.objects.all()  # Fetch all teacher profiles
     return render(request, 'users/advisors.html', {'teachers': teachers})
 
+
+# View for Listing All Students
+@login_required
+def teacher_student_list_view(request):
+    students = CustomUser.objects.filter(role='student')  # Use 'student' instead of CustomUser.Role.STUDENT
+    return render(request, 'users/student_list.html', {'students': students})
+
+
+
 # Admin dashboard
 @login_required
 def admin_dashboard_view(request):
     return render(request, 'users/admin_dashboard.html')
+
+
