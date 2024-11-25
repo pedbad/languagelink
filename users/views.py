@@ -61,14 +61,24 @@ def login_view(request):
 @login_required
 def student_profile_view(request):
     student_profile = request.user.studentprofile
-    if request.method == 'POST':
+
+    # Check if the student profile is being edited
+    is_editing = request.GET.get('edit', False)
+
+    if request.method == 'POST' and is_editing:
         form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)
         if form.is_valid():
             form.save()
-            return redirect('student_profile')
+            return redirect('student_profile')  # Redirect to prevent form resubmission
     else:
         form = StudentProfileForm(instance=student_profile)
-    return render(request, 'users/student_profile.html', {'form': form})
+
+    return render(request, 'users/student_profile.html', {
+        'form': form,
+        'student_profile': student_profile,
+        'is_editing': is_editing,
+    })
+
 
 # Teacher Profile View
 @login_required

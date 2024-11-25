@@ -1,15 +1,67 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Student Profile{% endblock %}
 
 {% block content %}
 <div class="container mx-auto mt-10">
     <h2 class="text-2xl font-bold mb-6">Student Profile</h2>
-    <p>Welcome, {{ request.user.email }}!</p>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
-    </form>
+
+    <!-- Flex Container for Profile Image and Info -->
+    <div class="flex items-start space-x-6">
+        <!-- Profile Image Placeholder or Uploaded Image -->
+        <div class="bg-white shadow-md rounded-lg p-4 w-40">
+            {% if student_profile.profile_picture %}
+                <img src="{{ student_profile.profile_picture.url }}" alt="Profile Picture" class="h-32 w-32 object-cover rounded-full mx-auto">
+            {% else %}
+                <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-32 w-32 object-cover rounded-full mx-auto">
+            {% endif %}
+        </div>
+
+        <!-- Profile Details -->
+        <div class="flex-1">
+            {% if not is_editing %}
+                <!-- Email Section -->
+                <p class="text-lg"><strong>Email:</strong> {{ request.user.email }}</p>
+                <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after email -->
+
+                <!-- Language Biography Section -->
+                <p><strong>Language Biography:</strong></p>
+                {% if student_profile.biography %}
+                    <p>{{ student_profile.biography }}</p>
+                {% else %}
+                    <p class="text-gray-500 italic">
+                        Tell Us About Yourself!<br>
+                        Use this space to introduce yourself to your advisor. Here are some ideas to get you started:
+                        <ul class="list-disc pl-6 mt-2">
+                            <li><strong>Your Language Background:</strong> What languages do you already speak? Have you studied this language before?</li>
+                            <li><strong>Your Goals:</strong> Why are you learning this language? Are you preparing for a trip, an exam, or just learning for fun?</li>
+                            <li><strong>Your Interests:</strong> What topics do you enjoy talking about? (e.g., travel, food, music, culture).</li>
+                            <li><strong>Your Challenges:</strong> Are there specific areas you find difficult, like pronunciation, grammar, or vocabulary?</li>
+                            <li><strong>Your Learning Style:</strong> Do you prefer structured lessons, casual conversations, or something else?</li>
+                        </ul>
+                    </p>
+                {% endif %}
+                <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after language biography -->
+
+                <!-- Languages of Interest Section -->
+                <p class="text-lg"><strong>Languages of Interest:</strong> {{ student_profile.languages_of_interest|default:"Not provided yet" }}</p>
+                <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
+
+                <!-- Edit Profile Button -->
+                <a href="?edit=true" class="btn btn-secondary mt-4">Edit Profile</a>
+            {% else %}
+                <!-- Display the form for editing -->
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary">Save Profile</button>
+                        <a href="{% url 'student_profile' %}" class="btn btn-secondary ml-2">Cancel</a>
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}
