@@ -21,6 +21,9 @@
         <!-- Profile Details -->
         <div class="flex-1">
             {% if not is_editing %}
+                <!--Name Section -->
+                <p><strong>Name:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
+
                 <!-- Email Section -->
                 <p class="text-lg"><strong>Email:</strong> {{ request.user.email }}</p>
                 <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after email -->

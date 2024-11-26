@@ -10,7 +10,7 @@ class CustomUserCreationForm(UserCreationForm):
     
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = ('email', 'role',)  # Only allow selection of email and role (no admin role)
+        fields = ('email', 'first_name', 'last_name', 'role')  # Only allow selection of email and role (no admin role)
     
     def save(self, commit=True):
         user = super().save(commit=False)
