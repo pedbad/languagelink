@@ -37,9 +37,44 @@ LanguageCompetencyFormSet = modelformset_factory(LanguageCompetency, form=Langua
 
 # Profile Update Form for Students
 class StudentProfileForm(forms.ModelForm):
+    # Adding fields from the CustomUser model
+    first_name = forms.CharField(max_length=30, required=True, label="First Name")
+    last_name = forms.CharField(max_length=30, required=True, label="Last Name")
+    email = forms.EmailField(required=True, label="Email")
+    biography = forms.CharField(  # Update the biography field
+        widget=forms.Textarea(attrs={'placeholder': 'Tell Us About Yourself!'}),
+        required=False,  # Explicitly set as optional
+        label="Language Biography",
+    )
+    languages_of_interest = forms.CharField(  # Add as a text area
+        widget=forms.Textarea(attrs={'placeholder': 'What languages are you interested in learning?'}),
+        required=False,  # Explicitly optional
+        label="Languages of Interest",
+    )
+
     class Meta:
         model = StudentProfile
         fields = ['biography', 'languages_of_interest', 'profile_picture']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+
+    def save(self, commit=True):
+        student_profile = super().save(commit=False)
+        if commit:
+            student_profile.save()
+            user = student_profile.user
+            user.first_name = self.cleaned_data['first_name']
+            user.last_name = self.cleaned_data['last_name']
+            user.email = self.cleaned_data['email']
+            user.save()
+        return student_profile
+
 
 # Profile Update Form for Teachers
 class TeacherProfileForm(forms.ModelForm):

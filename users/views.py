@@ -59,6 +59,8 @@ def login_view(request):
 
 # Student Profile View
 @login_required
+# Student Profile View
+@login_required
 def student_profile_view(request):
     student_profile = request.user.studentprofile
 
@@ -66,12 +68,12 @@ def student_profile_view(request):
     is_editing = request.GET.get('edit', False)
 
     if request.method == 'POST' and is_editing:
-        form = StudentProfileForm(request.POST, request.FILES, instance=student_profile)
+        form = StudentProfileForm(request.POST, request.FILES, instance=student_profile, user=request.user)
         if form.is_valid():
-            form.save()
+            form.save()  # Save both StudentProfile and CustomUser fields
             return redirect('student_profile')  # Redirect to prevent form resubmission
     else:
-        form = StudentProfileForm(instance=student_profile)
+        form = StudentProfileForm(instance=student_profile, user=request.user)
 
     return render(request, 'users/student_profile.html', {
         'form': form,

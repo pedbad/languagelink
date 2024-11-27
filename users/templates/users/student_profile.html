@@ -5,76 +5,152 @@
 
 {% block content %}
 <div class="container mx-auto mt-10">
-    <h2 class="text-2xl font-bold mb-6">Student Profile</h2>
-
-    <!-- Flex Container for Profile Image and Info -->
-    <div class="flex items-start space-x-6">
-        <!-- Profile Image Placeholder or Uploaded Image -->
-        <div class="bg-white shadow-md rounded-lg p-4 w-40">
-            {% if student_profile.profile_picture %}
-                <img src="{{ student_profile.profile_picture.url }}" alt="Profile Picture" class="h-32 w-32 object-cover rounded-full mx-auto">
-            {% else %}
-                <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-32 w-32 object-cover rounded-full mx-auto">
-            {% endif %}
-        </div>
-
-        <!-- Profile Details -->
-        <div class="flex-1">
-            {% if not is_editing %}
-                <!--Name Section -->
-                <p><strong>Name:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
-
-                <!-- Email Section -->
-                <p class="text-lg"><strong>Email:</strong> {{ request.user.email }}</p>
-                <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after email -->
-
-                <!-- Language Biography Section -->
-                <p><strong>Language Biography:</strong></p>
-                {% if student_profile.biography %}
-                    <p>{{ student_profile.biography }}</p>
-                {% else %}
-                    <p class="text-gray-500 italic">
-                        Tell Us About Yourself!<br>
-                        Use this space to introduce yourself to your advisor. Here are some ideas to get you started:
-                        <ul class="list-disc pl-6 mt-2">
-                            <li><strong>Your Language Background:</strong> What languages do you already speak? Have you studied this language before?</li>
-                            <li><strong>Your Goals:</strong> Why are you learning this language? Are you preparing for a trip, an exam, or just learning for fun?</li>
-                            <li><strong>Your Interests:</strong> What topics do you enjoy talking about? (e.g., travel, food, music, culture).</li>
-                            <li><strong>Your Challenges:</strong> Are there specific areas you find difficult, like pronunciation, grammar, or vocabulary?</li>
-                            <li><strong>Your Learning Style:</strong> Do you prefer structured lessons, casual conversations, or something else?</li>
-                        </ul>
-                    </p>
-                {% endif %}
-                <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after language biography -->
-
-                <!-- Languages of Interest Section -->
-                <p class="text-lg"><strong>Languages of Interest:</strong> {{ student_profile.languages_of_interest|default:"Not provided yet" }}</p>
-                <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
-
-                <!-- Edit Profile Button -->
-                <a href="?edit=true" 
-                    class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4 w-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                    </svg>
-                    <span>Edit Profile</span>
-                </a>
-
-                <hr class="my-4 mb-32 border-1 border-primary-dark-teal"> <!-- Divider after edit profile button -->
-             
-
-            {% else %}
-                <!-- Display the form for editing -->
-                <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="mt-4">
-                        <button type="submit" class="btn btn-primary">Save Profile</button>
-                        <a href="{% url 'student_profile' %}" class="btn btn-secondary ml-2">Cancel</a>
-                    </div>
-                </form>
-            {% endif %}
-        </div>
+  <h2 class="text-2xl font-bold mb-6">Student Profile</h2>
+  <!-- Flex Container for Profile Image and Info -->
+  <div class="flex items-start space-x-6">
+    <!-- Profile Image Placeholder or Uploaded Image -->
+    <div class="bg-white shadow-md rounded-lg p-4 w-40">
+      {% if student_profile.profile_picture %}
+        <img src="{{ student_profile.profile_picture.url }}" alt="Profile Picture" class="h-32 w-32 object-cover rounded-full mx-auto">
+      {% else %}
+        <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-32 w-32 object-cover rounded-full mx-auto">
+      {% endif %}
     </div>
-</div>
+
+    <!-- Profile Details -->
+    <div class="flex-1">
+      {% if not is_editing %}
+        <!-- Name Section -->
+        <p class="text-lg"><strong>Name:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
+
+        <!-- Email Section -->
+        <p class="text-lg"><strong>Email:</strong> {{ request.user.email }}</p>
+        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after email -->
+
+        <!-- Language Biography Section -->
+        <p class="text-lg"><strong>Language Biography:</strong></p>
+        {% if student_profile.biography %}
+          <p class="text-gray-800">{{ student_profile.biography }}</p> <!-- Standard biography text -->
+        {% else %}
+          <p class="text-gray-500 italic">
+            Not provided yet. Tell Us About Yourself! You can edit your profile to add this information.<br>
+            Use this space to introduce yourself to your advisor. Here are some ideas to get you started:
+            <ul class="list-disc pl-6 mt-2">
+              <li><strong>Your Language Background:</strong> What languages do you already speak? Have you studied this language before?</li>
+              <li><strong>Your Goals:</strong> Why are you learning this language? Are you preparing for a trip, an exam, or just learning for fun?</li>
+              <li><strong>Your Interests:</strong> What topics do you enjoy talking about? (e.g., travel, food, music, culture).</li>
+              <li><strong>Your Challenges:</strong> Are there specific areas you find difficult, like pronunciation, grammar, or vocabulary?</li>
+              <li><strong>Your Learning Style:</strong> Do you prefer structured lessons, casual conversations, or something else?</li>
+            </ul>
+          </p>
+        {% endif %}
+        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after language biography -->
+
+        <!-- Languages of Interest Section -->
+        <p class="text-lg"><strong>Languages of Interest:</strong></p>
+        {% if student_profile.languages_of_interest %}
+          <p class="text-gray-800">{{ student_profile.languages_of_interest }}</p> <!-- Standard text -->
+        {% else %}
+          <p class="text-gray-500 italic">
+            Not provided yet. Tell us what languages you're interested in learning! You can edit your profile to add this information.
+          </p>
+        {% endif %}
+        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
+
+                
+
+
+        <!-- Edit Profile Button -->
+        <a href="?edit=true" 
+          class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4 w-full">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+          </svg>
+          <span>Edit Profile</span>
+        </a>
+        <hr class="my-4 mb-32 border-1 border-primary-dark-teal"> <!-- Divider after edit profile button -->
+
+      {% else %}
+        <!-- Display the form for editing -->
+        <form method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          
+          <!-- First Name Field -->
+          <div class="relative mb-6" data-twe-input-wrapper-init>
+            <input type="text" name="first_name" id="id_first_name" value="{{ form.first_name.value|default:'' }}"
+              class="peer block min-h-[auto] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              placeholder="First Name" required />
+            <label for="id_first_name"
+              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+              First Name
+            </label>
+          </div>
+
+          <!-- Last Name Field -->
+          <div class="relative mb-6" data-twe-input-wrapper-init>
+            <input type="text" name="last_name" id="id_last_name"
+              value="{{ form.last_name.value|default:'' }}"
+              class="peer block min-h-[auto] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              placeholder="Last Name" required />
+            <label for="id_last_name"
+              class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+              Last Name
+            </label>
+          </div>
+          
+          <!-- Email Field -->
+          <div class="relative mb-6" data-twe-input-wrapper-init>
+            <input type="email" name="email" id="id_email"
+              value="{{ form.email.value|default:'' }}"
+              class="peer block min-h-[auto] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              placeholder="Email Address" required />
+            <label for="id_email"
+              class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+              Email Address
+            </label>
+          </div>
+ 
+
+
+          <!-- Biography Field -->
+          <div class="relative mb-6" data-twe-input-wrapper-init>
+            <textarea name="biography" id="id_biography"
+              class="peer block min-h-[6rem] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              placeholder="Tell Us About Yourself!">{{ form.biography.value|default:'' }}</textarea>
+            <label for="id_biography"
+              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+              Language Biography
+            </label>
+          </div>
+          
+          <!-- Languages of Interest Field -->
+          <div class="relative mb-6" data-twe-input-wrapper-init>
+            <textarea name="languages_of_interest" id="id_languages_of_interest"
+              class="peer block min-h-[6rem] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              placeholder="What languages are you interested in learning?">{{ form.languages_of_interest.value|default:'' }}</textarea>
+            <label for="id_languages_of_interest"
+              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+              Languages of Interest
+            </label>
+          </div>
+          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
+          
+
+          <!-- Profile Picture Field -->
+          <div class="mb-4">
+            <label for="id_profile_picture" class="block text-gray-700">Profile Picture</label>
+            {{ form.profile_picture }}
+          </div>
+
+          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
+          
+          <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+            <a href="{% url 'student_profile' %}" class="btn btn-secondary ml-2">Cancel</a>
+          </div>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</div> <!-- eof container -->
 {% endblock %}
