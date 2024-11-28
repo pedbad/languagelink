@@ -72,7 +72,7 @@
 
       {% else %}
         <!-- Display the form for editing -->
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" class="mb-10">
           {% csrf_token %}
           
           <!-- First Name Field -->
@@ -109,45 +109,87 @@
               Email Address
             </label>
           </div>
- 
 
-
-          <!-- Biography Field -->
-          <div class="relative mb-6" data-twe-input-wrapper-init>
+          <!-- Language Biography Field -->
+          <div class="mb-6">
+            <label for="id_biography" class="block text-sm font-medium text-gray-700 mb-1">Language Biography</label>
             <textarea name="biography" id="id_biography"
-              class="peer block min-h-[6rem] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              class="block w-full h-32 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Tell Us About Yourself!">{{ form.biography.value|default:'' }}</textarea>
-            <label for="id_biography"
-              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
-              Language Biography
-            </label>
           </div>
-          
+
           <!-- Languages of Interest Field -->
-          <div class="relative mb-6" data-twe-input-wrapper-init>
+          <div class="mb-6">
+            <label for="id_languages_of_interest" class="block text-sm font-medium text-gray-700 mb-1">Languages of Interest</label>
             <textarea name="languages_of_interest" id="id_languages_of_interest"
-              class="peer block min-h-[6rem] w-full w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+              class="block w-full h-32 rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="What languages are you interested in learning?">{{ form.languages_of_interest.value|default:'' }}</textarea>
-            <label for="id_languages_of_interest"
-              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
-              Languages of Interest
-            </label>
           </div>
+
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
-          
 
           <!-- Profile Picture Field -->
-          <div class="mb-4">
-            <label for="id_profile_picture" class="block text-gray-700">Profile Picture</label>
-            {{ form.profile_picture }}
-          </div>
+          <div class="mb-6">
+            <label for="id_profile_picture" class="block text-lg font-medium text-gray-700 mb-2">Profile Picture</label>
 
+            <!-- Profile Picture Preview -->
+            <div class="flex items-center space-x-4">
+              <!-- Profile Picture Thumbnail -->
+              <div class="w-16 h-16 rounded-full overflow-hidden border border-gray-300">
+                <img id="profile-picture-preview" 
+                  src="{% if student_profile.profile_picture %}{{ student_profile.profile_picture.url }}{% else %}{% static 'core/img/default-profile.png' %}{% endif %}" 
+                  data-default-src="{% static 'core/img/default-profile.png' %}" 
+                  alt="Current Profile Picture" 
+                  class="object-cover w-full h-full">
+              </div>
+
+              <!-- Styled File Upload Button -->
+              <div class="flex-1 relative">
+                <!-- File Input -->
+                <input type="file" id="id_profile_picture" name="profile_picture" 
+                      class="hidden" 
+                      onchange="updateFileName(); updateProfilePicturePreview();">
+
+                <!-- Custom Button -->
+                <label for="id_profile_picture"
+                  class="inline-flex items-center bg-deep-teal text-white px-3 py-1 rounded-lg cursor-pointer hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 transition-all duration-200 ease-in-out">
+                  <!-- Upload Icon -->
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V20.25A2.25 2.25 0 005.25 22.5H18.75A2.25 2.25 0 0021 20.25V16.5M7.5 10.5L12 6M12 6L16.5 10.5M12 6V18" />
+                  </svg>
+                  Choose File
+                </label>
+
+                <!-- Display File Name -->
+                <p id="file-name" class="text-sm text-gray-500 mt-1">
+                  {% if student_profile.profile_picture %}
+                    {{ student_profile.profile_picture.name }}
+                  {% else %}
+                    No file chosen
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            <!-- Clear Current Picture -->
+            {% if student_profile.profile_picture %}
+            <div class="mt-4 flex items-center space-x-2">
+              <input type="checkbox" id="clear_id_profile_picture" name="profile_picture-clear" class="form-checkbox h-5 w-5 text-deep-teal border-gray-300 rounded focus:ring-deep-teal">
+              <label for="clear_id_profile_picture" class="text-sm text-gray-700">Clear Current Picture</label>
+            </div>
+            {% endif %}
+          </div>
+          
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
           
           <div class="mt-4">
             <button type="submit" class="btn btn-primary">Save Profile</button>
             <a href="{% url 'student_profile' %}" class="btn btn-secondary ml-2">Cancel</a>
           </div>
+
+
+
+          
         </form>
       {% endif %}
     </div>

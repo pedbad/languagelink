@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, LanguageCompetency, StudentProfile, TeacherProfile, Questionnaire
 from django.forms import modelformset_factory
+from django.forms.widgets import ClearableFileInput
+
 
 # User Registration Form
 class CustomUserCreationForm(UserCreationForm):
@@ -56,13 +58,17 @@ class StudentProfileForm(forms.ModelForm):
         model = StudentProfile
         fields = ['biography', 'languages_of_interest', 'profile_picture']
 
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
+        self.fields['profile_picture'].widget = ClearableFileInput(attrs={'class': 'file-input'})
         if user:
             self.fields['first_name'].initial = user.first_name
             self.fields['last_name'].initial = user.last_name
             self.fields['email'].initial = user.email
+        print(type(self.fields['profile_picture'].widget))
+
 
     def save(self, commit=True):
         student_profile = super().save(commit=False)
