@@ -34,6 +34,16 @@
 /* Import Tailwind Elements */
 @import 'tw-elements';
 
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1; /* Ensures main content stretches and allows spacing */
+}
+
 /* Any additional custom CSS styles */
 footer {
   flex-shrink: 0;
