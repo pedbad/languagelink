@@ -3,21 +3,61 @@
 
 {% block content %}
 <div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
-    <p>Welcome, {{ request.user.email }}!</p>
+  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center">Admin Dashboard</h1>
 
-    <!-- Link to list all students -->
-    <div class="mb-4">
-        <a href="{% url 'teacher_student_list' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">
-            List All Students
-        </a>
-    </div>
+  <!-- Welcome Message -->
+  <p class="text-lg text-gray-700 mt-4 text-center">
+      Welcome, {{ request.user.first_name }} {{ request.user.last_name }}
+  </p>
 
-    <!-- Link to list all teachers (advisors) -->
-    <div class="mb-4">
-        <a href="{% url 'advisors' %}" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">
-            List All Advisors
-        </a>
-    </div>
+  <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Welcome Message -->
+
+  <!-- Cards Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+    <!-- Students Card -->
+    <a href="{% url 'teacher_student_list' %}" class="block bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 group">
+      <div class="flex flex-col items-center text-center">
+        <!-- Icon with Circular Background -->
+        <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary-dark-teal transition-all duration-200 transform group-hover:scale-110 group-hover:bg-bright-teal">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-10 h-10 transition-colors duration-200 group-hover:stroke-primary-dark-teal">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+        </div>
+        <!-- Title with List Icon -->
+        <h2 class="text-xl font-semibold mt-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2 text-primary-dark-teal">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+          List All Students
+        </h2>
+        <p class="text-sm text-gray-600 mt-2">View and manage all registered students.</p>
+      </div>
+    </a>
+    <!-- end of Students Card -->
+
+    <!-- Advisors Card -->
+    <a href="{% url 'advisors' %}" class="block bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 group">
+      <div class="flex flex-col items-center text-center">
+        <!-- Icon with Circular Background -->
+        <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary-dark-teal transition-all duration-200 transform group-hover:scale-110 group-hover:bg-bright-teal">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-10 h-10 transition-colors duration-200 group-hover:stroke-primary-dark-teal">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+          </svg>
+        </div>
+        <!-- Title with List Icon -->
+        <h2 class="text-xl font-semibold mt-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2 text-primary-dark-teal">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+          </svg>
+          List All Advisors
+        </h2>
+        <p class="text-sm text-gray-600 mt-2">View and manage all registered advisors.</p>
+      </div>
+    </a>
+    <!-- end of Advisors Card -->
+  </div>
+  <!-- end of Cards Section -->
+
+  <hr class="mt-6 mb-12 border-1 border-primary-dark-teal"> <!-- Divider after Cards -->
 </div>
 {% endblock %}
