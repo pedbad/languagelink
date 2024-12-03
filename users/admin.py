@@ -22,6 +22,23 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
+    # Override get_fieldsets to exclude the "usable_password" field
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if 'usable_password' in fieldsets:
+            fieldsets = [
+                (name, {'fields': [f for f in options['fields'] if f != 'usable_password']})
+                for name, options in fieldsets
+            ]
+        return fieldsets
+
+    # Override get_form to exclude "usable_password" in forms
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'usable_password' in form.base_fields:
+            form.base_fields.pop('usable_password')
+        return form
+
 
 # Registering the models with the admin site
 admin.site.register(CustomUser, CustomUserAdmin)

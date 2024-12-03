@@ -12,7 +12,13 @@ class CustomUserCreationForm(UserCreationForm):
     
     class Meta(UserCreationForm.Meta):
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'role')  # Only allow selection of email and role (no admin role)
+        fields = ('email', 'first_name', 'last_name', 'role', 'password1', 'password2')  # Only allow these fields
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove 'usable_password' if it exists
+        self.fields.pop('usable_password', None)
+
     
     def save(self, commit=True):
         user = super().save(commit=False)

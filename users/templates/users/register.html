@@ -3,12 +3,109 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<div class="container mx-auto mt-10">
-    <h2 class="text-2xl font-bold mb-6">Register</h2>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary mt-4">Register</button>
+<div class="py-16 sm:py-20 mb-20">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center">Register</h1>
+    <p class="mt-4 text-sm text-gray-600 text-center">Use this form to register new Students or Advisors.</p>
+
+    <form method="post" class="mt-10 space-y-8">
+      {% csrf_token %}
+      
+      <!-- Email -->
+      <div class="relative mb-6">
+        <input type="email" name="email" id="email"
+          class="peer block min-h-[auto] w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+          placeholder="Email Address" required />
+        <label for="email" 
+          class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+          Email Address
+        </label>
+      </div>
+
+      <!-- First Name -->
+      <div class="relative mb-6">
+        <input type="text" name="first_name" id="first_name"
+          class="peer block min-h-[auto] w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+          placeholder="First Name" required />
+        <label for="first_name" 
+          class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+          First Name
+        </label>
+      </div>
+
+      <!-- Last Name -->
+      <div class="relative mb-6">
+        <input type="text" name="last_name" id="last_name"
+          class="peer block min-h-[auto] w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+          placeholder="Last Name" required />
+        <label for="last_name" 
+          class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+          Last Name
+        </label>
+      </div>
+      
+      <!-- Role Field -->
+      <div class="mb-6">
+        <label for="role" class="block text-sm font-medium text-gray-900 mb-2">Role</label>
+        <div class="isolate inline-flex rounded-md shadow-sm">
+          <!-- Student Button -->
+          <button type="button" id="student-btn" 
+            class="relative inline-flex items-center rounded-l-md px-3 py-2 text-sm font-semibold bg-deep-teal text-white ring-1 ring-inset ring-deep-teal hover:bg-teal-600 focus:z-10">
+            <!-- Student Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+            Student
+          </button>
+          <!-- Teacher Button -->
+          <button type="button" id="teacher-btn" 
+            class="relative inline-flex items-center -ml-px rounded-r-md px-3 py-2 text-sm font-semibold bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-teal-600 hover:text-white focus:z-10">
+            <!-- Teacher Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+            </svg>
+            Teacher
+          </button>
+        </div>
+        <!-- Hidden Input to Store the Role -->
+        <input type="hidden" id="role" name="role" value="student">
+      </div>
+
+
+      <!-- Password -->
+      <div class="relative mb-6">
+        <input type="password" name="password1" id="password1"
+          class="peer block min-h-[auto] w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+          placeholder="Password" required />
+        <label for="password1" 
+          class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+          Password
+        </label>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="relative mb-6">
+        <input type="password" name="password2" id="password2"
+          class="peer block min-h-[auto] w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
+          placeholder="Confirm Password" required />
+        <label for="password2" 
+          class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+          Confirm Password
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="pt-6 mb-40">
+        <button type="submit"
+          class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-white bg-deep-teal hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:text-sm">
+          <!-- Save Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4 4L19 7M5 12.5H4v5.25A2.25 2.25 0 006.25 20.5h11.5A2.25 2.25 0 0020 18.25V13h-1" />
+          </svg>
+          Register
+        </button>
+      </div>
     </form>
+  </div>
 </div>
 {% endblock %}

@@ -41,5 +41,34 @@
                 }
             });
         }
+
+        // Role selection toggle
+        const studentBtn = document.getElementById('student-btn');
+        const teacherBtn = document.getElementById('teacher-btn');
+        const roleInput = document.getElementById('role');
+
+        if (studentBtn && teacherBtn && roleInput) {
+            // Function to handle button click and update styles
+            function selectRole(role) {
+                if (role === 'student') {
+                    // Update button styles
+                    studentBtn.classList.add('bg-deep-teal', 'text-white', 'ring-deep-teal');
+                    studentBtn.classList.remove('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
+                    teacherBtn.classList.add('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
+                    teacherBtn.classList.remove('bg-deep-teal', 'text-white', 'ring-deep-teal');
+                } else if (role === 'teacher') {
+                    teacherBtn.classList.add('bg-deep-teal', 'text-white', 'ring-deep-teal');
+                    teacherBtn.classList.remove('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
+                    studentBtn.classList.add('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
+                    studentBtn.classList.remove('bg-deep-teal', 'text-white', 'ring-deep-teal');
+                }
+                // Update the hidden input value
+                roleInput.value = role;
+            }
+
+            // Attach click event listeners
+            studentBtn.addEventListener('click', () => selectRole('student'));
+            teacherBtn.addEventListener('click', () => selectRole('teacher'));
+        }
     });
 })();
