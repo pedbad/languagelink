@@ -2,30 +2,93 @@
 {% load static %}
 
 {% block content %}
-<div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold mb-6">List of Students</h1>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for student in students %}
-        <div class="bg-white shadow-md rounded-lg p-4">
-            {% if student.studentprofile.profile_picture %}
-            <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}"
-                class="h-32 w-32 object-cover rounded-full mx-auto">
-            {% else %}
-            <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile"
-                class="h-32 w-32 object-cover rounded-full mx-auto">
-            {% endif %}
-            <h2 class="text-xl font-semibold mt-4 text-center">{{ student.email }}</h2>
-            
-            <p class="text-center">
-                {% if student.studentprofile.biography %}
-                    {{ student.studentprofile.biography }}
-                {% else %}
-                    Biography not provided
-                {% endif %}
-            </p>
-        </div>
-        {% endfor %}
+<div class="px-4 sm:px-6 lg:px-8 pb-16">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl">List of Students</h1>
+      <p class="mt-2 text-sm text-gray-700">
+        A list of all registered students, including their avatar, first name, last name, and email.
+      </p>
     </div>
+    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+      <a href="#" 
+        class="block rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600">
+          Add New Student
+      </a>
+    </div>
+  </div>
+
+  <div class="-mx-4 mt-8 sm:-mx-6 lg:-mx-8">
+    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-neutral-gray-brown text-white">
+          <tr>
+            <th scope="col" class="py-4 px-4 text-center text-base font-semibold sm:pl-0">
+              <span class="sr-only">Avatar</span>
+            </th>
+            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">First Name</th>
+            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">Last Name</th>
+            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">Email</th>
+            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">Questionnaire</th>
+            <th scope="col" class="py-4 px-4 text-center text-base font-semibold">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        
+        <tbody class="divide-y divide-gray-200 bg-white">
+          {% for student in students %}
+          <tr class="hover:bg-gray-50">
+            <!-- Avatar Column -->
+            <td class="py-5 px-4 text-center">
+              <div class="h-10 w-10 rounded-full bg-gray-100 overflow-hidden mx-auto">
+                {% if student.studentprofile.profile_picture %}
+                <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}" class="h-full w-full object-cover">
+                {% else %}
+                <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-full w-full object-cover">
+                {% endif %}
+              </div>
+            </td>
+        
+            <!-- First Name -->
+            <td class="py-5 px-4 text-left font-medium text-gray-900">
+              {{ student.first_name }}
+            </td>
+        
+            <!-- Last Name -->
+            <td class="py-5 px-4 text-left font-medium text-gray-900">
+              {{ student.last_name }}
+            </td>
+        
+            <!-- Email -->
+            <td class="py-5 px-4 text-left text-gray-500">
+              {{ student.email }}
+            </td>
+        
+            <!-- Questionnaire Status -->
+            <td class="py-5 px-4 text-left">
+              {% if student.questionnaire_completed %}
+              <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                Completed
+              </span>
+              {% else %}
+              <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
+                Not Completed
+              </span>
+              {% endif %}
+            </td>
+        
+            <!-- Actions Column -->
+            <td class="py-5 px-4 text-center">
+              <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        
+        
+      </table>
+    </div>
+  </div>
 </div>
 {% endblock %}
