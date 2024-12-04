@@ -111,64 +111,102 @@
           </tr>
         </thead>
         
-        
-        
-        
-        
-        
         <tbody class="divide-y divide-gray-200 bg-white">
-          {% for student in students %}
+          {% for student in page_obj %}
           <tr class="hover:bg-gray-50">
             <!-- Avatar Column -->
-            <td class="py-5 px-4 text-center">
-              <div class="h-10 w-10 rounded-full bg-gray-100 overflow-hidden mx-auto">
+            <td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-gray-900 text-center">
+              <div class="flex items-center justify-center">
                 {% if student.studentprofile.profile_picture %}
-                <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}" class="h-full w-full object-cover">
+                <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}" class="h-10 w-10 rounded-full">
                 {% else %}
-                <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-full w-full object-cover">
+                  <!-- Display Placeholder Image -->
+                  <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full">
                 {% endif %}
               </div>
             </td>
         
             <!-- First Name -->
-            <td class="py-5 px-4 text-left font-medium text-gray-900">
-              {{ student.first_name }}
-            </td>
+            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{{ student.first_name }}</td>
         
             <!-- Last Name -->
-            <td class="py-5 px-4 text-left font-medium text-gray-900">
-              {{ student.last_name }}
-            </td>
+            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">{{ student.last_name }}</td>
         
             <!-- Email -->
-            <td class="py-5 px-4 text-left text-gray-500">
-              {{ student.email }}
-            </td>
+            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ student.email }}</td>
         
             <!-- Questionnaire Status -->
-            <td class="py-5 px-4 text-left">
+            <td class="whitespace-nowrap px-3 py-4 text-sm">
               {% if student.questionnaire_completed %}
-              <span class="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                Completed
-              </span>
+              <span class="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800">Completed</span>
               {% else %}
-              <span class="inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10">
-                Not Completed
-              </span>
+              <span class="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Not Completed</span>
               {% endif %}
             </td>
         
-            <!-- Actions Column -->
-            <td class="py-5 px-4 text-center">
-              <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+            <!-- Actions -->
+            <td class="relative whitespace-nowrap py-4 px-4 text-right text-sm font-medium">
+              <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, {{ student.first_name }}</span></a>
             </td>
           </tr>
           {% endfor %}
         </tbody>
-        
-        
       </table>
     </div>
   </div>
+
+  <div class="flex items-center justify-between mt-4">
+    <!-- Pagination Button Group -->
+    <div class="flex items-center space-x-1">
+      <!-- Previous Button -->
+      {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}&sort={{ current_sort }}&order={{ current_order }}"
+         class="px-3 py-2 border border-gray-300 rounded-l-md bg-white text-gray-500 hover:bg-gray-100">
+        ← Previous
+      </a>
+      {% else %}
+      <span class="px-3 py-2 border border-gray-300 rounded-l-md bg-gray-200 text-gray-400">← Previous</span>
+      {% endif %}
+  
+      <!-- Page Numbers -->
+      {% for page in page_obj.paginator.page_range %}
+      {% if page == page_obj.number %}
+      <span class="px-3 py-2 border border-gray-300 bg-indigo-100 text-indigo-600">{{ page }}</span>
+      {% else %}
+      <a href="?page={{ page }}&items_per_page={{ items_per_page }}&sort={{ current_sort }}&order={{ current_order }}"
+         class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-100">
+        {{ page }}
+      </a>
+      {% endif %}
+      {% endfor %}
+  
+      <!-- Next Button -->
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}&sort={{ current_sort }}&order={{ current_order }}"
+         class="px-3 py-2 border border-gray-300 rounded-r-md bg-white text-gray-500 hover:bg-gray-100">
+        Next →
+      </a>
+      {% else %}
+      <span class="px-3 py-2 border border-gray-300 rounded-r-md bg-gray-200 text-gray-400">Next →</span>
+      {% endif %}
+    </div>
+    
+    <!-- Items Per Page Dropdown -->
+    <div class="flex items-center space-x-2 pb-16">
+      <label for="items_per_page" class="text-sm font-medium text-gray-700">Show</label>
+      <select id="items_per_page" name="items_per_page"
+              class="rounded-md border-gray-300 text-sm px-4 py-2 h-10 focus:ring-primary-dark-teal focus:border-primary-dark-teal"
+              onchange="this.form.submit()">
+        <option value="25" {% if items_per_page == 25 %}selected{% endif %}>25</option>
+        <option value="50" {% if items_per_page == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if items_per_page == 100 %}selected{% endif %}>100</option>
+        <option value="250" {% if items_per_page == 250 %}selected{% endif %}>250</option>
+        <option value="500" {% if items_per_page == 500 %}selected{% endif %}>500</option>
+      </select>
+      <span class="text-sm font-medium text-gray-700">Users</span>
+    </div>
+
+  </div>
+
 </div>
 {% endblock %}

@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate, login
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.shortcuts import render, redirect
+
 from django.db.models import BooleanField, Value as V, Case, When, F
 
 from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
@@ -161,41 +163,36 @@ def student_advisors_view(request):
 @login_required
 def teacher_student_list_view(request):
   """
-  Displays a list of all students, including their questionnaire completion status,
-  with support for sorting by columns (First Name, Last Name, Email, etc.).
+  Displays a list of all students, with pagination and sorting.
   """
+  # Default sorting
+  sort = request.GET.get('sort', 'first_name')
+  order = request.GET.get('order', 'asc')
+  items_per_page = int(request.GET.get('items_per_page', 25))  # Default items per page to 25
 
-  # Get sorting parameters from the query string
-  sort_by = request.GET.get('sort', 'first_name')  # Default sorting column is 'first_name'
-  order = request.GET.get('order', 'asc')  # Default order is ascending
+  # Sorting logic
+  if order == 'desc':
+    sort = f"-{sort}"
 
-  # Determine sorting direction
-  order_prefix = '-' if order == 'desc' else ''  # Use '-' prefix for descending order
-
-  # Fetch students with sorting and questionnaire status
+  # Fetch students and annotate questionnaire status
   students = CustomUser.objects.filter(role='student').select_related('studentprofile').annotate(
     questionnaire_completed=Case(
       When(studentprofile__questionnaire__completed=True, then=V(True)),
       default=V(False),
       output_field=BooleanField(),
     )
-  )
+  ).order_by(sort)
 
-  # Apply sorting based on the selected column
-  if sort_by == 'first_name':
-    students = students.order_by(order_prefix + 'first_name')
-  elif sort_by == 'last_name':
-    students = students.order_by(order_prefix + 'last_name')
-  elif sort_by == 'email':
-    students = students.order_by(order_prefix + 'email')
-  elif sort_by == 'questionnaire_completed':
-    students = students.order_by(order_prefix + 'questionnaire_completed')
+  # Paginate
+  paginator = Paginator(students, items_per_page)
+  page_number = request.GET.get('page', 1)
+  page_obj = paginator.get_page(page_number)
 
-  # Pass current sorting parameters to the template for column links
+  # Context
   context = {
-    'students': students,
-    'current_sort': sort_by,
-    'current_order': order,
+    'page_obj': page_obj,
+    'current_sort': sort.lstrip('-'),
+    'current_order': 'desc' if sort.startswith('-') else 'asc',
+    'items_per_page': items_per_page,
   }
-
   return render(request, 'users/student_list.html', context)
