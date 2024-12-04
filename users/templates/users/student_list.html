@@ -23,18 +23,98 @@
       <table class="min-w-full divide-y divide-gray-300">
         <thead class="bg-neutral-gray-brown text-white">
           <tr>
+            <!-- Avatar Column -->
             <th scope="col" class="py-4 px-4 text-center text-base font-semibold sm:pl-0">
               <span class="sr-only">Avatar</span>
             </th>
-            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">First Name</th>
-            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">Last Name</th>
-            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">Email</th>
-            <th scope="col" class="py-4 px-4 text-left text-base font-semibold">Questionnaire</th>
+        
+            <!-- First Name Column -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=first_name&order={% if current_sort == 'first_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                First Name
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'first_name' %}
+                    {% if current_order == 'asc' %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+        
+            <!-- Last Name Column -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=last_name&order={% if current_sort == 'last_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Last Name
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'last_name' %}
+                    {% if current_order == 'asc' %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+        
+            <!-- Email Column -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=email&order={% if current_sort == 'email' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Email
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'email' %}
+                    {% if current_order == 'asc' %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+        
+            <!-- Questionnaire Column -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=questionnaire_completed&order={% if current_sort == 'questionnaire_completed' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Questionnaire
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'questionnaire_completed' %}
+                    {% if current_order == 'asc' %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+        
+            <!-- Actions Column -->
             <th scope="col" class="py-4 px-4 text-center text-base font-semibold">
               <span class="sr-only">Actions</span>
             </th>
           </tr>
         </thead>
+        
+        
+        
+        
+        
         
         <tbody class="divide-y divide-gray-200 bg-white">
           {% for student in students %}

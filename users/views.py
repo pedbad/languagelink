@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import BooleanField, Value as V, Case, When
+from django.db.models import BooleanField, Value as V, Case, When, F
 
 from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
 from .forms import CustomUserCreationForm, TeacherProfileForm, StudentProfileForm, QuestionnaireForm
@@ -161,8 +161,18 @@ def student_advisors_view(request):
 @login_required
 def teacher_student_list_view(request):
   """
-  Displays a list of all students, including their questionnaire completion status.
+  Displays a list of all students, including their questionnaire completion status,
+  with support for sorting by columns (First Name, Last Name, Email, etc.).
   """
+
+  # Get sorting parameters from the query string
+  sort_by = request.GET.get('sort', 'first_name')  # Default sorting column is 'first_name'
+  order = request.GET.get('order', 'asc')  # Default order is ascending
+
+  # Determine sorting direction
+  order_prefix = '-' if order == 'desc' else ''  # Use '-' prefix for descending order
+
+  # Fetch students with sorting and questionnaire status
   students = CustomUser.objects.filter(role='student').select_related('studentprofile').annotate(
     questionnaire_completed=Case(
       When(studentprofile__questionnaire__completed=True, then=V(True)),
@@ -171,4 +181,21 @@ def teacher_student_list_view(request):
     )
   )
 
-  return render(request, 'users/student_list.html', {'students': students})
+  # Apply sorting based on the selected column
+  if sort_by == 'first_name':
+    students = students.order_by(order_prefix + 'first_name')
+  elif sort_by == 'last_name':
+    students = students.order_by(order_prefix + 'last_name')
+  elif sort_by == 'email':
+    students = students.order_by(order_prefix + 'email')
+  elif sort_by == 'questionnaire_completed':
+    students = students.order_by(order_prefix + 'questionnaire_completed')
+
+  # Pass current sorting parameters to the template for column links
+  context = {
+    'students': students,
+    'current_sort': sort_by,
+    'current_order': order,
+  }
+
+  return render(request, 'users/student_list.html', context)
