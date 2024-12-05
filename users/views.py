@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
-from django.db.models import BooleanField, Value as V, Case, When, F
+from django.db.models import BooleanField, Value as V, Case, When, F, Q
 
 from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
 from .forms import CustomUserCreationForm, TeacherProfileForm, StudentProfileForm, QuestionnaireForm
@@ -163,36 +163,51 @@ def student_advisors_view(request):
 @login_required
 def teacher_student_list_view(request):
   """
-  Displays a list of all students, with pagination and sorting.
+  Displays a list of all students, with support for searching, sorting, and pagination.
   """
-  # Default sorting
-  sort = request.GET.get('sort', 'first_name')
-  order = request.GET.get('order', 'asc')
-  items_per_page = int(request.GET.get('items_per_page', 25))  # Default items per page to 25
+  # Get sorting parameters
+  sort = request.GET.get('sort', 'date_joined')  # Default sort is by date_joined
+  order = request.GET.get('order', 'desc')  # Default order is descending
+  search_query = request.GET.get('search', '')  # Search query from the search box
+  items_per_page = request.GET.get('items_per_page', 25)  # Default to 25 items per page
 
-  # Sorting logic
+  # Determine sorting direction
   if order == 'desc':
     sort = f"-{sort}"
 
-  # Fetch students and annotate questionnaire status
+  # Fetch students with sorting and search functionality
   students = CustomUser.objects.filter(role='student').select_related('studentprofile').annotate(
     questionnaire_completed=Case(
       When(studentprofile__questionnaire__completed=True, then=V(True)),
       default=V(False),
       output_field=BooleanField(),
     )
-  ).order_by(sort)
+  )
 
-  # Paginate
+  # Apply search filters
+  if search_query:
+    students = students.filter(
+      Q(first_name__icontains=search_query) |
+      Q(last_name__icontains=search_query) |
+      Q(email__icontains=search_query) |
+      Q(date_joined__icontains=search_query)
+    )
+
+  # Apply sorting
+  students = students.order_by(sort)
+
+  # Paginate results
   paginator = Paginator(students, items_per_page)
   page_number = request.GET.get('page', 1)
   page_obj = paginator.get_page(page_number)
 
-  # Context
+  # Pass context to template
   context = {
+    'students': page_obj,
     'page_obj': page_obj,
-    'current_sort': sort.lstrip('-'),
-    'current_order': 'desc' if sort.startswith('-') else 'asc',
-    'items_per_page': items_per_page,
+    'current_sort': request.GET.get('sort', 'date_joined'),  # Default to 'date_joined'
+    'current_order': request.GET.get('order', 'desc'),  # Default to 'desc'
+    'items_per_page': int(items_per_page),
+    'search_query': search_query,
   }
   return render(request, 'users/student_list.html', context)

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from django.utils.timezone import now
 
 '''
 The following code to create a custom user model that inherits from 
@@ -49,6 +50,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30)   # Required: no blank and null
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)  # Required for admin access
+    date_joined = models.DateTimeField(default=now)  # Date user is registered
 
     objects = CustomUserManager()
 

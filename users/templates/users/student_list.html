@@ -11,15 +11,47 @@
       </p>
     </div>
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-      <a href="#" 
-        class="block rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600">
-          Add New Student
+      <a href="{% url 'register' %}" 
+        class="block rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600 flex items-center justify-center">
+        <!-- Student Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+        </svg>
+        Add New Student
       </a>
     </div>
   </div>
 
+  <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after heading section -->
+
   <div class="-mx-4 mt-8 sm:-mx-6 lg:-mx-8">
     <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+
+      
+
+      <!-- Search Form -->
+      <form id="search-form" method="GET" action="{% url 'teacher_student_list' %}" class="relative flex-auto mb-4">
+        <!-- Search Input -->
+        <input
+          id="search-input"
+          type="search"
+          name="search"
+          aria-label="Search students"
+          placeholder="Search students by name, email, or date..."
+          class="block w-full appearance-none rounded-lg bg-white border border-gray-300 py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:ring-primary-dark-teal focus:border-primary-dark-teal"
+          value="{{ request.GET.search }}"
+        >
+        <!-- Magnifying Glass Icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          aria-hidden="true"
+          class="pointer-events-none absolute top-[45%] left-3 h-5 w-5 transform -translate-y-1/2 text-gray-500"
+        >
+          <path d="M16.72 17.78a.75.75 0 1 0 1.06-1.06l-1.06 1.06ZM9 14.5A5.5 5.5 0 0 1 3.5 9H2a7 7 0 0 0 7 7v-1.5ZM3.5 9A5.5 5.5 0 0 1 9 3.5V2a7 7 0 0 0-7 7h1.5ZM9 3.5A5.5 5.5 0 0 1 14.5 9H16a7 7 0 0 0-7-7v1.5Zm3.89 10.45 3.83 3.83 1.06-1.06-3.83-3.83-1.06 1.06ZM14.5 9a5.48 5.48 0 0 1-1.61 3.89l1.06 1.06A6.98 6.98 0 0 0 16 9h-1.5Zm-1.61 3.89A5.48 5.48 0 0 1 9 14.5V16a6.98 6.98 0 0 0 4.95-2.05l-1.06-1.06Z" />
+        </svg>
+      </form>
+      
       <table class="min-w-full divide-y divide-gray-300">
         <thead class="bg-neutral-gray-brown text-white">
           <tr>
@@ -103,7 +135,31 @@
                 </svg>
               </a>
             </th>
-        
+
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=date_joined&order={% if current_sort == 'date_joined' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Date Registered
+                {% if current_sort == 'date_joined' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                       stroke="currentColor" class="w-4 h-4 ml-1">
+                    {% if current_order == 'asc' %}
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  </svg>
+                {% else %}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                       stroke="currentColor" class="w-4 h-4 ml-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  </svg>
+                {% endif %}
+              </a>
+            </th>
+                    
             <!-- Actions Column -->
             <th scope="col" class="py-4 px-4 text-center text-base font-semibold">
               <span class="sr-only">Actions</span>
@@ -143,6 +199,11 @@
               <span class="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Not Completed</span>
               {% endif %}
             </td>
+
+            <!-- Date Registered -->
+            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+              {{ student.date_joined|date:"M d, Y" }}
+            </td>
         
             <!-- Actions -->
             <td class="relative whitespace-nowrap py-4 px-4 text-right text-sm font-medium">
@@ -160,7 +221,7 @@
     <div class="flex items-center space-x-1">
       <!-- Previous Button -->
       {% if page_obj.has_previous %}
-      <a href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}&sort={{ current_sort }}&order={{ current_order }}"
+      <a href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search|default:'' }}&sort={{ current_sort|default:'first_name' }}&order={{ current_order|default:'asc' }}&items_per_page={{ items_per_page|default:25 }}"
          class="px-3 py-2 border border-gray-300 rounded-l-md bg-white text-gray-500 hover:bg-gray-100">
         ← Previous
       </a>
@@ -170,19 +231,19 @@
   
       <!-- Page Numbers -->
       {% for page in page_obj.paginator.page_range %}
-      {% if page == page_obj.number %}
-      <span class="px-3 py-2 border border-gray-300 bg-indigo-100 text-indigo-600">{{ page }}</span>
-      {% else %}
-      <a href="?page={{ page }}&items_per_page={{ items_per_page }}&sort={{ current_sort }}&order={{ current_order }}"
-         class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-100">
-        {{ page }}
-      </a>
-      {% endif %}
+        {% if page == page_obj.number %}
+        <span class="px-3 py-2 border border-gray-300 bg-indigo-100 text-indigo-600">{{ page }}</span>
+        {% else %}
+        <a href="?page={{ page }}&search={{ request.GET.search|default:'' }}&sort={{ current_sort|default:'first_name' }}&order={{ current_order|default:'asc' }}&items_per_page={{ items_per_page|default:25 }}"
+           class="px-3 py-2 border border-gray-300 bg-white text-gray-500 hover:bg-gray-100">
+          {{ page }}
+        </a>
+        {% endif %}
       {% endfor %}
   
       <!-- Next Button -->
       {% if page_obj.has_next %}
-      <a href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}&sort={{ current_sort }}&order={{ current_order }}"
+      <a href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search|default:'' }}&sort={{ current_sort|default:'first_name' }}&order={{ current_order|default:'asc' }}&items_per_page={{ items_per_page|default:25 }}"
          class="px-3 py-2 border border-gray-300 rounded-r-md bg-white text-gray-500 hover:bg-gray-100">
         Next →
       </a>
@@ -190,13 +251,13 @@
       <span class="px-3 py-2 border border-gray-300 rounded-r-md bg-gray-200 text-gray-400">Next →</span>
       {% endif %}
     </div>
-    
+  
     <!-- Items Per Page Dropdown -->
     <div class="flex items-center space-x-2 pb-16">
       <label for="items_per_page" class="text-sm font-medium text-gray-700">Show</label>
       <select id="items_per_page" name="items_per_page"
               class="rounded-md border-gray-300 text-sm px-4 py-2 h-10 focus:ring-primary-dark-teal focus:border-primary-dark-teal"
-              onchange="this.form.submit()">
+              onchange="window.location.href='?page=1&items_per_page=' + this.value + '&search={{ request.GET.search|default:'' }}&sort={{ current_sort|default:'first_name' }}&order={{ current_order|default:'asc' }}'">
         <option value="25" {% if items_per_page == 25 %}selected{% endif %}>25</option>
         <option value="50" {% if items_per_page == 50 %}selected{% endif %}>50</option>
         <option value="100" {% if items_per_page == 100 %}selected{% endif %}>100</option>
@@ -205,8 +266,7 @@
       </select>
       <span class="text-sm font-medium text-gray-700">Users</span>
     </div>
-
   </div>
-
+  
 </div>
 {% endblock %}
