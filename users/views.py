@@ -109,26 +109,31 @@ def teacher_profile_view(request):
 # Questionnaire View
 @login_required
 def questionnaire_view(request):
-  """
-  Displays and handles the student questionnaire form.
-  """
-  student_profile = request.user.studentprofile
+    """
+    Displays and handles the student questionnaire form.
+    """
+    student_profile = request.user.studentprofile
 
-  # Ensure a questionnaire exists
-  if not hasattr(student_profile, 'questionnaire'):
-    Questionnaire.objects.create(student_profile=student_profile)
+    # Ensure a questionnaire exists
+    questionnaire, created = Questionnaire.objects.get_or_create(student_profile=student_profile)
 
-  if request.method == 'POST':
-    form = QuestionnaireForm(request.POST, instance=student_profile.questionnaire)
-    if form.is_valid():
-      questionnaire = form.save(commit=False)
-      questionnaire.completed = True
-      questionnaire.save()
-      return redirect('student_profile')
-  else:
-    form = QuestionnaireForm(instance=student_profile.questionnaire)
+    # Check if the questionnaire is incomplete
+    is_editing = not questionnaire.completed or request.GET.get('edit', False)
 
-  return render(request, 'users/questionnaire.html', {'form': form})
+    if request.method == 'POST':
+        form = QuestionnaireForm(request.POST, instance=questionnaire)
+        if form.is_valid():
+            questionnaire = form.save(commit=False)
+            questionnaire.completed = True
+            questionnaire.save()  # `last_updated` is automatically updated
+            return redirect('student_profile')  # Redirect to profile after saving
+    else:
+        form = QuestionnaireForm(instance=questionnaire)
+
+    return render(request, 'users/questionnaire.html', {
+        'form': form,
+        'is_editing': is_editing,
+    })
 
 
 # Admin Dashboard View

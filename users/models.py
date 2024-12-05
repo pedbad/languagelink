@@ -113,6 +113,7 @@ class Questionnaire(models.Model):
     student_profile = models.OneToOneField(StudentProfile, on_delete=models.CASCADE)
     question1 = models.TextField()  # Replace with actual questions
     question2 = models.TextField()
+    last_updated = models.DateTimeField(auto_now=True)  # Add this field
     # Add more fields for additional questions
     #
     completed = models.BooleanField(default=False)  # New field to track completion
