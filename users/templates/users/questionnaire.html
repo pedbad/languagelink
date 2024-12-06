@@ -1,73 +1,96 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Questionnaire{% endblock %}
+{% block title %}Student Questionnaire{% endblock %}
 
 {% block content %}
 <div class="container mx-auto mt-10">
-  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6">Questionnaire</h1>
+  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6">
+    Questionnaire Details for {{ student.first_name }} {{ student.last_name }}
+  </h1>
+  <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Welcome Message -->
+
   <div class="bg-white shadow-md rounded-lg p-6">
-    {% if not is_editing %}
-    <!-- Read-Only View -->
-    <p class="text-lg font-semibold text-gray-900 mb-4">Questionnaire Details</p>
+    {% if is_editing %}
+      <!-- Edit Mode -->
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Edit Your Questionnaire</h2>
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Question 1 -->
+        <div class="relative mb-6">
+          <input type="text" name="question1" id="id_question1" value="{{ form.question1.value|default:'' }}"
+            class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+            placeholder="Question 1" required />
+          <label for="id_question1"
+            class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+            Question 1
+          </label>
+        </div>
 
-    {% for field in form.visible_fields %}
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
-      <p class="text-gray-800">{{ field.value|default:"Not provided" }}</p>
-    </div>
-    <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after each field -->
-    {% endfor %}
+        <!-- Question 2 -->
+        <div class="relative mb-6">
+          <input type="text" name="question2" id="id_question2" value="{{ form.question2.value|default:'' }}"
+            class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+            placeholder="Question 2" required />
+          <label for="id_question2"
+            class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
+            Question 2
+          </label>
+        </div>
 
-    <!-- Timestamp -->
-    <p class="text-sm text-gray-500 italic mt-6">Last updated: {{ form.instance.last_updated|date:"F j, Y, g:i a" }}</p>
+        <!-- Add more questions here if needed -->
 
-    <!-- Edit Button -->
-    <a href="?edit=true" 
-       class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4 w-full">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-      </svg>
-      Edit Questionnaire
-    </a>
+        <!-- Save Changes Button -->
+        <div class="flex justify-end space-x-4">
+          <button type="submit"
+            class="inline-flex items-center bg-warm-brown text-white px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+            <!-- Save Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4 4L19 7M5 12.5H4v5.25A2.25 2.25 0 006.25 20.5h11.5A2.25 2.25 0 0020 18.25V13h-1" />
+            </svg>
+            Save Changes
+          </button>
+          <a href="{% url 'questionnaire' %}" 
+            class="inline-flex items-center bg-gray-200 text-gray-800 px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+            Cancel
+          </a>
+        </div>
+
+
+
+
+      </form>
     {% else %}
-    <!-- Edit View -->
-    <form method="POST" class="space-y-6">
-      {% csrf_token %}
-      <p class="text-lg font-semibold text-gray-900 mb-4">Edit Your Questionnaire</p>
-
-      {% for field in form.visible_fields %}
-      <div class="relative mb-6">
-        <input type="{{ field.field.widget.input_type }}" 
-               name="{{ field.html_name }}" 
-               id="{{ field.id_for_label }}" 
-               value="{{ field.value|default:'' }}" 
-               class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-               placeholder="{{ field.label }}" 
-               required>
-        <label for="{{ field.id_for_label }}"
-               class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
-          {{ field.label }}
-        </label>
-      </div>
-      <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after each field -->
-      {% endfor %}
-
-      <!-- Save and Cancel Buttons -->
-      <div class="flex justify-end space-x-4">
-        <button type="submit"
-                class="inline-flex items-center bg-warm-brown text-white px-6 pb-2 pt-2.5 text-sm font-medium leading-normal rounded shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4 4L19 7M5 12.5H4v5.25A2.25 2.25 0 006.25 20.5h11.5A2.25 2.25 0 0020 18.25V13h-1" />
-          </svg>
-          Save Changes
-        </button>
-        <a href="{% url 'questionnaire' %}" 
-           class="inline-flex items-center bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
-          Cancel
-        </a>
-      </div>
-    </form>
+      <!-- Read-Only Mode -->
+      {% if questionnaires %}
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Previous Submissions</h2>
+        <ul class="divide-y divide-gray-300">
+          {% for questionnaire in questionnaires %}
+            <li class="py-4">
+              <p class="text-sm text-gray-500">Submitted on: {{ questionnaire.created_at|date:"F j, Y, g:i a" }}</p>
+              <p class="text-gray-800"><strong>Question 1:</strong> {{ questionnaire.question1|default:"Not provided" }}</p>
+              <p class="text-gray-800"><strong>Question 2:</strong> {{ questionnaire.question2|default:"Not provided" }}</p>
+              <!-- Add more questions here if needed -->
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-gray-500 italic">No previous submissions available.</p>
+      {% endif %}
     {% endif %}
   </div>
+
+  <!-- Edit Button for Students -->
+  {% if not is_editing and request.user.role == 'student' %}
+    <div class="mt-6">
+      <a href="?edit=true"
+        class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 w-full">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+        </svg>
+        Edit Questionnaire
+      </a>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}

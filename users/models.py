@@ -104,22 +104,28 @@ class TeacherProfile(models.Model):
 
     
 '''
-Create a Questionnaire model to store the responses from students after they register. 
-This model will be linked to the StudentProfile model, and both teachers and admins 
-will be able to view these responses.
+The Questionnaire model stores responses from students. 
+Each student can now have multiple questionnaires associated with their profile, 
+allowing for versioning or tracking updates over time. 
+Teachers and admins can view all questionnaires for a student. 
+Fields include timestamps for creation and updates, and a completion status.
 '''
 
 class Questionnaire(models.Model):
-    student_profile = models.OneToOneField(StudentProfile, on_delete=models.CASCADE)
-    question1 = models.TextField()  # Replace with actual questions
-    question2 = models.TextField()
-    last_updated = models.DateTimeField(auto_now=True)  # Add this field
-    # Add more fields for additional questions
-    #
-    completed = models.BooleanField(default=False)  # New field to track completion
+    student_profile = models.ForeignKey(
+        StudentProfile,
+        on_delete=models.CASCADE,
+        related_name="questionnaires"  # Allows querying related questionnaires easily
+    )
+    question1 = models.TextField()  # Required field
+    question2 = models.TextField()  # Required field
+    completed = models.BooleanField(default=False)  # To track if this version was completed
+    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp for when the questionnaire was created
+    last_updated = models.DateTimeField(auto_now=True)  # Timestamp for when the questionnaire was last updated
 
     def __str__(self):
-        return f"Questionnaire for {self.student_profile.user.email}"
+        return f"Questionnaire for {self.student_profile.user.email} (Created: {self.created_at})"
+
 
 
 

@@ -6,6 +6,7 @@
 {% block content %}
 <div class="container mx-auto mt-10">
   <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6">Student Profile</h1>
+  <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Welcome Message -->
   <!-- Flex Container for Profile Image and Info -->
   <div class="flex items-start space-x-6">
     <!-- Profile Image Placeholder or Uploaded Image -->
@@ -193,27 +194,24 @@
               <span>Change Your Password</span>
           </a>
 
-
-
-
-
-
-
-
           
-          <div class="mt-4 mb-28">
+          <div class="mt-4 mb-28 flex justify-end space-x-4">
             <!-- Save Profile Button -->
             <button type="submit"
-              class="inline-flex items-center bg-warm-brown text-white px-6 pb-2 pt-2.5 text-xs font-medium leading-normal rounded shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange hover:shadow-md focus:bg-dark-orange focus:shadow-md focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50 active:bg-accent-olive-green active:shadow-md motion-reduce:transition-none">
+              class="inline-flex items-center bg-warm-brown text-white px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
               <!-- Save Icon -->
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4 4L19 7M5 12.5H4v5.25A2.25 2.25 0 006.25 20.5h11.5A2.25 2.25 0 0020 18.25V13h-1" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4 4L19 7M5 12.5H4v5.25A2.25 2.25 0 006.25 20.5h11.5A2.25 2.25 0 0020 18.25V13h-1" />
               </svg>
               Save Profile
             </button>
-
-            <a href="{% url 'student_profile' %}" class="btn btn-secondary ml-2">Cancel</a>
+          
+            <a href="{% url 'student_profile' %}" 
+              class="inline-flex items-center bg-gray-200 text-gray-800 px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+              Cancel
+            </a>
           </div>
+          
 
 
 

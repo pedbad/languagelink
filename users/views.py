@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 
-from django.db.models import BooleanField, Value as V, Case, When, F, Q
+from django.db.models import BooleanField, Value as V, Case, When, F, Q, Exists, OuterRef
 
 from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
 from .forms import CustomUserCreationForm, TeacherProfileForm, StudentProfileForm, QuestionnaireForm
@@ -108,32 +108,56 @@ def teacher_profile_view(request):
 
 # Questionnaire View
 @login_required
-def questionnaire_view(request):
-    """
-    Displays and handles the student questionnaire form.
-    """
+def questionnaire_view(request, student_id=None):
+  """
+  Handles the questionnaire view for both students and admins.
+
+  - Students: Can view and edit their own questionnaire.
+  - Admins: Can view a student's completed questionnaire in read-only mode.
+  """
+  if student_id:
+    # Admin is viewing a specific student's questionnaire
+    student = CustomUser.objects.filter(id=student_id, role='student').first()
+    if not student or not hasattr(student, 'studentprofile'):
+      return render(request, '404.html', status=404)  # Render a 404 page if the student does not exist
+    student_profile = student.studentprofile
+    is_editing = False  # Admins cannot edit student questionnaires
+  else:
+    # Student is viewing their own questionnaire
+    student = request.user
     student_profile = request.user.studentprofile
 
-    # Ensure a questionnaire exists
-    questionnaire, created = Questionnaire.objects.get_or_create(student_profile=student_profile)
+    # Check if the student has any completed questionnaires
+    has_completed_questionnaires = student_profile.questionnaires.filter(completed=True).exists()
 
-    # Check if the questionnaire is incomplete
-    is_editing = not questionnaire.completed or request.GET.get('edit', False)
+    # Determine if the user is in edit mode
+    is_editing = request.GET.get('edit', 'false').lower() == 'true'
+    if not has_completed_questionnaires:
+      is_editing = True  # Force edit mode if no completed questionnaires exist
 
-    if request.method == 'POST':
-        form = QuestionnaireForm(request.POST, instance=questionnaire)
-        if form.is_valid():
-            questionnaire = form.save(commit=False)
-            questionnaire.completed = True
-            questionnaire.save()  # `last_updated` is automatically updated
-            return redirect('student_profile')  # Redirect to profile after saving
-    else:
-        form = QuestionnaireForm(instance=questionnaire)
+  # Get the latest questionnaire for display
+  latest_questionnaire = student_profile.questionnaires.order_by('-created_at').first()
 
-    return render(request, 'users/questionnaire.html', {
-        'form': form,
-        'is_editing': is_editing,
-    })
+  if request.method == 'POST' and is_editing:
+    # Handle form submission for editing or creating a questionnaire
+    form = QuestionnaireForm(request.POST)
+    if form.is_valid():
+      new_questionnaire = form.save(commit=False)
+      new_questionnaire.student_profile = student_profile  # Associate the questionnaire with the student profile
+      new_questionnaire.completed = True  # Mark the questionnaire as completed
+      new_questionnaire.save()
+      return redirect('questionnaire')  # Redirect to prevent duplicate submissions
+  else:
+    # Pre-fill the form with the latest questionnaire data if available
+    form = QuestionnaireForm(instance=latest_questionnaire)
+
+  return render(request, 'users/questionnaire.html', {
+    'form': form,  # Form for editing or displaying the questionnaire
+    'is_editing': is_editing,  # Whether the user is in edit mode
+    'student': student,  # Student object for displaying name in the template
+    'latest_questionnaire': latest_questionnaire,  # Latest questionnaire for context
+    'questionnaires': student_profile.questionnaires.filter(completed=True).order_by('-created_at'),  # Completed questionnaires
+  })
 
 
 # Admin Dashboard View
@@ -167,6 +191,61 @@ def student_advisors_view(request):
 # View for Listing All Students
 @login_required
 def teacher_student_list_view(request):
+  """
+  Displays a list of all students, with support for searching, sorting, and pagination.
+  """
+  # Get sorting parameters
+  sort = request.GET.get('sort', 'date_joined')  # Default sort is by date_joined
+  order = request.GET.get('order', 'desc')  # Default order is descending
+  search_query = request.GET.get('search', '')  # Search query from the search box
+  items_per_page = request.GET.get('items_per_page', 25)  # Default to 25 items per page
+
+  # Determine sorting direction
+  if order == 'desc':
+    sort = f"-{sort}"
+
+  # Annotate students with the questionnaire completion status
+  students = (
+    CustomUser.objects.filter(role='student')
+    .select_related('studentprofile')
+    .annotate(
+      questionnaire_completed=Exists(
+        Questionnaire.objects.filter(
+          student_profile=OuterRef('studentprofile'),
+          completed=True
+        )
+      )
+    )
+  )
+
+  # Apply search filters
+  if search_query:
+    students = students.filter(
+      Q(first_name__icontains=search_query)
+      | Q(last_name__icontains=search_query)
+      | Q(email__icontains=search_query)
+      | Q(date_joined__icontains=search_query)
+    )
+
+  # Apply sorting
+  students = students.order_by(sort)
+
+  # Paginate results
+  paginator = Paginator(students, items_per_page)
+  page_number = request.GET.get('page', 1)
+  page_obj = paginator.get_page(page_number)
+
+  # Pass context to template
+  context = {
+    'students': page_obj,
+    'page_obj': page_obj,
+    'current_sort': request.GET.get('sort', 'date_joined'),  # Default to 'date_joined'
+    'current_order': request.GET.get('order', 'desc'),  # Default to 'desc'
+    'items_per_page': int(items_per_page),
+    'search_query': search_query,
+  }
+  return render(request, 'users/student_list.html', context)
+
   """
   Displays a list of all students, with support for searching, sorting, and pagination.
   """

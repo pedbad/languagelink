@@ -1,28 +1,30 @@
 from django.urls import path
 from django.contrib.auth.views import LogoutView, PasswordChangeView, PasswordChangeDoneView
+
+# Import views
 from .views import (
-    register,
-    login_view,
-    student_profile_view,
-    student_resource_view,
-    student_advisors_view,
-    teacher_profile_view,
-    teacher_student_list_view,
-    questionnaire_view,
-    admin_dashboard_view,
+  register,
+  login_view,
+  student_profile_view,
+  student_resource_view,
+  student_advisors_view,
+  teacher_profile_view,
+  teacher_student_list_view,
+  questionnaire_view,
+  admin_dashboard_view,
 )
 
 urlpatterns = [
-    path('register/', register, name='register'),
-    path('login/', login_view, name='login'),
-    path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
-    path('student/profile/', student_profile_view, name='student_profile'),
-    path('student/resource/', student_resource_view, name='student_resource'),
-    path('student/advisors/', student_advisors_view, name='advisors'),
-    path('teacher/profile/', teacher_profile_view, name='teacher_profile'),
-    path('teacher/students/', teacher_student_list_view, name='teacher_student_list'),
-    path('student/questionnaire/', questionnaire_view, name='questionnaire'),
-    path('admin/dashboard/', admin_dashboard_view, name='admin_dashboard'),
-    path('password-change/', PasswordChangeView.as_view(template_name='users/password_change.html'), name='password_change'),
-    path('password-change/done/', PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'), name='password_change_done'),
+  path('register/', register, name='register'),
+  path('login/', login_view, name='login'),
+  path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+  path('student/profile/', student_profile_view, name='student_profile'),
+  path('student/resource/', student_resource_view, name='student_resource'),
+  path('student/advisors/', student_advisors_view, name='advisors'),
+  path('teacher/profile/', teacher_profile_view, name='teacher_profile'),
+  path('teacher/students/', teacher_student_list_view, name='teacher_student_list'),
+  path('student/questionnaire/', questionnaire_view, name='questionnaire'),
+  path('admin/dashboard/', admin_dashboard_view, name='admin_dashboard'),
+  path('password-change/', PasswordChangeView.as_view(template_name='users/password_change.html'), name='password_change'),
+  path('password-change/done/', PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'), name='password_change_done'),
 ]
