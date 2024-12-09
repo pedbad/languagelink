@@ -31,37 +31,62 @@ def register(request):
 
 
 # Login View
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from .models import Questionnaire
+
 def login_view(request):
   """
-  Handles user login and redirection based on user roles.
+  Handles user login and redirects users based on their roles:
+  - Students are redirected to the questionnaire page if they have no completed questionnaires.
+  - Teachers are redirected to their profile page.
+  - Admins are redirected to the admin dashboard.
   """
   if request.method == 'POST':
-    email = request.POST['email']
-    password = request.POST['password']
+    # Retrieve email and password from the POST request
+    email = request.POST.get('email')
+    password = request.POST.get('password')
+
+    # Authenticate the user
     user = authenticate(request, email=email, password=password)
 
     if user:
+      # Log in the user
       login(request, user)
 
-      # Session expiry logic
+      # Session expiry logic: 'remember_me' sets a 2-week expiry, otherwise session expires on browser close
       if 'remember_me' in request.POST:
         request.session.set_expiry(1209600)  # 2 weeks
       else:
-        request.session.set_expiry(0)  # Browser close
+        request.session.set_expiry(0)  # Session expires when the browser is closed
 
       # Role-based redirection
       if user.role == 'student':
-        questionnaire = Questionnaire.objects.filter(student_profile__user=user).first()
-        if questionnaire and not questionnaire.completed:
-          return redirect('questionnaire')
-        return redirect('student_profile')
-      elif user.role == 'teacher':
-        return redirect('teacher_profile')
-      elif user.role == 'admin':
-        return redirect('admin_dashboard')
-    else:
-      return render(request, 'users/login.html', {'error': 'Invalid credentials'})
+        # Retrieve the student's profile and check for completed questionnaires
+        student_profile = user.studentprofile
+        has_completed_questionnaire = student_profile.questionnaires.filter(completed=True).exists()
 
+        # Redirect to questionnaire page in edit mode if no completed questionnaire exists
+        if not has_completed_questionnaire:
+          return redirect('questionnaire')  # Student must fill out the questionnaire
+
+        # If a completed questionnaire exists, redirect to the student profile page
+        return redirect('student_profile')
+
+      elif user.role == 'teacher':
+        # Redirect teachers to their profile page
+        return redirect('teacher_profile')
+
+      elif user.role == 'admin':
+        # Redirect admins to the admin dashboard
+        return redirect('admin_dashboard')
+
+    else:
+      # Render login page with an error message for invalid credentials
+      return render(request, 'users/login.html', {'error': 'Invalid email or password.'})
+
+  # Render the login page for GET requests or failed login attempts
   return render(request, 'users/login.html')
 
 
