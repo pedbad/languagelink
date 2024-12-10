@@ -1,13 +1,18 @@
+# Django Imports
+from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.shortcuts import render, redirect
+from django.db.models import BooleanField, Value as V, Case, When, Exists, OuterRef, Q
 
-from django.db.models import BooleanField, Value as V, Case, When, F, Q, Exists, OuterRef
-
+# App Imports
 from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
-from .forms import CustomUserCreationForm, TeacherProfileForm, StudentProfileForm, QuestionnaireForm
-
+from .forms import (
+  CustomUserCreationForm,
+  TeacherProfileForm,
+  StudentProfileForm,
+  QuestionnaireForm
+)
 
 # Registration View
 def register(request):
@@ -31,11 +36,6 @@ def register(request):
 
 
 # Login View
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
-from .models import Questionnaire
-
 def login_view(request):
   """
   Handles user login and redirects users based on their roles:

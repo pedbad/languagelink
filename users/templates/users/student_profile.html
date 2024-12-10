@@ -26,6 +26,10 @@
 
         <!-- Email Section -->
         <p class="text-lg"><strong>Email:</strong> {{ request.user.email }}</p>
+        
+        <!-- Date Registered Section -->
+    <p class="text-lg"><strong>Date Registered:</strong> {{ request.user.date_joined|date:"F j, Y" }}</p>
+        
         <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after email -->
 
         <!-- Language Biography Section -->
