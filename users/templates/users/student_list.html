@@ -7,7 +7,7 @@
     <div class="sm:flex-auto">
       <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl">List of Students</h1>
       <p class="mt-2 text-sm text-gray-700">
-        A list of all registered students, including their avatar, first name, last name, and email.
+        A list of all registered students.
       </p>
     </div>
     <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -194,9 +194,17 @@
             <!-- Questionnaire Status -->
             <td class="whitespace-nowrap px-3 py-4 text-sm">
               {% if student.questionnaire_completed %}
-              <span class="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800">Completed</span>
+                <a href="{% url 'student_questionnaire' student.id %}" 
+                  class="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-800 hover:text-green-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                  </svg>
+                  Completed
+                </a>
               {% else %}
-              <span class="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-800">Not Completed</span>
+                <span class="inline-flex items-center rounded-md bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
+                  Not Completed
+                </span>
               {% endif %}
             </td>
 

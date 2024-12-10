@@ -1,30 +1,40 @@
+# Import Django utilities
 from django.urls import path
 from django.contrib.auth.views import LogoutView, PasswordChangeView, PasswordChangeDoneView
 
-# Import views
+# Import app views
 from .views import (
-  register,
-  login_view,
-  student_profile_view,
-  student_resource_view,
-  student_advisors_view,
-  teacher_profile_view,
-  teacher_student_list_view,
-  questionnaire_view,
-  admin_dashboard_view,
+  register,                    # Handles user registration
+  login_view,                  # Handles user login
+  student_profile_view,        # Displays/edit student profile
+  student_resource_view,       # Displays resources for students
+  student_advisors_view,       # Displays advisors/teachers
+  teacher_profile_view,        # Displays/edit teacher profile
+  teacher_student_list_view,   # Displays list of students for teachers/admins
+  questionnaire_view,          # Handles student/admin questionnaires
+  admin_dashboard_view,        # Displays admin dashboard
 )
 
+# URL patterns for the app
 urlpatterns = [
+  # Authentication URLs
   path('register/', register, name='register'),
   path('login/', login_view, name='login'),
   path('logout/', LogoutView.as_view(next_page='/'), name='logout'),
+
+  # Student URLs
   path('student/profile/', student_profile_view, name='student_profile'),
   path('student/resource/', student_resource_view, name='student_resource'),
-  path('student/advisors/', student_advisors_view, name='advisors'),
+  path('student/questionnaire/', questionnaire_view, name='questionnaire'),  # Student's own questionnaire
+  path('student/advisors/', student_advisors_view, name='advisors'),  # View for listing all advisors/teachers
+
+  # Admin/Teacher URLs
   path('teacher/profile/', teacher_profile_view, name='teacher_profile'),
   path('teacher/students/', teacher_student_list_view, name='teacher_student_list'),
-  path('student/questionnaire/', questionnaire_view, name='questionnaire'),
+  path('student/<int:student_id>/questionnaire/', questionnaire_view, name='student_questionnaire'),  # View student's questionnaire
   path('admin/dashboard/', admin_dashboard_view, name='admin_dashboard'),
+
+  # Password Management URLs
   path('password-change/', PasswordChangeView.as_view(template_name='users/password_change.html'), name='password_change'),
   path('password-change/done/', PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'), name='password_change_done'),
 ]
