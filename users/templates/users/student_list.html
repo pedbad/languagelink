@@ -215,7 +215,9 @@
         
             <!-- Actions -->
             <td class="relative whitespace-nowrap py-4 px-4 text-right text-sm font-medium">
-              <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit<span class="sr-only">, {{ student.first_name }}</span></a>
+              <a href="{% url 'student_profile_admin' student.id %}" class="text-indigo-600 hover:text-indigo-900">
+                Edit<span class="sr-only">, {{ student.first_name }}</span>
+              </a>
             </td>
           </tr>
           {% endfor %}

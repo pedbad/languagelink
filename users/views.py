@@ -1,9 +1,9 @@
 # Django Imports
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.db.models import BooleanField, Value as V, Case, When, Exists, OuterRef, Q
+from django.shortcuts import render, redirect, get_object_or_404
 
 # App Imports
 from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
@@ -92,26 +92,56 @@ def login_view(request):
 
 # Student Profile View
 @login_required
-def student_profile_view(request):
-  """
-  Displays and allows editing of the student's profile.
-  """
-  student_profile = request.user.studentprofile
-  is_editing = request.GET.get('edit', False)
+def student_profile_view(request, student_id=None):
+    """
+    Displays and allows editing of the student's profile.
+    Admins can view the profile of any student and perform actions like toggling active status or deleting.
+    """
+    # Check if the logged-in user is an admin
+    is_admin = request.user.role == 'admin'
 
-  if request.method == 'POST' and is_editing:
-    form = StudentProfileForm(request.POST, request.FILES, instance=student_profile, user=request.user)
-    if form.is_valid():
-      form.save()
-      return redirect('student_profile')
-  else:
-    form = StudentProfileForm(instance=student_profile, user=request.user)
+    # Fetch student profile: Admin views other profiles, students view their own
+    if student_id and is_admin:
+        student_profile = get_object_or_404(StudentProfile, user__id=student_id)
+    else:
+        # Students can only access their own profile
+        student_profile = request.user.studentprofile
 
-  return render(request, 'users/student_profile.html', {
-    'form': form,
-    'student_profile': student_profile,
-    'is_editing': is_editing,
-  })
+    # Handle admin-specific actions
+    if request.method == 'POST' and is_admin:
+        if 'toggle_active' in request.POST:
+            student_profile.user.is_active = not student_profile.user.is_active
+            student_profile.user.save()
+            return redirect('student_profile_admin', student_id=student_profile.user.id)
+
+        elif 'delete_student' in request.POST:
+            student_profile.user.delete()
+            return redirect('teacher_student_list')
+
+    # Editing logic
+    is_editing = request.GET.get('edit', 'false').lower() == 'true'
+
+    if request.method == 'POST' and is_editing:
+        # Bind the form to the student's data explicitly
+        form = StudentProfileForm(request.POST, request.FILES, instance=student_profile, user=student_profile.user)
+        if form.is_valid():
+            form.save()
+            # Redirect after saving
+            if is_admin:
+                return redirect('student_profile_admin', student_id=student_profile.user.id)
+            else:
+                return redirect('student_profile')
+    else:
+        # Form initializes with the correct user's data
+        form = StudentProfileForm(instance=student_profile, user=student_profile.user) if is_editing else None
+
+    # Render the template
+    return render(request, 'users/student_profile.html', {
+        'student_profile': student_profile,
+        'is_admin': is_admin,
+        'is_editing': is_editing,
+        'form': form,
+    })
 
 
 # Teacher Profile View
@@ -217,22 +247,26 @@ def student_advisors_view(request):
 @login_required
 def teacher_student_list_view(request):
   """
-  Displays a list of all students, with support for searching, sorting, and pagination.
+  Displays a list of active students with support for:
+  - Sorting (first name, last name, email, date registered, questionnaire status)
+  - Searching by name, email, or date registered
+  - Pagination for better usability
   """
-  # Get sorting parameters
-  sort = request.GET.get('sort', 'date_joined')  # Default sort is by date_joined
-  order = request.GET.get('order', 'desc')  # Default order is descending
-  search_query = request.GET.get('search', '')  # Search query from the search box
-  items_per_page = request.GET.get('items_per_page', 25)  # Default to 25 items per page
+  # 1. Extract query parameters from GET request
+  sort = request.GET.get('sort', 'date_joined')       # Default sort by date_joined
+  order = request.GET.get('order', 'desc')            # Default descending order
+  search_query = request.GET.get('search', '')        # Search query from input
+  items_per_page = int(request.GET.get('items_per_page', 25))  # Default items per page
+  page_number = request.GET.get('page', 1)            # Current page number
 
-  # Determine sorting direction
+  # 2. Determine sorting direction (add '-' for descending)
   if order == 'desc':
     sort = f"-{sort}"
 
-  # Annotate students with the questionnaire completion status
+  # 3. Query the active students only
   students = (
-    CustomUser.objects.filter(role='student')
-    .select_related('studentprofile')
+    CustomUser.objects.filter(role='student', is_active=True)
+    .select_related('studentprofile')  # Avoid extra queries for studentprofile
     .annotate(
       questionnaire_completed=Exists(
         Questionnaire.objects.filter(
@@ -243,57 +277,7 @@ def teacher_student_list_view(request):
     )
   )
 
-  # Apply search filters
-  if search_query:
-    students = students.filter(
-      Q(first_name__icontains=search_query)
-      | Q(last_name__icontains=search_query)
-      | Q(email__icontains=search_query)
-      | Q(date_joined__icontains=search_query)
-    )
-
-  # Apply sorting
-  students = students.order_by(sort)
-
-  # Paginate results
-  paginator = Paginator(students, items_per_page)
-  page_number = request.GET.get('page', 1)
-  page_obj = paginator.get_page(page_number)
-
-  # Pass context to template
-  context = {
-    'students': page_obj,
-    'page_obj': page_obj,
-    'current_sort': request.GET.get('sort', 'date_joined'),  # Default to 'date_joined'
-    'current_order': request.GET.get('order', 'desc'),  # Default to 'desc'
-    'items_per_page': int(items_per_page),
-    'search_query': search_query,
-  }
-  return render(request, 'users/student_list.html', context)
-
-  """
-  Displays a list of all students, with support for searching, sorting, and pagination.
-  """
-  # Get sorting parameters
-  sort = request.GET.get('sort', 'date_joined')  # Default sort is by date_joined
-  order = request.GET.get('order', 'desc')  # Default order is descending
-  search_query = request.GET.get('search', '')  # Search query from the search box
-  items_per_page = request.GET.get('items_per_page', 25)  # Default to 25 items per page
-
-  # Determine sorting direction
-  if order == 'desc':
-    sort = f"-{sort}"
-
-  # Fetch students with sorting and search functionality
-  students = CustomUser.objects.filter(role='student').select_related('studentprofile').annotate(
-    questionnaire_completed=Case(
-      When(studentprofile__questionnaire__completed=True, then=V(True)),
-      default=V(False),
-      output_field=BooleanField(),
-    )
-  )
-
-  # Apply search filters
+  # 4. Apply search filters
   if search_query:
     students = students.filter(
       Q(first_name__icontains=search_query) |
@@ -302,21 +286,53 @@ def teacher_student_list_view(request):
       Q(date_joined__icontains=search_query)
     )
 
-  # Apply sorting
+  # 5. Apply sorting
   students = students.order_by(sort)
 
-  # Paginate results
+  # 6. Paginate results
   paginator = Paginator(students, items_per_page)
-  page_number = request.GET.get('page', 1)
   page_obj = paginator.get_page(page_number)
 
-  # Pass context to template
+  # 7. Context for the template
   context = {
-    'students': page_obj,
-    'page_obj': page_obj,
-    'current_sort': request.GET.get('sort', 'date_joined'),  # Default to 'date_joined'
-    'current_order': request.GET.get('order', 'desc'),  # Default to 'desc'
-    'items_per_page': int(items_per_page),
+    'students': page_obj,                       # Paginated student queryset
+    'page_obj': page_obj,                       # Page object for pagination
+    'current_sort': request.GET.get('sort', 'date_joined'),
+    'current_order': request.GET.get('order', 'desc'),
+    'items_per_page': items_per_page,
     'search_query': search_query,
   }
+
+  # 8. Render the template
   return render(request, 'users/student_list.html', context)
+
+
+@login_required
+@user_passes_test(lambda u: u.role == 'admin')  # Only allow admins to access this view
+def toggle_student_active(request, student_id):
+  """
+  Toggles the 'is_active' status of a student.
+  """
+  student = get_object_or_404(CustomUser, id=student_id, role='student')
+  
+  # Toggle the is_active field
+  student.is_active = not student.is_active
+  student.save()
+
+  # Redirect back to the student's profile page
+  return redirect('student_profile_admin', student_id=student.id)
+
+
+@login_required
+@user_passes_test(lambda u: u.role == 'admin')  # Only allow admins to access this view
+def delete_student(request, student_id):
+  """
+  Deletes a student from the database.
+  """
+  student = get_object_or_404(CustomUser, id=student_id, role='student')
+
+  # Delete the student object
+  student.delete()
+
+  # Redirect to the student list page
+  return redirect('teacher_student_list')
