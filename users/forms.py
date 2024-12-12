@@ -9,17 +9,23 @@ from django.forms.widgets import ClearableFileInput
 class CustomUserCreationForm(UserCreationForm):
     # Define the role field with restricted choices
     role = forms.ChoiceField(choices=[('student', 'Student'), ('teacher', 'Teacher')], label="Role")
-    
+
     class Meta(UserCreationForm.Meta):
         model = CustomUser
         fields = ('email', 'first_name', 'last_name', 'role', 'password1', 'password2')  # Only allow these fields
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Remove 'usable_password' if it exists
         self.fields.pop('usable_password', None)
 
-    
+    # Step 1: Add email validation logic
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already in use. Please use a different email.")
+        return email
+
     def save(self, commit=True):
         user = super().save(commit=False)
         user.role = self.cleaned_data['role']
@@ -31,7 +37,6 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
-
 
 
 # Form for managing Language Competencies

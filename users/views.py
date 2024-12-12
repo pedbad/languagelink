@@ -30,8 +30,12 @@ def register(request):
           return redirect('teacher_student_list')
         elif user.role == 'teacher':
           return redirect('advisors')
+    else:
+      # If form is not valid, return the form with errors
+      return render(request, 'users/register.html', {'form': form})
   else:
     form = CustomUserCreationForm()
+  
   return render(request, 'users/register.html', {'form': form})
 
 

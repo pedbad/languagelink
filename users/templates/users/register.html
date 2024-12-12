@@ -14,15 +14,22 @@
       {% csrf_token %}
       
       <!-- Email -->
+
       <div class="relative mb-6">
         <input type="email" name="email" id="email"
           class="peer block min-h-[auto] w-full rounded border-0 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:text-primary peer-valid:text-primary dark:text-white dark:placeholder:text-neutral-300 dark:peer-focus:text-primary"
-          placeholder="Email Address" required />
+          placeholder="Email Address" required value="{{ form.email.value|default:'' }}" />
         <label for="email" 
           class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
           Email Address
         </label>
+
+        <!-- Step 2: Display email errors -->
+        {% if form.email.errors %}
+          <p id="email-error" class="text-red-500 text-sm mt-1">{{ form.email.errors|first }}</p>
+        {% endif %}
       </div>
+
 
       <!-- First Name -->
       <div class="relative mb-6">
