@@ -32,6 +32,7 @@ urlpatterns = [
 
   # Admin/Teacher URLs
   path('teacher/profile/', teacher_profile_view, name='teacher_profile'),
+  path('teacher/<int:teacher_id>/profile/', teacher_profile_view, name='teacher_profile_admin'),
   path('teacher/students/', teacher_student_list_view, name='teacher_student_list'),
   path('student/<int:student_id>/questionnaire/', questionnaire_view, name='student_questionnaire'),  # View student's questionnaire
   path('student/<int:student_id>/profile/', student_profile_view, name='student_profile_admin'),  # View specific student's profile

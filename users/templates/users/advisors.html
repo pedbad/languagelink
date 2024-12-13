@@ -2,23 +2,184 @@
 {% load static %}
 
 {% block content %}
-<div class="container mx-auto py-8">
-    <h1 class="text-3xl font-bold mb-6">List of Advisors</h1>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for teacher in teachers %}
-        <div class="bg-white shadow-md rounded-lg p-4">
-            {% if teacher.profile_picture %}
-            <img src="{{ teacher.profile_picture.url }}" alt="{{ teacher.user.email }}"
-                class="h-32 w-32 object-cover rounded-full mx-auto">
-            {% else %}
-            <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile"
-                class="h-32 w-32 object-cover rounded-full mx-auto">
-            {% endif %}
-            <h2 class="text-xl font-semibold mt-4 text-center">{{ teacher.user.email }}</h2>
-            <p class="text-center">{{ teacher.biography }}</p>
-        </div>
-        {% endfor %}
+<div class="px-4 sm:px-6 lg:px-8 pb-16">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl">List of Advisors</h1>
+      <p class="mt-2 text-sm text-gray-700">
+        A list of all registered advisors.
+      </p>
     </div>
+    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+      <a href="{% url 'register' %}"
+         class="rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600 flex items-center justify-center">
+        <!-- Academic Cap Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443" />
+        </svg>
+        Add New Advisor
+      </a>
+    </div>
+  </div>
+
+  <hr class="my-4 border-1 border-primary-dark-teal">
+
+  <!-- Table Container Alignment (Missing Div Added) -->
+  <div class="-mx-4 mt-8 sm:-mx-6 lg:-mx-8">
+    <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+
+      <!-- Search Form -->
+      <form id="search-form" method="GET" action="{% url 'advisors' %}" class="relative flex-auto mb-4">
+        <input
+          id="search-input"
+          type="search"
+          name="search"
+          aria-label="Search advisors"
+          placeholder="Search advisors by name or email..."
+          class="block w-full appearance-none rounded-lg bg-white border border-gray-300 py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:ring-primary-dark-teal focus:border-primary-dark-teal"
+          value="{{ request.GET.search }}"
+        >
+        <!-- Magnifying Glass Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" aria-hidden="true"
+             class="pointer-events-none absolute top-[45%] left-3 h-5 w-5 transform -translate-y-1/2 text-gray-500">
+          <path d="M16.72 17.78a.75.75 0 1 0 1.06-1.06l-1.06 1.06ZM9 14.5A5.5 5.5 0 0 1 3.5 9H2a7 7 0 0 0 7 7v-1.5ZM3.5 9A5.5 5.5 0 0 1 9 3.5V2a7 7 0 0 0-7 7h1.5ZM9 3.5A5.5 5.5 0 0 1 14.5 9H16a7 7 0 0 0-7-7v1.5Zm3.89 10.45 3.83 3.83 1.06-1.06-3.83-3.83-1.06 1.06ZM14.5 9a5.48 5.48 0 0 1-1.61 3.89l1.06 1.06A6.98 6.98 0 0 0 16 9h-1.5Zm-1.61 3.89A5.48 5.48 0 0 1 9 14.5V16a6.98 6.98 0 0 0 4.95-2.05l-1.06-1.06Z" />
+        </svg>
+      </form>
+
+      <!-- Table -->
+      <table class="min-w-full divide-y divide-gray-300">
+        <thead class="bg-neutral-gray-brown text-white">
+          <tr>
+            <!-- Avatar -->
+            <th scope="col" class="py-4 px-4 text-center text-base font-semibold sm:pl-0">
+              <span class="sr-only">Avatar</span>
+            </th>
+            <!-- First Name -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=first_name&order={% if current_sort == 'first_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                First Name
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'first_name' %}
+                    {% if current_order == 'asc' %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+            <!-- Last Name -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=last_name&order={% if current_sort == 'last_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Last Name
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'last_name' %}
+                    {% if current_order == 'asc' %}
+                      <!-- Single Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <!-- Single Up Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <!-- Default Double Arrows -->
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+            
+            <!-- Email -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=email&order={% if current_sort == 'email' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Email
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'email' %}
+                    {% if current_order == 'asc' %}
+                      <!-- Single Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <!-- Single Up Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <!-- Default Double Arrows -->
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+            
+            <!-- Date Registered -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=date_joined&order={% if current_sort == 'date_joined' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Date Registered
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'date_joined' %}
+                    {% if current_order == 'asc' %}
+                      <!-- Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% else %}
+                      <!-- Up Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% endif %}
+                  {% else %}
+                    <!-- Default Double Arrows -->
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>
+            
+            <!-- Actions -->
+            <th scope="col" class="py-4 px-4 text-center text-base font-semibold">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          {% for teacher in teachers %}
+          <tr class="hover:bg-gray-50">
+            <td class="py-4 px-4 text-center">
+              {% if teacher.profile_picture %}
+                <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
+              {% else %}
+                <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full mx-auto">
+              {% endif %}
+            </td>
+            <td class="px-3 py-4 text-sm text-gray-900">{{ teacher.user.first_name }}</td>
+            <td class="px-3 py-4 text-sm text-gray-900">{{ teacher.user.last_name }}</td>
+            <td class="px-3 py-4 text-sm text-gray-500">{{ teacher.user.email }}</td>
+            <td class="px-3 py-4 text-sm text-gray-500">{{ teacher.user.date_joined|date:"M d, Y" }}</td>
+            <td class="py-4 px-4 text-center">
+              <a href="{% url 'teacher_profile_admin' teacher.user.id %}"
+                 class="inline-flex items-center bg-warm-brown text-white px-3 py-1.5 rounded-lg hover:bg-dark-orange">
+                View
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<hr class="my-4 border-1 border-primary-dark-teal">
+<div class="mt-6 mb-20">
+  <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+    Back to Dashboard
+  </a>
 </div>
 {% endblock %}
+
+      
+
+

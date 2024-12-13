@@ -340,3 +340,22 @@ def delete_student(request, student_id):
 
   # Redirect to the student list page
   return redirect('teacher_student_list')
+
+
+def advisor_list(request):
+    sort = request.GET.get('sort', 'date_joined')  # Default sorting column
+    order = request.GET.get('order', 'asc')       # Default order is ascending
+    
+    # Add '-' for descending sort
+    if order == 'desc':
+        sort = f"-{sort}"
+    
+    # Fetch and sort advisors
+    advisors = TeacherProfile.objects.select_related('user').order_by(sort)
+    
+    context = {
+        'teachers': advisors,
+        'current_sort': request.GET.get('sort', 'date_joined'),  # Pass current sort column
+        'current_order': request.GET.get('order', 'asc'),       # Pass current order
+    }
+    return render(request, 'advisors_list.html', context)
