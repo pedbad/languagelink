@@ -56,35 +56,39 @@
             </th>
             <!-- First Name -->
             <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
-              <a href="?sort=first_name&order={% if current_sort == 'first_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+              <a href="?sort=user__first_name&order={% if current_sort == 'user__first_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
                  class="flex items-center">
                 First Name
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
-                  {% if current_sort == 'first_name' %}
+                  {% if current_sort == 'user__first_name' %}
                     {% if current_order == 'asc' %}
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
-                    {% else %}
+                      <!-- Up Arrow -->
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% else %}
+                      <!-- Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
                     {% endif %}
                   {% else %}
+                    <!-- Default Double Arrows -->
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
                   {% endif %}
                 </svg>
               </a>
             </th>
+            
             <!-- Last Name -->
             <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
-              <a href="?sort=last_name&order={% if current_sort == 'last_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+              <a href="?sort=user__last_name&order={% if current_sort == 'user__last_name' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
                  class="flex items-center">
                 Last Name
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
-                  {% if current_sort == 'last_name' %}
+                  {% if current_sort == 'user__last_name' %}
                     {% if current_order == 'asc' %}
-                      <!-- Single Down Arrow -->
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
-                    {% else %}
-                      <!-- Single Up Arrow -->
+                      <!-- Up Arrow -->
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% else %}
+                      <!-- Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
                     {% endif %}
                   {% else %}
                     <!-- Default Double Arrows -->
@@ -96,17 +100,39 @@
             
             <!-- Email -->
             <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
-              <a href="?sort=email&order={% if current_sort == 'email' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+              <a href="?sort=user__email&order={% if current_sort == 'user__email' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
                  class="flex items-center">
                 Email
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
-                  {% if current_sort == 'email' %}
+                  {% if current_sort == 'user__email' %}
                     {% if current_order == 'asc' %}
-                      <!-- Single Down Arrow -->
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
-                    {% else %}
-                      <!-- Single Up Arrow -->
+                      <!-- Up Arrow -->
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% else %}
+                      <!-- Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
+                    {% endif %}
+                  {% else %}
+                    <!-- Default Double Arrows -->
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
+                  {% endif %}
+                </svg>
+              </a>
+            </th>            
+            
+            <!-- Date Registered -->
+            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
+              <a href="?sort=user__date_joined&order={% if current_sort == 'user__date_joined' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
+                 class="flex items-center">
+                Date Registered
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
+                  {% if current_sort == 'user__date_joined' %}
+                    {% if current_order == 'asc' %}
+                      <!-- Up Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
+                    {% else %}
+                      <!-- Down Arrow -->
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
                     {% endif %}
                   {% else %}
                     <!-- Default Double Arrows -->
@@ -116,27 +142,6 @@
               </a>
             </th>
             
-            <!-- Date Registered -->
-            <th scope="col" class="py-3.5 px-3 text-left text-sm font-semibold">
-              <a href="?sort=date_joined&order={% if current_sort == 'date_joined' and current_order == 'asc' %}desc{% else %}asc{% endif %}"
-                 class="flex items-center">
-                Date Registered
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-4 h-4 ml-1">
-                  {% if current_sort == 'date_joined' %}
-                    {% if current_order == 'asc' %}
-                      <!-- Down Arrow -->
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m0 0-6-6m6 6 6-6" />
-                    {% else %}
-                      <!-- Up Arrow -->
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 19.5v-15m0 0-6 6m6-6 6 6" />
-                    {% endif %}
-                  {% else %}
-                    <!-- Default Double Arrows -->
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5" />
-                  {% endif %}
-                </svg>
-              </a>
-            </th>
             
             <!-- Actions -->
             <th scope="col" class="py-4 px-4 text-center text-base font-semibold">

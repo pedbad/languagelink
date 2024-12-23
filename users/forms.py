@@ -95,9 +95,34 @@ class StudentProfileForm(forms.ModelForm):
 
 # Profile Update Form for Teachers
 class TeacherProfileForm(forms.ModelForm):
+    # Adding fields from the CustomUser model
+    first_name = forms.CharField(max_length=30, required=True, label="First Name")
+    last_name = forms.CharField(max_length=30, required=True, label="Last Name")
+    email = forms.EmailField(required=True, label="Email")
+
     class Meta:
         model = TeacherProfile
-        fields = ['biography', 'profile_picture', 'can_host_in_person', 'can_host_online']
+        fields = ['biography', 'profile_picture', 'can_host_in_person', 'can_host_online']  # Add other fields as needed
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['first_name'].initial = user.first_name
+            self.fields['last_name'].initial = user.last_name
+            self.fields['email'].initial = user.email
+
+    def save(self, commit=True):
+        teacher_profile = super().save(commit=False)
+        user = teacher_profile.user
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()  # Save user changes
+            teacher_profile.save()  # Save profile changes
+        return teacher_profile
+
 
 # Questionnaire Form
 # This form is used to handle the questionnaire that students fill out.

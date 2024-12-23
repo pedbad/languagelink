@@ -150,19 +150,35 @@ def student_profile_view(request, student_id=None):
 
 # Teacher Profile View
 @login_required
-def teacher_profile_view(request):
-  """
-  Displays and allows editing of the teacher's profile.
-  """
-  teacher_profile = request.user.teacherprofile
-  if request.method == 'POST':
-    form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile)
-    if form.is_valid():
-      form.save()
-      return redirect('teacher_profile')
-  else:
-    form = TeacherProfileForm(instance=teacher_profile)
-  return render(request, 'users/teacher_profile.html', {'form': form})
+def teacher_profile_view(request, teacher_id=None):
+    """
+    Displays and allows editing of the teacher's profile.
+    Admins can view a specific teacher's profile using teacher_id.
+    """
+    if teacher_id:
+        # Admin viewing a specific teacher's profile
+        teacher_profile = get_object_or_404(TeacherProfile, user__id=teacher_id)
+        user = teacher_profile.user
+    else:
+        # Teacher viewing their own profile
+        teacher_profile = request.user.teacherprofile
+        user = request.user
+
+    if request.method == 'POST':
+        form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=user)
+        if form.is_valid():
+            form.save()
+            if teacher_id:
+                return redirect('teacher_profile_admin', teacher_id=teacher_id)
+            else:
+                return redirect('teacher_profile')
+    else:
+        form = TeacherProfileForm(instance=teacher_profile, user=user)
+
+    return render(request, 'users/teacher_profile.html', {
+        'form': form,
+        'teacher_profile': teacher_profile,
+    })
 
 
 # Questionnaire View
@@ -237,14 +253,54 @@ def student_resource_view(request):
   return render(request, 'users/student_resources.html')
 
 
-# View for Listing All Teachers / Advisors
+
+# View for Listing All Advisors
 @login_required
 def student_advisors_view(request):
   """
-  Displays a list of all advisors (teachers).
+  Displays a list of all advisors (teachers) with sorting and search functionality.
   """
-  teachers = TeacherProfile.objects.all()
-  return render(request, 'users/advisors.html', {'teachers': teachers})
+  # Extract sorting and search parameters
+  sort = request.GET.get('sort', 'user__date_joined')  # Default sorting by user date joined
+  order = request.GET.get('order', 'desc')  # Default order is descending
+  search_query = request.GET.get('search', '')  # Search query
+
+  # Determine sorting direction (prepend '-' for descending)
+  if order == 'desc':
+    sort = f"-{sort}"
+
+  # Query all advisors (teachers) with optional search filter
+  advisors = TeacherProfile.objects.select_related('user').filter(
+    Q(user__first_name__icontains=search_query) |
+    Q(user__last_name__icontains=search_query) |
+    Q(user__email__icontains=search_query)
+  )
+
+  # Apply sorting safely
+  valid_sort_fields = ['user__first_name', 'user__last_name', 'user__email', 'user__date_joined']
+  if sort.lstrip('-') in valid_sort_fields:
+    advisors = advisors.order_by(sort)
+  else:
+    advisors = advisors.order_by('user__date_joined')  # Fallback to default sorting
+
+  # Pagination setup
+  items_per_page = int(request.GET.get('items_per_page', 25))  # Default 25 items per page
+  paginator = Paginator(advisors, items_per_page)
+  page_number = request.GET.get('page', 1)
+  page_obj = paginator.get_page(page_number)
+
+  # Context for the template
+  context = {
+    'teachers': page_obj,  # Paginated advisors queryset
+    'page_obj': page_obj,  # Page object for pagination
+    'current_sort': request.GET.get('sort', 'user__date_joined'),
+    'current_order': request.GET.get('order', 'desc'),
+    'items_per_page': items_per_page,
+    'search_query': search_query,
+  }
+
+  return render(request, 'users/advisors.html', context)
+
 
 
 # View for Listing All Students
@@ -340,22 +396,3 @@ def delete_student(request, student_id):
 
   # Redirect to the student list page
   return redirect('teacher_student_list')
-
-
-def advisor_list(request):
-    sort = request.GET.get('sort', 'date_joined')  # Default sorting column
-    order = request.GET.get('order', 'asc')       # Default order is ascending
-    
-    # Add '-' for descending sort
-    if order == 'desc':
-        sort = f"-{sort}"
-    
-    # Fetch and sort advisors
-    advisors = TeacherProfile.objects.select_related('user').order_by(sort)
-    
-    context = {
-        'teachers': advisors,
-        'current_sort': request.GET.get('sort', 'date_joined'),  # Pass current sort column
-        'current_order': request.GET.get('order', 'asc'),       # Pass current order
-    }
-    return render(request, 'advisors_list.html', context)
