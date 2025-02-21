@@ -258,7 +258,7 @@ def student_advisors_view(request):
     'search_query': search_query,
   }
 
-  return render(request, 'users/advisors.html', context)
+  return render(request, 'users/advisor_list.html', context)
 
 
 # View for Listing All Students
