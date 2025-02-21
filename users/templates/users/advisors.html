@@ -181,11 +181,19 @@
 </div>
 
 <hr class="my-4 border-1 border-primary-dark-teal">
-<div class="mt-6 mb-20">
-  <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
-    Back to Dashboard
-  </a>
+
+<div class="mt-6 mb-20 text-center">
+  {% if request.user.role == 'admin' %}
+    <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+      Back to Dashboard
+    </a>
+  {% elif request.user.role == 'student' %}
+    <a href="{% url 'student_profile' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+      Back to Profile
+    </a>
+  {% endif %}
 </div>
+
 {% endblock %}
 
       
