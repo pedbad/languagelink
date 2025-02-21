@@ -10,16 +10,19 @@
         A list of all registered advisors.
       </p>
     </div>
-    <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-      <a href="{% url 'register' %}"
-         class="rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600 flex items-center justify-center">
-        <!-- Academic Cap Icon -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443" />
-        </svg>
-        Add New Advisor
-      </a>
-    </div>
+    {% if request.user.role == 'admin' %}
+      <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+        <a href="{% url 'register' %}"
+          class="rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600 flex items-center justify-center">
+          <!-- Academic Cap Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443" />
+          </svg>
+          Add New Advisor
+        </a>
+      </div>
+    {% endif %}
+  
   </div>
 
   <hr class="my-4 border-1 border-primary-dark-teal">
