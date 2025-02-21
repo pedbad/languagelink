@@ -149,36 +149,74 @@ def student_profile_view(request, student_id=None):
 
 
 # Teacher Profile View
+# @login_required
+# def teacher_profile_view(request, teacher_id=None):
+#     """
+#     Displays and allows editing of the teacher's profile.
+#     Admins can view a specific teacher's profile using teacher_id.
+#     """
+#     if teacher_id:
+#         # Admin viewing a specific teacher's profile
+#         teacher_profile = get_object_or_404(TeacherProfile, user__id=teacher_id)
+#         user = teacher_profile.user
+#     else:
+#         # Teacher viewing their own profile
+#         teacher_profile = request.user.teacherprofile
+#         user = request.user
+
+#     if request.method == 'POST':
+#         form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=user)
+#         if form.is_valid():
+#             form.save()
+#             if teacher_id:
+#                 return redirect('teacher_profile_admin', teacher_id=teacher_id)
+#             else:
+#                 return redirect('teacher_profile')
+#     else:
+#         form = TeacherProfileForm(instance=teacher_profile, user=user)
+
+#     return render(request, 'users/teacher_profile.html', {
+#         'form': form,
+#         'teacher_profile': teacher_profile,
+#     })
+
 @login_required
 def teacher_profile_view(request, teacher_id=None):
     """
     Displays and allows editing of the teacher's profile.
-    Admins can view a specific teacher's profile using teacher_id.
+    - Teachers can edit their own profile.
+    - Admins can edit any teacher's profile.
     """
-    if teacher_id:
-        # Admin viewing a specific teacher's profile
-        teacher_profile = get_object_or_404(TeacherProfile, user__id=teacher_id)
-        user = teacher_profile.user
-    else:
-        # Teacher viewing their own profile
-        teacher_profile = request.user.teacherprofile
-        user = request.user
+    is_admin = request.user.role == 'admin'
 
-    if request.method == 'POST':
-        form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=user)
+    # Fetch teacher profile: Admin views other profiles, teachers view their own
+    if teacher_id and is_admin:
+        teacher_profile = get_object_or_404(TeacherProfile, user__id=teacher_id)
+    else:
+        teacher_profile = request.user.teacherprofile
+
+    # Determine if user is in edit mode
+    is_editing = request.GET.get('edit', 'false').lower() == 'true'
+
+    if request.method == 'POST' and is_editing:
+        form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=teacher_profile.user)
         if form.is_valid():
             form.save()
-            if teacher_id:
-                return redirect('teacher_profile_admin', teacher_id=teacher_id)
+            # Redirect to prevent form resubmission
+            if is_admin:
+                return redirect('teacher_profile_admin', teacher_id=teacher_profile.user.id)
             else:
                 return redirect('teacher_profile')
     else:
-        form = TeacherProfileForm(instance=teacher_profile, user=user)
+        form = TeacherProfileForm(instance=teacher_profile, user=teacher_profile.user) if is_editing else None
 
     return render(request, 'users/teacher_profile.html', {
-        'form': form,
         'teacher_profile': teacher_profile,
+        'is_admin': is_admin,
+        'is_editing': is_editing,
+        'form': form,
     })
+
 
 
 # Questionnaire View
