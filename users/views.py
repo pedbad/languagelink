@@ -113,32 +113,58 @@ def student_profile_view(request, student_id=None):
 # Teacher Profile View
 @login_required
 def teacher_profile_view(request, teacher_id=None):
-  """
-  Displays and allows editing of the teacher's profile.
-  """
-  is_admin = request.user.role == 'admin'
+    """
+    Displays the teacher's profile.
+    - Teachers can edit their own profile.
+    - Admins can view and edit any teacher's profile.
+    - Students can only view advisors.
+    """
 
-  if teacher_id and is_admin:
-    teacher_profile = get_object_or_404(TeacherProfile, user__id=teacher_id)
-  else:
-    teacher_profile = request.user.teacherprofile
+    is_admin = request.user.role == 'admin'
+    is_teacher = request.user.role == 'teacher'
+    is_student = request.user.role == 'student'
 
-  is_editing = request.GET.get('edit', 'false').lower() == 'true'
+    # If teacher_id is None, assume the logged-in teacher is accessing their own profile
+    if teacher_id is None:
+        if not is_teacher:
+            # Redirect non-teachers to a relevant page
+            return redirect('advisors')  # Redirect students to the advisor list
+        teacher_user = request.user  # Teacher views their own profile
+    else:
+        # Admins and students viewing a teacher's profile
+        teacher_user = get_object_or_404(CustomUser, id=teacher_id, role='teacher')
 
-  if request.method == 'POST' and is_editing:
-    form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=teacher_profile.user)
-    if form.is_valid():
-      form.save()
-      return redirect('teacher_profile_admin' if is_admin else 'teacher_profile', teacher_id=teacher_profile.user.id)
-  else:
-    form = TeacherProfileForm(instance=teacher_profile, user=teacher_profile.user) if is_editing else None
+    # Try to get the teacher's profile, handle case where it doesn't exist
+    try:
+        teacher_profile = teacher_user.teacherprofile
+    except TeacherProfile.DoesNotExist:
+        if is_admin:
+            # Admins should still see the page even if the profile is missing
+            teacher_profile = None
+        else:
+            # Students and teachers should not access a missing profile
+            return render(request, "users/404.html", status=404)
 
-  return render(request, 'users/teacher_profile.html', {
-    'teacher_profile': teacher_profile,
-    'is_admin': is_admin,
-    'is_editing': is_editing,
-    'form': form,
-  })
+    # Determine if the user is in edit mode (only allowed for the owner or admin)
+    is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_teacher)
+
+    # Process form submission only if editing is allowed
+    if request.method == 'POST' and is_editing:
+        form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=teacher_user)
+        if form.is_valid():
+            form.save()
+            return redirect('teacher_profile_admin', teacher_id=teacher_user.id)
+    else:
+        form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing and teacher_profile else None
+
+    return render(request, 'users/teacher_profile.html', {
+        'teacher_profile': teacher_profile,
+        'is_editing': is_editing,
+        'can_edit': is_teacher or is_admin,
+        'form': form,
+    })
+
+
 
 # Questionnaire View
 @login_required
