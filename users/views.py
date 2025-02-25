@@ -78,37 +78,47 @@ def student_profile_view(request, student_id=None):
   Displays and allows editing of the student's profile.
   """
   is_admin = request.user.role == 'admin'
+  is_teacher = request.user.role == 'teacher'
+  is_student = request.user.role == 'student'
 
+  # Fetch the correct student based on the user role
   if student_id and is_admin:
-    student_profile = get_object_or_404(StudentProfile, user__id=student_id)
+    student = get_object_or_404(CustomUser, id=student_id, role='student')
+  elif student_id and is_teacher:
+    student = get_object_or_404(CustomUser, id=student_id, role='student')
+  elif is_student:
+    student = request.user  # Student viewing their own profile
   else:
-    student_profile = request.user.studentprofile
+    raise Http404("You do not have permission to view this page.")
 
-  if request.method == 'POST' and is_admin:
-    if 'toggle_active' in request.POST:
-      student_profile.user.is_active = not student_profile.user.is_active
-      student_profile.user.save()
-      return redirect('student_profile_admin', student_id=student_profile.user.id)
-    elif 'delete_student' in request.POST:
-      student_profile.user.delete()
-      return redirect('teacher_student_list')
+  # Try fetching the student's profile, handle missing profile
+  try:
+    student_profile = student.studentprofile
+  except ObjectDoesNotExist:
+    raise Http404("This student does not have a profile.")
 
-  is_editing = request.GET.get('edit', 'false').lower() == 'true'
+  # Determine if editing is allowed
+  is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_student)
 
   if request.method == 'POST' and is_editing:
-    form = StudentProfileForm(request.POST, request.FILES, instance=student_profile, user=student_profile.user)
+    form = StudentProfileForm(request.POST, request.FILES, instance=student_profile, user=student)
     if form.is_valid():
       form.save()
-      return redirect('student_profile_admin' if is_admin else 'student_profile', student_id=student_profile.user.id)
+      return redirect('student_profile_admin', student_id=student.id) if is_admin else redirect('student_profile')
+
   else:
-    form = StudentProfileForm(instance=student_profile, user=student_profile.user) if is_editing else None
+    form = StudentProfileForm(instance=student_profile, user=student) if is_editing else None
 
   return render(request, 'users/student_profile.html', {
     'student_profile': student_profile,
     'is_admin': is_admin,
+    'is_teacher': is_teacher,
+    'is_student': is_student,
     'is_editing': is_editing,
     'form': form,
   })
+
+
 
 # Teacher Profile View
 @login_required

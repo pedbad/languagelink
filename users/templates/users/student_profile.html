@@ -60,9 +60,7 @@
             Not provided yet. Tell us what languages you're interested in learning! You can edit your profile to add this information.
           </p>
         {% endif %}
-        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
-
-                
+        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->                
 
 
         <!-- Edit Profile Button Student only -->
@@ -153,11 +151,12 @@
                 </div>
               </div>
             </div>
-
           </div>
-
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Dividerdelete button -->
+        {% endif %}
 
+        <!-- Back to Student List button for admins and teachers -->
+        {% if request.user.role != 'student' %}
           <div class="mt-6 mb-20">
             <a href="{% url 'teacher_student_list' %}"
               class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 w-full">
@@ -249,7 +248,7 @@
 
                 <!-- Custom Button -->
                 <label for="id_profile_picture"
-                  class="inline-flex items-center bg-deep-teal text-white px-4 pb-[5px] pt-[6px] text-xs font-medium leading-normal rounded shadow-lg transition duration-150 ease-in-out hover:bg-teal-600 hover:shadow-md focus:bg-teal-600 focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 active:bg-teal-700 active:shadow-md motion-reduce:transition-none cursor-pointer">
+                  class="inline-flex items-center bg-deep-teal text-white px-4 pb-[5px] pt-[6px] text-xs font-medium leading-normal rounded shadow-lg transition duration-150 ease-in-out hover:bg-teal-600 hover:shadow-md focus:bg-teal-600 focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 active:bg-teal-700 active:shadow-md motion-reduce:transition-none">
                   <!-- Upload Icon -->
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V20.25A2.25 2.25 0 005.25 22.5H18.75A2.25 2.25 0 0021 20.25V16.5M7.5 10.5L12 6M12 6L16.5 10.5M12 6V18" />
@@ -281,7 +280,7 @@
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
 
           <a href="{% url 'password_change' %}" 
-            class="flex items-center justify-center bg-deep-teal text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4">
+            class="flex items-center bg-deep-teal text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4">
               <!-- Icon -->
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
