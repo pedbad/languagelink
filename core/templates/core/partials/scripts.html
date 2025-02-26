@@ -1,6 +1,11 @@
 {% load static %}
+
 {% block extra_scripts %}
-<!-- Add additional JS files here in specific templates -->
-<script src="{% static 'js/tw-elements.umd.min.js' %}"></script>
-<script src="{% static 'js/main.js' %}"></script>
+  <!-- Load Tailwind Elements script -->
+  <script src="{% static 'js/tw-elements.umd.min.js' %}"></script>
+
+  <!-- Load main JavaScript file -->
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <!-- Additional scripts can be added in child templates using block extension -->
 {% endblock %}

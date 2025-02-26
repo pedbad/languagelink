@@ -1,9 +1,36 @@
 {% load static %}
+
+<!-- Character encoding -->
 <meta charset="UTF-8">
+
+<!-- Responsive design settings -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Search Engine Optimization (SEO) Meta Tags -->
+<meta name="description" content="LanguageLink - A comprehensive advising system for language learners. Connect with expert advisors and enhance your language skills.">
+<meta name="keywords" content="Language learning, Advising system, Language courses, Online learning">
+<meta name="author" content="LanguageLink Team">
+
+<!-- Open Graph (OG) Meta Tags for Social Media -->
+<meta property="og:title" content="{% block og_title %}LanguageLink{% endblock %}">
+<meta property="og:description" content="A platform to connect language learners with expert advisors.">
+<meta property="og:image" content="{% static 'core/img/languagelink-logo.png' %}">
+<meta property="og:url" content="https://yourwebsite.com">
+<meta property="og:type" content="website">
+
+<!-- Twitter Card Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{% block twitter_title %}LanguageLink{% endblock %}">
+<meta name="twitter:description" content="A platform to connect language learners with expert advisors.">
+<meta name="twitter:image" content="{% static 'core/img/languagelink-logo.png' %}">
+
+<!-- Page title, overridden in child templates -->
 <title>{% block title %}LanguageLink{% endblock %}</title>
+
+<!-- Stylesheets -->
 <link rel="stylesheet" href="{% static 'css/tw-elements.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/languagelink.css' %}">
+
 {% block extra_head %}
-<!-- Add additional CSS files here in specific templates -->
+  <!-- Additional CSS files can be added in child templates -->
 {% endblock %}
