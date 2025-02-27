@@ -98,9 +98,10 @@ class TeacherProfile(models.Model):
   can_host_in_person = models.BooleanField(default=False)
   can_host_online = models.BooleanField(default=False)
   bookings_link = models.URLField(max_length=250, blank=True, null=True)
+  is_active_advisor = models.BooleanField(default=True)  # NEW FIELD for activation/deactivation
 
   def __str__(self):
-    return f"{self.user.email} - Teacher Profile"
+    return f"{self.user.email} - {'Active' if self.is_active_advisor else 'Inactive'} Teacher Profile"
 
 
 '''

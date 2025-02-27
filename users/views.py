@@ -119,60 +119,76 @@ def student_profile_view(request, student_id=None):
   })
 
 
-
 # Teacher Profile View
 @login_required
 def teacher_profile_view(request, teacher_id=None):
-    """
-    Displays the teacher's profile.
-    - Teachers can edit their own profile.
-    - Admins can view and edit any teacher's profile.
-    - Students can only view advisors.
-    """
+  """
+  Displays and allows editing of the teacher's profile.
+  - Teachers can edit their own profile.
+  - Admins can view and edit any teacher's profile.
+  - Students can only view advisors.
+  """
+  is_admin = request.user.role == 'admin'
+  is_teacher = request.user.role == 'teacher'
+  is_student = request.user.role == 'student'
 
-    is_admin = request.user.role == 'admin'
-    is_teacher = request.user.role == 'teacher'
-    is_student = request.user.role == 'student'
+  # If teacher_id is None, assume the logged-in teacher is accessing their own profile
+  if teacher_id is None:
+    if not is_teacher:
+      return redirect('advisors')  # Redirect students to the advisor list
+    teacher_user = request.user  # Teacher views their own profile
+  else:
+    teacher_user = get_object_or_404(CustomUser, id=teacher_id, role='teacher')
 
-    # If teacher_id is None, assume the logged-in teacher is accessing their own profile
-    if teacher_id is None:
-        if not is_teacher:
-            # Redirect non-teachers to a relevant page
-            return redirect('advisors')  # Redirect students to the advisor list
-        teacher_user = request.user  # Teacher views their own profile
+  # Get the teacher's profile, or return 404 if not found
+  try:
+    teacher_profile = teacher_user.teacherprofile
+  except TeacherProfile.DoesNotExist:
+    if is_admin:
+      teacher_profile = None
     else:
-        # Admins and students viewing a teacher's profile
-        teacher_user = get_object_or_404(CustomUser, id=teacher_id, role='teacher')
+      return render(request, "users/404.html", status=404)
 
-    # Try to get the teacher's profile, handle case where it doesn't exist
-    try:
-        teacher_profile = teacher_user.teacherprofile
-    except TeacherProfile.DoesNotExist:
-        if is_admin:
-            # Admins should still see the page even if the profile is missing
-            teacher_profile = None
-        else:
-            # Students and teachers should not access a missing profile
-            return render(request, "users/404.html", status=404)
+  # Determine if the user is in edit mode
+  is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_teacher)
 
-    # Determine if the user is in edit mode (only allowed for the owner or admin)
-    is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_teacher)
+  if request.method == 'POST' and is_editing:
+    form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=teacher_user)
 
-    # Process form submission only if editing is allowed
-    if request.method == 'POST' and is_editing:
-        form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=teacher_user)
-        if form.is_valid():
-            form.save()
-            return redirect('teacher_profile_admin', teacher_id=teacher_user.id)
-    else:
-        form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing and teacher_profile else None
+    if form.is_valid():
+      updated_profile = form.save(commit=False)
 
-    return render(request, 'users/teacher_profile.html', {
-        'teacher_profile': teacher_profile,
-        'is_editing': is_editing,
-        'can_edit': is_teacher or is_admin,
-        'form': form,
-    })
+      # Handle the toggle for advising availability
+      updated_profile.is_active_advisor = request.POST.get('is_active_advisor') == "on"
+
+      updated_profile.save()
+      return redirect('teacher_profile')  # Redirect to profile after saving
+
+  else:
+    form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing and teacher_profile else None
+
+  return render(request, 'users/teacher_profile.html', {
+    'teacher_profile': teacher_profile,
+    'is_editing': is_editing,
+    'can_edit': is_teacher or is_admin,
+    'form': form,
+  })
+
+
+# Toggle Advising Status Availability  
+@login_required
+def toggle_advising_status(request):
+  """
+  Allows a teacher to activate/deactivate themselves from advising.
+  """
+  if request.user.role != 'teacher':
+    return redirect('teacher_profile')  # Only teachers can perform this action
+
+  teacher_profile = request.user.teacherprofile
+  teacher_profile.is_active_advisor = not teacher_profile.is_active_advisor  # Toggle status
+  teacher_profile.save()
+
+  return redirect('teacher_profile')  # Redirect back to the profile page
 
 
 

@@ -133,5 +133,44 @@
         }
       });
     }
+
+
+    // === Toggle Advising Status Dynamically ===
+    const checkbox = document.getElementById('is_active_advisor');
+    const label = document.getElementById('toggle-label');
+    const statusText = document.getElementById('status-text'); // Find the Current Status element
+
+    if (checkbox && label) {
+      checkbox.addEventListener('change', function () {
+        if (this.checked) {
+          label.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon -->
+            </svg>
+            <span>Deactivate Advising</span>
+          `;
+          label.classList.remove("bg-[#10454F]", "hover:bg-[#0d3a45]", "focus:ring-[#10454F]");
+          label.classList.add("bg-[#B02907]", "hover:bg-[#992405]", "focus:ring-[#B02907]");
+ 
+          statusText.textContent = "Active";
+          statusText.classList.remove("text-[#B02907]"); // Remove red color
+          statusText.classList.add("text-[#10454F]"); // Add green color
+        } else {
+          label.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon -->
+            </svg>
+            <span>Activate Advising</span>
+          `;
+          label.classList.remove("bg-[#B02907]", "hover:bg-[#992405]", "focus:ring-[#B02907]");
+          label.classList.add("bg-[#10454F]", "hover:bg-[#0d3a45]", "focus:ring-[#10454F]");
+
+          statusText.textContent = "Inactive";
+          statusText.classList.remove("text-[#10454F]"); // Remove green color
+          statusText.classList.add("text-[#B02907]"); // Add red color
+        }
+      });
+    }
+
   });
 })();

@@ -24,7 +24,7 @@
         <p class="text-lg"><strong>Name:</strong> {{ teacher_profile.user.first_name }} {{ teacher_profile.user.last_name }}</p>
         <p class="text-lg"><strong>Email:</strong> {{ teacher_profile.user.email }}</p>
         <hr class="my-4 border-1 border-primary-dark-teal">
-
+        
         <p class="text-lg"><strong>Biography:</strong></p>
         {% if teacher_profile.biography %}
           <p class="text-gray-800">{{ teacher_profile.biography }}</p>
@@ -42,6 +42,26 @@
           {% endif %}
         </p>
         <hr class="my-4 border-1 border-primary-dark-teal">
+
+        <!-- Advising Status -->
+        <p class="text-lg"><strong>Advising Status:</strong></p>
+        <p class="flex items-center space-x-2 {% if teacher_profile.is_active_advisor %}text-green-600{% else %}text-red-600{% endif %} font-semibold">
+          {% if teacher_profile.is_active_advisor %}
+            <!-- Heroicon Check Circle -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"/>
+            </svg>
+            <span>Active</span>
+          {% else %}
+            <!-- Heroicon X Circle -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"/>
+            </svg>
+            <span>Inactive</span>
+          {% endif %}
+        </p>
+
+
 
         <!-- Edit Button -->
         {% if request.user.role == 'teacher' and request.user.id == teacher_profile.user.id %}
@@ -135,6 +155,56 @@
 
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
 
+
+          <!-- Toggle Advising Status Section -->
+          <div class="mb-6">
+            <label class="block text-lg font-medium text-gray-700">Advising Status</label>
+
+            <!-- Display Current Status -->
+            <p class="text-gray-800 mb-2">
+              Current Status: 
+              <strong id="status-text" class="{% if teacher_profile.is_active_advisor %}text-[#10454F]{% else %}text-[#B02907]{% endif %}">
+                {% if teacher_profile.is_active_advisor %} Active {% else %} Inactive {% endif %}
+              </strong>
+            </p>
+
+            <!-- Toggle Checkbox Styled as Button -->
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="is_active_advisor" id="is_active_advisor" class="hidden"
+                {% if teacher_profile.is_active_advisor %}checked{% endif %}>
+
+              <span id="toggle-label"
+                class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
+                {% if teacher_profile.is_active_advisor %}
+                  bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
+                {% else %}
+                  bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
+                {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
+                
+                <!-- Hero Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+                  {% if teacher_profile.is_active_advisor %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Inactive) -->
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Active) -->
+                  {% endif %}
+                </svg>
+
+                <span>
+                  {% if teacher_profile.is_active_advisor %}
+                    Deactivate Advising
+                  {% else %}
+                    Activate Advising
+                  {% endif %}
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle button -->
+
+
+          <!-- Change Your Password Section -->
           <a href="{% url 'password_change' %}" 
             class="flex items-center justify-center bg-deep-teal text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4">
               <!-- Icon -->
