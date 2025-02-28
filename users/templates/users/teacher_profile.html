@@ -34,6 +34,26 @@
         <hr class="my-4 border-1 border-primary-dark-teal">
 
         <p class="text-lg"><strong>Hosting Availability:</strong></p>
+        {% if teacher_profile.can_host_online or teacher_profile.can_host_in_person %}
+  <p class="text-gray-800">
+    {% if teacher_profile.can_host_online %}
+      ✅ Available for online meetings.
+    {% endif %}
+    {% if teacher_profile.can_host_in_person %}
+      {% if teacher_profile.can_host_online %} | {% endif %}
+      ✅ In-Person Meetings
+    {% endif %}
+  </p>
+{% else %}
+  <p class="text-red-600 font-semibold">❌ Not Available for online meetings.</p>
+{% endif %}
+
+
+
+
+
+
+
         <p class="text-gray-800">
           {% if teacher_profile.can_host_online %} Online {% endif %}
           {% if teacher_profile.can_host_in_person %} | In-Person {% endif %}
@@ -156,6 +176,60 @@
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
 
 
+
+          <!-- Online Hosting Toggle -->
+           <!-- Online Hosting Availability Toggle -->
+<div class="mb-6">
+  <label class="block text-lg font-medium text-gray-700">Online Hosting Availability</label>
+
+  <!-- Display Current Status -->
+  <p class="text-gray-800 mb-2">
+    Current Status: 
+    <strong id="online-status-text" class="{% if teacher_profile.can_host_online %}text-[#10454F]{% else %}text-[#B02907]{% endif %}">
+      {% if teacher_profile.can_host_online %} Available for online meetings {% else %} Not available for online meetings {% endif %}
+    </strong>
+  </p>
+
+  <!-- Toggle Styled Button -->
+  <label class="inline-flex items-center cursor-pointer">
+    <input type="checkbox" name="can_host_online" id="can_host_online" class="hidden"
+      {% if teacher_profile.can_host_online %}checked{% endif %}>
+
+    <span id="online-toggle-label"
+      class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
+      {% if teacher_profile.can_host_online %}
+        bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
+      {% else %}
+        bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
+      {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
+      
+      <!-- Hero Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+        {% if teacher_profile.can_host_online %}
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
+        {% else %}
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
+        {% endif %}
+      </svg>
+
+      <span>
+        {% if teacher_profile.can_host_online %}
+          Disable Online Meetings
+        {% else %}
+          Enable Online Meetings
+        {% endif %}
+      </span>
+    </span>
+  </label>
+</div>
+
+<hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle -->
+
+          
+          
+          
+          
+          
           <!-- Toggle Advising Status Section -->
           <div class="mb-6">
             <label class="block text-lg font-medium text-gray-700">Advising Status</label>

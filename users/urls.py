@@ -15,6 +15,7 @@ from .views import (
   admin_dashboard_view,        # Displays admin dashboard
   toggle_student_active,       # Import the new toggle active view
   delete_student,              # Placeholder for the delete functionality
+  toggle_can_host_online,      # Teacher availability for online meetings
   toggle_advising_status,      # Teacher availability toggle view
   
 )
@@ -36,6 +37,7 @@ urlpatterns = [
   path('teacher/profile/', teacher_profile_view, name='teacher_profile'),
   path('teacher/<int:teacher_id>/profile/', teacher_profile_view, name='teacher_profile_admin'),
   path('teacher/students/', teacher_student_list_view, name='teacher_student_list'),
+  path('teacher/toggle-online/', toggle_can_host_online, name='toggle_can_host_online'),  # route to toggle online availability
   path('teacher/toggle-advising/', toggle_advising_status, name='toggle_advising_status'),  # route to toggle teacher availability
   path('student/<int:student_id>/questionnaire/', questionnaire_view, name='student_questionnaire'),  # View student's questionnaire
   path('student/<int:student_id>/profile/', student_profile_view, name='student_profile_admin'),  # View specific student's profile

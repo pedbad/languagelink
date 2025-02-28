@@ -173,6 +173,22 @@ def teacher_profile_view(request, teacher_id=None):
     'can_edit': is_teacher or is_admin,
     'form': form,
   })
+  
+  
+@login_required
+def toggle_can_host_online(request):
+  """
+  Allows a teacher to toggle their availability for online hosting.
+  """
+  if request.user.role != 'teacher':
+    return redirect('teacher_profile')  # Only teachers can perform this action
+
+  teacher_profile = request.user.teacherprofile
+  teacher_profile.can_host_online = not teacher_profile.can_host_online  # Toggle status
+  teacher_profile.save()
+
+  return redirect('teacher_profile')  # Redirect back to the profile page
+
 
 
 # Toggle Advising Status Availability  

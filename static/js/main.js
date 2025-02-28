@@ -135,6 +135,47 @@
     }
 
 
+    // === Toggle Online Hosting Availability Dynamically ===
+    const onlineCheckbox = document.getElementById('can_host_online');
+    const onlineLabel = document.getElementById('online-toggle-label');
+    const onlineStatusText = document.getElementById('online-status-text'); // Find the Current Status element
+
+    if (onlineCheckbox && onlineLabel) {
+      onlineCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+          onlineLabel.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
+            </svg>
+            <span>Disable Online Meetings</span>
+          `;
+          onlineLabel.classList.remove("bg-[#10454F]", "hover:bg-[#0d3a45]", "focus:ring-[#10454F]");
+          onlineLabel.classList.add("bg-[#B02907]", "hover:bg-[#992405]", "focus:ring-[#B02907]");
+
+          // Update Current Status Text
+          onlineStatusText.textContent = "Available for online meetings";
+          onlineStatusText.classList.remove("text-[#B02907]");
+          onlineStatusText.classList.add("text-[#10454F]");
+        } else {
+          onlineLabel.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
+            </svg>
+            <span>Enable Online Meetings</span>
+          `;
+          onlineLabel.classList.remove("bg-[#B02907]", "hover:bg-[#992405]", "focus:ring-[#B02907]");
+          onlineLabel.classList.add("bg-[#10454F]", "hover:bg-[#0d3a45]", "focus:ring-[#10454F]");
+
+          // Update Current Status Text
+          onlineStatusText.textContent = "Not available for online meetings";
+          onlineStatusText.classList.remove("text-[#10454F]");
+          onlineStatusText.classList.add("text-[#B02907]");
+        }
+      });
+    }
+
+
+
     // === Toggle Advising Status Dynamically ===
     const checkbox = document.getElementById('is_active_advisor');
     const label = document.getElementById('toggle-label');
