@@ -154,16 +154,35 @@
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
           {% for teacher in teachers %}
-          <tr class="hover:bg-gray-50">
+          <tr class="hover:bg-gray-50 {% if not teacher.is_active_advisor %}opacity-50{% endif %}" 
+              {% if not teacher.is_active_advisor %}title="This advisor is currently inactive"{% endif %}>
             <td class="py-4 px-4 text-center">
+              <!-- Profile Picture -->
               {% if teacher.profile_picture %}
                 <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
               {% else %}
                 <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full mx-auto">
               {% endif %}
+
+              <!-- Advisor Status Badge -->
+              <div class="mt-2">
+                {% if not teacher.is_active_advisor %}
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-red-500 text-white">
+                    Inactive
+                  </span>
+                {% else %}
+                  <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-[#10454F] text-white">
+                    Available
+                  </span>
+                {% endif %}
+              </div>
+            </td>            
+            <td class="px-3 py-4 text-sm {% if not teacher.is_active_advisor %}text-gray-500{% else %}text-gray-900{% endif %}">
+              {{ teacher.user.first_name }}
             </td>
-            <td class="px-3 py-4 text-sm text-gray-900">{{ teacher.user.first_name }}</td>
-            <td class="px-3 py-4 text-sm text-gray-900">{{ teacher.user.last_name }}</td>
+            <td class="px-3 py-4 text-sm {% if not teacher.is_active_advisor %}text-gray-500{% else %}text-gray-900{% endif %}">
+              {{ teacher.user.last_name }}
+            </td>
             <td class="px-3 py-4 text-sm text-gray-500">{{ teacher.user.email }}</td>
             <td class="px-3 py-4 text-sm text-gray-500">{{ teacher.user.date_joined|date:"M d, Y" }}</td>
             <td class="py-4 px-4 text-center">
