@@ -176,6 +176,23 @@ def teacher_profile_view(request, teacher_id=None):
   
   
 @login_required
+def toggle_can_host_in_person(request):
+  """
+  Allows a teacher to toggle their availability for in-person hosting.
+  """
+  if request.user.role != 'teacher':
+    return redirect('teacher_profile')  # Only teachers can perform this action
+
+  teacher_profile = request.user.teacherprofile
+  teacher_profile.can_host_in_person = not teacher_profile.can_host_in_person  # Toggle status
+  teacher_profile.save()
+
+  return redirect('teacher_profile')  # Redirect back to the profile page
+
+  
+
+  
+@login_required
 def toggle_can_host_online(request):
   """
   Allows a teacher to toggle their availability for online hosting.

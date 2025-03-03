@@ -135,6 +135,50 @@
     }
 
 
+
+    // === Toggle In-Person Hosting Availability Dynamically ===
+    const inPersonCheckbox = document.getElementById('can_host_in_person');
+    const inPersonLabel = document.getElementById('in-person-toggle-label');
+    const inPersonStatusText = document.getElementById('in-person-status-text'); // Find the Current Status element
+
+    if (inPersonCheckbox && inPersonLabel) {
+      inPersonCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+          inPersonLabel.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
+            </svg>
+            <span>Disable In-Person Meetings</span>
+          `;
+          inPersonLabel.classList.remove("bg-[#10454F]", "hover:bg-[#0d3a45]", "focus:ring-[#10454F]");
+          inPersonLabel.classList.add("bg-[#B02907]", "hover:bg-[#992405]", "focus:ring-[#B02907]");
+
+          // Update Current Status Text
+          inPersonStatusText.textContent = "Available for in-person meetings";
+          inPersonStatusText.classList.remove("text-[#B02907]");
+          inPersonStatusText.classList.add("text-[#10454F]");
+        } else {
+          inPersonLabel.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
+            </svg>
+            <span>Enable In-Person Meetings</span>
+          `;
+          inPersonLabel.classList.remove("bg-[#B02907]", "hover:bg-[#992405]", "focus:ring-[#B02907]");
+          inPersonLabel.classList.add("bg-[#10454F]", "hover:bg-[#0d3a45]", "focus:ring-[#10454F]");
+
+          // Update Current Status Text
+          inPersonStatusText.textContent = "Not available for in-person meetings";
+          inPersonStatusText.classList.remove("text-[#10454F]");
+          inPersonStatusText.classList.add("text-[#B02907]");
+        }
+      });
+    }
+
+
+
+
+
     // === Toggle Online Hosting Availability Dynamically ===
     const onlineCheckbox = document.getElementById('can_host_online');
     const onlineLabel = document.getElementById('online-toggle-label');
