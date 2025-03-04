@@ -35,6 +35,7 @@ INSTALLED_APPS = [
   # Custom Apps
   'core',
   'users',
+  'booking',
 ]
 
 MIDDLEWARE = [
