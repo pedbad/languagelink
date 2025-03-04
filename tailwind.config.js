@@ -4,6 +4,7 @@ module.exports = {
     './templates/**/*.html',
     './core/templates/**/*.html',
     './users/templates/**/*.html',
+    './booking/templates/**/*.html',
     './node_modules/tw-elements/dist/js/**/*.js'
   ],
   theme: {

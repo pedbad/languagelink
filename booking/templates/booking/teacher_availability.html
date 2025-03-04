@@ -1,11 +1,85 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load booking_filters %}
 
 {% block content %}
   <div class="container mx-auto mt-10">
-    <h1 class="text-3xl font-light text-gray-900 text-center mb-6">Teacher Availability</h1>
-    <hr class="my-4 border-1 border-gray-300">
+    <h1 class="text-3xl font-light text-gray-900 text-center mb-6">
+      {{ request.user.first_name }} {{ request.user.last_name }}'s Availability Page
+    </h1>
+    <hr class="my-4 border-1 border-gray-300 mb-6">    
 
-    <p class="text-lg text-gray-700 text-center">This is a placeholder for the availability page.</p>
+    <!-- Month Navigation -->
+    <div class="flex justify-between items-center mb-4">
+      <a href="?year={{ prev_year }}&month={{ prev_month }}" 
+         class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+        &larr; Previous Month
+      </a>
+      <h2 class="text-xl font-semibold text-gray-800">
+        {{ current_month }} {{ current_year }}
+      </h2>      
+      <a href="?year={{ next_year }}&month={{ next_month }}" 
+         class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+        Next Month &rarr;
+      </a>
+    </div>
+
+    <!-- Availability Table -->
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse border border-gray-300 text-sm sm:text-base">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
+            {% for start_time, end_time in time_slots %}
+              <th class="border border-gray-300 px-2 py-1 text-xs whitespace-nowrap">{{ start_time }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for day in month_dates %}
+            {% with day_weekday=day|date:"w" %}
+              <tr class="text-center 
+                {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} border-l-4 border-deep-teal {% endif %} 
+                {% if day < today %} bg-gray-200 opacity-60 {% endif %}">
+                
+                <!-- Date Column -->
+                <td class="border border-gray-300 px-4 py-2 font-semibold 
+                  {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} bg-deep-teal text-white font-bold {% else %} text-gray-700 {% endif %}">
+                  {{ day|date:"D, jS" }}
+                </td>
+
+                <!-- Time Slots -->
+                {% for start_time, end_time in time_slots %}
+                  {% with day_availability=availability_dict|get_item:day %}
+                    {% with is_available=day_availability|get_item:start_time %}
+                      <td class="border border-gray-300 px-2 py-1">
+                        <button 
+                          data-date="{{ day }}" 
+                          data-start-time="{{ start_time }}"
+                          data-end-time="{{ end_time }}"
+                          class="toggle-slot px-2 py-1 rounded-md 
+                            {% if is_available %} bg-green-500 text-white {% else %} bg-red-500 text-white {% endif %}
+                            {% if day < today %} cursor-not-allowed opacity-50 {% endif %}">
+                          {% if is_available %} 🟢 {% else %} 🔴 {% endif %}
+                        </button>
+                      </td>
+                    {% endwith %}
+                  {% endwith %}
+                {% endfor %}
+              </tr>
+
+              <!-- Insert a blank row after every Friday -->
+              {% if day|date:"D" == "Fri" %}
+              <tr>
+                <td colspan="{{ time_slots|length|add:1 }}" 
+                    class="h-4 bg-slate-200 border-l-4 border-r-4 border-transparent"></td>
+              </tr>
+              {% endif %}
+
+            {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 {% endblock %}
