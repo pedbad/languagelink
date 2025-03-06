@@ -7,7 +7,7 @@
     <h1 class="text-3xl font-light text-gray-900 text-center mb-6">
       {{ request.user.first_name }} {{ request.user.last_name }}'s Availability Page
     </h1>
-    <hr class="my-4 border-1 border-gray-300 mb-6">    
+    <hr class="my-4 border-1 border-gray-300 mb-6"> 
 
     <!-- Month Navigation -->
     <div class="flex items-center justify-center gap-4 mb-4">
@@ -91,7 +91,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3 mx-auto">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
                 </svg>
-                {{ end_time|date:"g:i" }}<!-- Removes AM/PM -->
+                {{ end_time|date:"g:i" }}
               </th>
             {% endfor %}
           </tr>
@@ -111,37 +111,37 @@
     
               <!-- Time Slots -->
               {% for start_time, end_time in time_slots %}
-                {% with day_availability=availability_dict|get_item:day %}
-                  {% with is_available=day_availability|get_item:start_time %}
-                  <td class="border border-gray-300 p-2">
-                    <button 
-                      data-date="{{ day }}" 
-                      data-start-time="{{ start_time }}"
-                      data-end-time="{{ end_time }}"
-                      class="toggle-slot flex items-center justify-center w-8 h-8 rounded-full shadow-md 
-                        {% if is_available %} bg-green-500 text-white hover:bg-green-600 {% else %} bg-red-500 text-white hover:bg-red-600 {% endif %}
-                        {% if day < today %} cursor-not-allowed opacity-50 {% endif %}">
-                  
-                      {% if is_available %}
-                        <!-- Larger Tick (Check) Icon -->
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M5 12l5 5L20 7"/>
-                        </svg>
-                      {% else %}
-                        <!-- Larger X Icon -->
-                        <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M6 6l12 12M18 6l-12 12"/>
-                        </svg>
-                      {% endif %}
-                    </button>
-                  </td>
-                  
-                  
-                  
-                  
-                  
-                  
-                  
+                {% with date_part=day|date:"Y-m-d" %}
+                  {% with time_part=start_time|time:"H:i:s" %}
+                    {% with key=date_part|add:","|add:time_part %}
+                      {% with is_available=availability_dict|get_item:key|default:False %}
+                        <td class="border border-gray-300 p-2">
+                          <!-- Availability Toggle Button -->
+                          <button 
+                            data-date="{{ date_part }}" 
+                            data-start-time="{{ time_part }}" 
+                            data-end-time="{{ end_time|time:'H:i:s' }}"
+                            class="toggle-slot flex items-center justify-center w-8 h-8 rounded-full shadow-md 
+                              {% if is_available %} bg-green-500 text-white hover:bg-green-600 
+                              {% else %} bg-red-500 text-white hover:bg-red-600 {% endif %}
+                              {% if day < today %} cursor-not-allowed opacity-50 {% endif %}">
+                            {% if is_available %}
+                              <!-- Tick (Check) Icon -->
+                              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12l5 5L20 7"/>
+                              </svg>
+                            {% else %}
+                              <!-- X Icon -->
+                              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 6l12 12M18 6l-12 12"/>
+                              </svg>
+                            {% endif %}
+                          </button>
+                        </td>
+                      {% endwith %}
+                    {% endwith %}
                   {% endwith %}
                 {% endwith %}
               {% endfor %}
@@ -222,3 +222,6 @@
 
   </div>
 {% endblock %}
+
+
+

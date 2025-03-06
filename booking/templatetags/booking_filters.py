@@ -4,5 +4,7 @@ register = template.Library()
 
 @register.filter
 def get_item(dictionary, key):
-    """ Retrieves an item from a dictionary safely in Django templates. """
-    return dictionary.get(key, {})
+  """Safely get an item from a dictionary using a tuple key."""
+  if isinstance(dictionary, dict):
+    return dictionary.get(key, False)  # Default to False
+  return False  # Prevent errors when `dictionary` isn't a dict

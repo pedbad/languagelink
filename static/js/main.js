@@ -257,5 +257,115 @@
       });
     }
 
+    // === Toggle Availability Slots Dynamically ===
+    const availabilityButtons = document.querySelectorAll('.toggle-slot');
+
+    availabilityButtons.forEach(button => {
+      button.addEventListener('click', async function () {
+        const date = this.getAttribute('data-date');
+        const startTime = this.getAttribute('data-start-time');
+        const endTime = this.getAttribute('data-end-time');
+
+        // Prevent toggling past dates
+        if (new Date(date) < new Date().setHours(0, 0, 0, 0)) {
+          return;
+        }
+
+        // ✅ Disable button during request to prevent spam clicking
+        this.disabled = true;
+
+        try {
+          const response = await fetch('/booking/toggle-availability/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({ 
+              date: date, 
+              start_time: startTime, 
+              end_time: endTime 
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // ✅ Instantly update button UI
+            if (data.is_available) {
+              this.classList.remove('bg-red-500', 'hover:bg-red-600');
+              this.classList.add('bg-green-500', 'hover:bg-green-600');
+              this.innerHTML = `
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12l5 5L20 7"/>
+                </svg>`;
+            } else {
+              this.classList.remove('bg-green-500', 'hover:bg-green-600');
+              this.classList.add('bg-red-500', 'hover:bg-red-600');
+              this.innerHTML = `
+                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M6 6l12 12M18 6l-12 12"/>
+                </svg>`;
+            }
+
+            // ✅ Refresh availability_dict **in the template**
+            updateAvailabilityUI(data.availability_dict);
+          } else {
+            console.error('Failed to toggle availability:', data.error);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        } finally {
+          // ✅ Re-enable button after request completes
+          this.disabled = false;
+        }
+      });
+    });
+
+    // ✅ Function to update the availability UI based on new data from the backend
+    function updateAvailabilityUI(availabilityDict) {
+      document.querySelectorAll('.toggle-slot').forEach(button => {
+        const date = button.getAttribute('data-date');
+        const startTime = button.getAttribute('data-start-time');
+
+        const key = `${date},${startTime}`;  // ✅ Match Django's new string key format
+        const isAvailable = availabilityDict[key];
+
+        if (isAvailable) {
+          button.classList.remove('bg-red-500', 'hover:bg-red-600');
+          button.classList.add('bg-green-500', 'hover:bg-green-600');
+          button.innerHTML = `
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12l5 5L20 7"/>
+            </svg>`;
+        } else {
+          button.classList.remove('bg-green-500', 'hover:bg-green-600');
+          button.classList.add('bg-red-500', 'hover:bg-red-600');
+          button.innerHTML = `
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 6l12 12M18 6l-12 12"/>
+            </svg>`;
+        }
+      });
+    }
+
+
+    
+    // Function to get CSRF token from cookies
+    function getCSRFToken() {
+      const name = 'csrftoken=';
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.startsWith(name)) {
+          return cookie.substring(name.length, cookie.length);
+        }
+      }
+      return '';
+    }
+
+
+
+
   });
 })();
