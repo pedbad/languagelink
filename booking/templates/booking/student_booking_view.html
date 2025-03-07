@@ -122,7 +122,7 @@
                   slotDiv.classList.add("p-4", "border", "rounded-lg", "shadow-md", "bg-white");
         
                   slotDiv.innerHTML = `
-                    <p class="font-medium">${time}</p>
+                    <p class="font-medium">${formatTimeRange(time)}</p>
                     <p class="text-gray-700">Available with:</p>
                     <ul class="text-gray-600">
                       ${teachers.map(teacher => `<li>👤 ${teacher}</li>`).join("")}
@@ -164,6 +164,33 @@
           });
         });
       });
+
+      // Function to format time from "HH:MM:SS" to "h:mm → h:mm"
+      function formatTimeRange(startTime) {
+        const timeParts = startTime.split(":");
+        const hour = parseInt(timeParts[0], 10);
+        const minute = timeParts[1];
+
+        // Create Date object for adding 30 minutes
+        const startDate = new Date(2000, 0, 1, hour, minute);
+        const endDate = new Date(startDate.getTime() + 30 * 60000); // Add 30 minutes
+
+        // Format times to "h:mm" format
+        const startFormatted = startDate.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true
+        });
+        
+        const endFormatted = endDate.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true
+        });
+
+        return `${startFormatted} → ${endFormatted}`;
+      }
+
     </script>
     
     
