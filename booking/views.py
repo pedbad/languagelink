@@ -2,10 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST  # Add this to enforce POST requests
 from datetime import datetime, timedelta, date
 import calendar
 import json
 from .models import TeacherAvailability, Booking
+
 
 @login_required
 def teacher_availability_view(request):
@@ -314,7 +316,7 @@ def student_booking_view(request):
   if week_start == current_week_start:  # Only disable past days in the current week
     disabled_days = [day for day in week_dates if day < today]
 
-  # ✅ Fix Month/Year Display for Weeks Spanning Two Months
+  # Fix Month/Year Display for Weeks Spanning Two Months
   if week_start.month == week_end.month:
     month_display = f"{calendar.month_name[week_start.month]} {week_start.year}"
   else:
@@ -333,3 +335,43 @@ def student_booking_view(request):
   }
 
   return render(request, "booking/student_booking_view.html", context)
+
+
+@login_required
+def get_available_slots(request):
+  """
+  Returns available teachers and their time slots for a given date.
+  """
+
+  # Ensure the request is a GET request
+  if request.method != "GET":
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+  # Get the date parameter from the request
+  date_str = request.GET.get("date")
+  if not date_str:
+    return JsonResponse({"error": "Missing date parameter"}, status=400)
+
+  try:
+    selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+  except ValueError:
+    return JsonResponse({"error": "Invalid date format"}, status=400)
+
+  # Fetch available slots for the selected date
+  available_slots = TeacherAvailability.objects.filter(
+    date=selected_date, is_available=True
+  ).select_related("teacher")
+
+  if not available_slots.exists():
+    return JsonResponse({"success": True, "slots": {}})  # Return empty slots if none exist
+
+  # Convert the queryset into a structured dictionary
+  slots_dict = {}
+  for slot in available_slots:
+    time_key = slot.start_time.strftime("%H:%M:%S")
+    if time_key not in slots_dict:
+      slots_dict[time_key] = []
+
+    slots_dict[time_key].append(slot.teacher.email)
+
+  return JsonResponse({"success": True, "slots": slots_dict})

@@ -33,7 +33,6 @@
         </a>
       {% endif %}
 
-
       <!-- Weekday Buttons -->
       <div class="flex space-x-2">
         {% for day in week_dates %}
@@ -43,13 +42,15 @@
             </span>
           {% else %}
             <a href="?date={{ day|date:'Y-m-d' }}" 
-              class="px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition duration-150 ease-in-out 
-                {% if day == selected_date %} bg-deep-teal text-white font-bold {% else %} bg-gray-200 text-gray-700 hover:bg-gray-300 {% endif %}">
+              class="week-day-button px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition duration-150 ease-in-out 
+                {% if day == selected_date %} bg-deep-teal text-white font-bold {% else %} bg-gray-200 text-gray-700 hover:bg-gray-300 {% endif %}"
+              data-date="{{ day|date:'Y-m-d' }}">
               {{ day|date:"l jS" }}
             </a>
           {% endif %}
         {% endfor %}
       </div>
+
 
       <!-- Next Week Button -->
       <a href="?date={{ next_week }}" 
@@ -62,8 +63,112 @@
       </a>
     </div>
 
-    <!-- Debugging Output -->
     <pre class="text-gray-800 text-center flex-1 mb-4">Selected Date: {{ selected_date }}</pre>
+    <hr class="my-4 border-1 border-gray-300 mb-6">
+
+    <!-- Available Slots Section -->
+    <div id="available-slots" class="mt-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">Available Slots</h2>
+      <div id="slots-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Slots will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const slotsContainer = document.getElementById("slots-container");
+        const selectedDateElement = document.getElementById("selected-date-display");
+    
+        // Get the initially selected date (today or Monday of the selected week)
+        let selectedDate = "{{ selected_date|date:'Y-m-d' }}"; 
+    
+        // Function to update highlighted button
+        function updateSelectedButton(newDate) {
+          document.querySelectorAll(".week-day-button").forEach(button => {
+            if (button.getAttribute("data-date") === newDate) {
+              button.classList.add("bg-deep-teal", "text-white", "font-bold");
+              button.classList.remove("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
+            } else {
+              button.classList.remove("bg-deep-teal", "text-white", "font-bold");
+              button.classList.add("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
+            }
+          });
+        }
+    
+        // Function to fetch available slots
+        function fetchAvailableSlots(date) {
+          console.log(`Fetching slots for date: ${date}`); // Debugging
+        
+          fetch(`/booking/get-available-slots/?date=${date}`)
+            .then(response => {
+              console.log("Response status:", response.status); // Log status
+              return response.json();
+            })
+            .then(data => {
+              console.log("Slots Data:", data); // Log the fetched slots data
+        
+              if (!data.success) {
+                console.error("Server Error:", data.error || "Unknown error");
+                slotsContainer.innerHTML = `<p class='text-red-600'>Error: ${data.error}</p>`;
+                return;
+              }
+        
+              // Clear previous slots
+              slotsContainer.innerHTML = "";
+        
+              if (Object.keys(data.slots).length > 0) {
+                Object.entries(data.slots).forEach(([time, teachers]) => {
+                  const slotDiv = document.createElement("div");
+                  slotDiv.classList.add("p-4", "border", "rounded-lg", "shadow-md", "bg-white");
+        
+                  slotDiv.innerHTML = `
+                    <p class="font-medium">${time}</p>
+                    <p class="text-gray-700">Available with:</p>
+                    <ul class="text-gray-600">
+                      ${teachers.map(teacher => `<li>👤 ${teacher}</li>`).join("")}
+                    </ul>
+                  `;
+        
+                  slotsContainer.appendChild(slotDiv);
+                });
+              } else {
+                slotsContainer.innerHTML = "<p class='text-gray-600'>No available slots for this date.</p>";
+              }
+            })
+            .catch(error => {
+              console.error("Fetch Error:", error); // Log the actual error
+              slotsContainer.innerHTML = "<p class='text-red-600'>Error loading slots.</p>";
+            });
+        }
+        
+    
+        // Fetch slots for initially selected date
+        fetchAvailableSlots(selectedDate);
+        selectedDateElement.textContent = `Selected Date: ${new Date(selectedDate).toLocaleDateString('en-US', {
+          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        })}`;
+        updateSelectedButton(selectedDate);
+    
+        // Add event listeners to **enabled weekday buttons only**
+        document.querySelectorAll(".week-day-button").forEach(button => {
+          button.addEventListener("click", function (event) {
+            event.preventDefault();
+    
+            // Get the date from the `data-date` attribute
+            let newDate = this.getAttribute("data-date");
+    
+            if (newDate) {
+              selectedDate = newDate;
+              fetchAvailableSlots(selectedDate);
+            }
+          });
+        });
+      });
+    </script>
+    
+    
+    
+
 
   </div>
 {% endblock %}
