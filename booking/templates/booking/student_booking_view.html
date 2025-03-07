@@ -3,11 +3,72 @@
 {% load booking_filters %}
 
 {% block content %}
-<pre>{{ booking_dict }}</pre>
-{{ booking_dict }}
+  <div class="container mx-auto mt-10">
+    <h1 class="text-3xl font-light text-gray-900 text-center mb-6">Book a Meeting</h1>
+    <hr class="my-4 border-1 border-gray-300 mb-6">
+    <!-- Month & Year (Always Centered) -->
+    <h2 class="text-xl font-semibold text-gray-800 text-center flex-1 mb-4">
+      {{ month_display }}
+    </h2>
+
+    <!-- Week Navigation -->
+    <div class="flex items-center justify-center gap-4 mb-6">
+      <!-- Previous Week Button -->
+      {% if disable_prev_week %}
+        <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
+          <!-- Heroicon Left Arrow -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Previous Week
+        </span>
+      {% else %}
+        <a href="?date={{ prev_week }}" 
+          class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+          <!-- Heroicon Left Arrow -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+          </svg>
+          Previous Week
+        </a>
+      {% endif %}
 
 
+      <!-- Weekday Buttons -->
+      <div class="flex space-x-2">
+        {% for day in week_dates %}
+          {% if day in disabled_days %}
+            <span class="px-4 py-2 rounded-lg text-sm font-medium shadow-lg cursor-not-allowed bg-gray-300 text-gray-500">
+              {{ day|date:"l jS" }}
+            </span>
+          {% else %}
+            <a href="?date={{ day|date:'Y-m-d' }}" 
+              class="px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition duration-150 ease-in-out 
+                {% if day == selected_date %} bg-deep-teal text-white font-bold {% else %} bg-gray-200 text-gray-700 hover:bg-gray-300 {% endif %}">
+              {{ day|date:"l jS" }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Next Week Button -->
+      <a href="?date={{ next_week }}" 
+        class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+        Next Week
+        <!-- Heroicon Right Arrow -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+        </svg>
+      </a>
+    </div>
+
+    <!-- Debugging Output -->
+    <pre class="text-gray-800 text-center flex-1 mb-4">Selected Date: {{ selected_date }}</pre>
+
+  </div>
 {% endblock %}
+
+
 
 
 

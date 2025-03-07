@@ -130,7 +130,7 @@ def toggle_availability(request):
 
       print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
 
-      # ✅ Convert availability_dict keys into **strings** (JSON-safe)
+      # Convert availability_dict keys into **strings** (JSON-safe)
       teacher_availabilities = TeacherAvailability.objects.filter(
         teacher=request.user, date__year=slot_date.year, date__month=slot_date.month
       )
@@ -143,7 +143,7 @@ def toggle_availability(request):
       return JsonResponse({
         "success": True, 
         "is_available": slot.is_available, 
-        "availability_dict": updated_availability_dict  # ✅ Now has string keys
+        "availability_dict": updated_availability_dict  # Now has string keys
       })
 
     except Exception as e:
@@ -194,7 +194,7 @@ def toggle_availability(request):
 
       print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
 
-      # ✅ Return the entire updated availability dictionary
+      # Return the entire updated availability dictionary
       teacher_availabilities = TeacherAvailability.objects.filter(
         teacher=request.user, date__year=slot_date.year, date__month=slot_date.month
       )
@@ -268,89 +268,68 @@ def toggle_availability(request):
   return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-
 @login_required
 def student_booking_view(request):
   """
-  Displays available booking slots for students, showing available teachers per slot.
+  Displays the booking system for students, allowing them to see
+  available slots and book meetings with teachers.
   """
 
-  # Restrict access to students only
-  if request.user.role != 'student':
-    return redirect('student_dashboard')
+  # Get the selected date from query params (default to today)
+  selected_date_str = request.GET.get("date")
+  today = datetime.today().date()
 
-  # Get current date and determine week's range
-  today = date.today()
-  start_of_week = today - timedelta(days=today.weekday())  # Get Monday
-  selected_week = int(request.GET.get("week", 0))  # Default to current week
+  if selected_date_str:
+    try:
+      selected_date = datetime.strptime(selected_date_str, "%Y-%m-%d").date()
+    except ValueError:
+      selected_date = today  # Fallback to today if invalid
+  else:
+    selected_date = today
 
-  # Calculate the week's date range
-  start_date = start_of_week + timedelta(weeks=selected_week)
-  end_date = start_date + timedelta(days=4)  # Friday only (no weekends)
+  # Get the start of the current week (Monday)
+  current_week_start = today - timedelta(days=today.weekday())  # Current week's Monday
+  current_week_end = current_week_start + timedelta(days=4)  # Current week's Friday
 
-  # Generate weekdays list (Monday to Friday)
-  week_dates = [start_date + timedelta(days=i) for i in range(5)]
+  # Calculate the start (Monday) and end (Friday) of the selected week
+  week_start = selected_date - timedelta(days=selected_date.weekday())  # Get Monday of selected week
+  week_end = week_start + timedelta(days=4)  # Friday of selected week
 
-  # Define 30-minute slots from 9:00 AM to 5:30 PM
-  time_slots = [
-    (
-      datetime(2000, 1, 1, hour, minute).time(),
-      (datetime(2000, 1, 1, hour, minute) + timedelta(minutes=30)).time(),
-    )
-    for hour in range(9, 18)  # 9:00 AM - 5:30 PM
-    for minute in (0, 30)
-  ]
+  # Get the previous and next week dates
+  prev_week = week_start - timedelta(days=7)
+  next_week = week_start + timedelta(days=7)
 
-  # Fetch all available slots for this week
-  available_slots = TeacherAvailability.objects.filter(
-    date__range=[start_date, end_date],
-    is_available=True
-  ).select_related("teacher")
+  # Ensure that in the current week, today is selected instead of Monday
+  if week_start == current_week_start:
+    selected_date = today  # Set selected date to today if we're in the current week
 
-  print(f"DEBUG: Retrieved Availability - {list(available_slots.values())}")
+  # Disable previous week button if we are in the current week
+  disable_prev_week = week_start <= current_week_start
 
-  # Convert queryset to dictionary for quick lookup
-  booking_dict = {}
+  # Generate the days for this week (Monday to Friday)
+  week_dates = [week_start + timedelta(days=i) for i in range(5)]
 
-  for slot in available_slots:
-    date_key = slot.date.strftime('%Y-%m-%d')
-    time_key = slot.start_time.strftime('%H:%M:%S')
+  # Identify which days should be disabled (past days in the current week)
+  disabled_days = []
+  if week_start == current_week_start:  # Only disable past days in the current week
+    disabled_days = [day for day in week_dates if day < today]
 
-    if date_key not in booking_dict:
-      booking_dict[date_key] = {}
+  # ✅ Fix Month/Year Display for Weeks Spanning Two Months
+  if week_start.month == week_end.month:
+    month_display = f"{calendar.month_name[week_start.month]} {week_start.year}"
+  else:
+    month_display = f"{calendar.month_name[week_start.month]} - {calendar.month_name[week_end.month]} {week_end.year}"
 
-    if time_key not in booking_dict[date_key]:
-      booking_dict[date_key][time_key] = []
-
-    booking_dict[date_key][time_key].append(slot.teacher)
-
-  print(f"DEBUG: Final Booking Dictionary - {booking_dict}")
-
-  # Ensure all slots exist, defaulting to an empty list (`[]`) if no teacher is available
-  for day in week_dates:
-    day_str = day.strftime('%Y-%m-%d')
-    if day_str not in booking_dict:
-      booking_dict[day_str] = {}
-
-    for start_time, _ in time_slots:
-      time_str = start_time.strftime('%H:%M:%S')
-      if time_str not in booking_dict[day_str]:
-        booking_dict[day_str][time_str] = []  # Default to empty list
-
-  # Prepare context for rendering the template
+  # Context for rendering the template
   context = {
     "today": today,
+    "selected_date": selected_date,
     "week_dates": week_dates,
-    "time_slots": time_slots,
-    "booking_dict": booking_dict,  # Pass available teachers per slot
-    "current_month": calendar.month_name[start_date.month],
-    "current_year": start_date.year,
-    "prev_week": selected_week - 1,
-    "next_week": selected_week + 1,
+    "prev_week": prev_week.strftime("%Y-%m-%d"),
+    "next_week": next_week.strftime("%Y-%m-%d"),
+    "disable_prev_week": disable_prev_week,
+    "disabled_days": disabled_days,  # Pass list of disabled days to the template
+    "month_display": month_display,  # Updated month display
   }
 
   return render(request, "booking/student_booking_view.html", context)
-
-
-
-
