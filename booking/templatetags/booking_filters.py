@@ -8,3 +8,12 @@ def get_item(dictionary, key):
   if isinstance(dictionary, dict):
     return dictionary.get(key, False)  # Default to False
   return False  # Prevent errors when `dictionary` isn't a dict
+
+@register.filter(name="add_int")
+def add_int(value, arg):
+  try:
+    return int(value) + int(arg)
+  except (ValueError, TypeError):
+    return value
+
+

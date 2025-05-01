@@ -98,65 +98,61 @@
         </thead>
         <tbody>
           {% for day in month_dates %}
-            {% with day_weekday=day|date:"w" %}
             <tr class="text-center 
-              {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} border-l-4 border-deep-teal {% endif %} 
+              {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} border-l-4 border-deep-teal {% endif %}
               {% if day < today %} bg-gray-200 opacity-60 {% endif %}">
-    
+        
               <!-- Date Column -->
               <td class="border border-gray-300 px-4 py-2 font-semibold 
                 {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} bg-deep-teal text-white font-bold {% else %} text-gray-700 {% endif %}">
                 {{ day|date:"D, jS" }}
               </td>
-    
+        
               <!-- Time Slots -->
               {% for start_time, end_time in time_slots %}
-                {% with date_part=day|date:"Y-m-d" %}
-                  {% with time_part=start_time|time:"H:i:s" %}
-                    {% with key=date_part|add:","|add:time_part %}
-                      {% with is_available=availability_dict|get_item:key|default:False %}
-                        <td class="border border-gray-300 p-2">
-                          <!-- Availability Toggle Button -->
-                          <button 
-                            data-date="{{ date_part }}" 
-                            data-start-time="{{ time_part }}" 
-                            data-end-time="{{ end_time|time:'H:i:s' }}"
-                            class="toggle-slot flex items-center justify-center w-8 h-8 rounded-full shadow-md 
-                              {% if is_available %} bg-green-500 text-white hover:bg-green-600 
-                              {% else %} bg-red-500 text-white hover:bg-red-600 {% endif %}
-                              {% if day < today %} cursor-not-allowed opacity-50 {% endif %}">
-                            {% if is_available %}
-                              <!-- Tick (Check) Icon -->
-                              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12l5 5L20 7"/>
-                              </svg>
-                            {% else %}
-                              <!-- X Icon -->
-                              <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M6 6l12 12M18 6l-12 12"/>
-                              </svg>
-                            {% endif %}
-                          </button>
-                        </td>
-                      {% endwith %}
+                {% with date_str=day|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
+                  {% with key=date_str|add:","|add:time_str %}
+                    {% with is_available=availability_dict|get_item:key|default_if_none:False %}
+                      <td class="border border-gray-300 p-2">
+                        <!-- Toggle Button -->
+                        <button 
+                          data-date="{{ date_str }}" 
+                          data-start-time="{{ time_str }}" 
+                          data-end-time="{{ end_time|time:'H:i:s' }}"
+                          class="toggle-slot flex items-center justify-center w-8 h-8 rounded-full shadow-md 
+                            {% if is_available %} bg-green-500 text-white hover:bg-green-600 
+                            {% else %} bg-red-500 text-white hover:bg-red-600 {% endif %}
+                            {% if day < today %} cursor-not-allowed opacity-50 {% endif %}">
+                          {% if is_available %}
+                            <!-- Check Icon -->
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M5 12l5 5L20 7"/>
+                            </svg>
+                          {% else %}
+                            <!-- X Icon -->
+                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M6 6l12 12M18 6l-12 12"/>
+                            </svg>
+                          {% endif %}
+                        </button>
+                      </td>
                     {% endwith %}
                   {% endwith %}
                 {% endwith %}
               {% endfor %}
             </tr>
-    
-            <!-- Insert a blank row after every Friday -->
+        
+            <!-- Optional spacer row after Fridays -->
             {% if day|date:"D" == "Fri" %}
               <tr>
-                <td colspan="{{ time_slots|length|add:1 }}" 
-                    class="h-2 bg-slate-200 border-l-4 border-r-4 border-transparent"></td>
+                <td colspan="{{ time_slots|length|add:1 }}" class="h-2 bg-slate-200 border-l-4 border-r-4 border-transparent"></td>
               </tr>
             {% endif %}
-            {% endwith %}
           {% endfor %}
         </tbody>
+        
       </table>
     </div>
 

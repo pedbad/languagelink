@@ -322,6 +322,8 @@ def student_booking_view(request):
   else:
     month_display = f"{calendar.month_name[week_start.month]} - {calendar.month_name[week_end.month]} {week_end.year}"
 
+  time_slot_hours = list(range(9, 18))  # 9 to 17 inclusive
+  
   # Context for rendering the template
   context = {
     "today": today,
@@ -332,8 +334,10 @@ def student_booking_view(request):
     "disable_prev_week": disable_prev_week,
     "disabled_days": disabled_days,  # Pass list of disabled days to the template
     "month_display": month_display,  # Updated month display
+    "time_slot_hours": time_slot_hours,
+    
   }
-
+  
   return render(request, "booking/student_booking_view.html", context)
 
 
