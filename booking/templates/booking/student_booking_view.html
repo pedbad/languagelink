@@ -63,7 +63,12 @@
       </a>
     </div>
 
-    <pre class="text-gray-800 text-center flex-1 mb-4">Selected Date: {{ selected_date }}</pre>
+    <!-- <pre class="text-gray-800 text-center flex-1 mb-4">Selected Date: {{ selected_date }}</pre> -->
+    <pre id="selected-date-display" class="text-gray-800 text-center flex-1 mb-4">
+      Selected Date: {{ selected_date|date:"l, F j, Y" }}
+    </pre>
+    
+
     <hr class="my-4 border-1 border-gray-300 mb-6">
 
     <!-- Available Slots Section -->
@@ -73,131 +78,130 @@
         <!-- Slots will be dynamically inserted here -->
       </div>
     </div>
+  </div>
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const slotsContainer = document.getElementById("slots-container");
-        const selectedDateElement = document.getElementById("selected-date-display");
-    
-        // Get the initially selected date (today or Monday of the selected week)
-        let selectedDate = "{{ selected_date|date:'Y-m-d' }}"; 
-    
-        // Function to update highlighted button
-        function updateSelectedButton(newDate) {
-          document.querySelectorAll(".week-day-button").forEach(button => {
-            if (button.getAttribute("data-date") === newDate) {
-              button.classList.add("bg-deep-teal", "text-white", "font-bold");
-              button.classList.remove("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
-            } else {
-              button.classList.remove("bg-deep-teal", "text-white", "font-bold");
-              button.classList.add("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
-            }
-          });
-        }
-    
-        // Function to fetch available slots
-        function fetchAvailableSlots(date) {
-          console.log(`Fetching slots for date: ${date}`); // Debugging
-        
-          fetch(`/booking/get-available-slots/?date=${date}`)
-            .then(response => {
-              console.log("Response status:", response.status); // Log status
-              return response.json();
-            })
-            .then(data => {
-              console.log("Slots Data:", data); // Log the fetched slots data
-        
-              if (!data.success) {
-                console.error("Server Error:", data.error || "Unknown error");
-                slotsContainer.innerHTML = `<p class='text-red-600'>Error: ${data.error}</p>`;
-                return;
-              }
-        
-              // Clear previous slots
-              slotsContainer.innerHTML = "";
-        
-              if (Object.keys(data.slots).length > 0) {
-                Object.entries(data.slots).forEach(([time, teachers]) => {
-                  const slotDiv = document.createElement("div");
-                  slotDiv.classList.add("p-4", "border", "rounded-lg", "shadow-md", "bg-white");
-        
-                  slotDiv.innerHTML = `
-                    <p class="font-medium">${formatTimeRange(time)}</p>
-                    <p class="text-gray-700">Available with:</p>
-                    <ul class="text-gray-600">
-                      ${teachers.map(teacher => `<li>👤 ${teacher}</li>`).join("")}
-                    </ul>
-                  `;
-        
-                  slotsContainer.appendChild(slotDiv);
-                });
-              } else {
-                slotsContainer.innerHTML = "<p class='text-gray-600'>No available slots for this date.</p>";
-              }
-            })
-            .catch(error => {
-              console.error("Fetch Error:", error); // Log the actual error
-              slotsContainer.innerHTML = "<p class='text-red-600'>Error loading slots.</p>";
-            });
-        }
-        
-    
-        // Fetch slots for initially selected date
-        fetchAvailableSlots(selectedDate);
-        selectedDateElement.textContent = `Selected Date: ${new Date(selectedDate).toLocaleDateString('en-US', {
-          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        })}`;
-        updateSelectedButton(selectedDate);
-    
-        // Add event listeners to **enabled weekday buttons only**
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const slotsContainer = document.getElementById("slots-container");
+      const selectedDateElement = document.getElementById("selected-date-display");
+      console.log("selectedDateElement:", selectedDateElement);
+  
+      // Get the initially selected date (today or Monday of the selected week)
+      let selectedDate = "{{ selected_date|date:'Y-m-d' }}";
+  
+      // Add ordinal suffix (1st, 2nd, 3rd, etc.)
+      function getOrdinalSuffix(n) {
+        const s = ["th", "st", "nd", "rd"];
+        const v = n % 100;
+        return s[(v - 20) % 10] || s[v] || s[0];
+      }
+  
+      // Format selected date as "Friday May 2nd"
+      function updateSelectedDateDisplay(dateStr) {
+        const dateObj = new Date(dateStr);
+        const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+        const month = dateObj.toLocaleDateString('en-US', { month: 'long' });
+        const day = dateObj.getDate();
+        const ordinal = getOrdinalSuffix(day);
+        selectedDateElement.textContent = `Selected Date: ${weekday} ${month} ${day}${ordinal}`;
+      }
+  
+      // Function to update highlighted button
+      function updateSelectedButton(newDate) {
         document.querySelectorAll(".week-day-button").forEach(button => {
-          button.addEventListener("click", function (event) {
-            event.preventDefault();
-    
-            // Get the date from the `data-date` attribute
-            let newDate = this.getAttribute("data-date");
-    
-            if (newDate) {
-              selectedDate = newDate;
-              fetchAvailableSlots(selectedDate);
+          if (button.getAttribute("data-date") === newDate) {
+            button.classList.add("bg-deep-teal", "text-white", "font-bold");
+            button.classList.remove("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
+          } else {
+            button.classList.remove("bg-deep-teal", "text-white", "font-bold");
+            button.classList.add("bg-gray-200", "text-gray-700", "hover:bg-gray-300");
+          }
+        });
+      }
+  
+      // Function to fetch available slots
+      function fetchAvailableSlots(date) {
+        console.log(`Fetching slots for date: ${date}`);
+        fetch(`/booking/get-available-slots/?date=${date}`)
+          .then(response => {
+            console.log("Response status:", response.status);
+            return response.json();
+          })
+          .then(data => {
+            console.log("Slots Data:", data);
+            if (!data.success) {
+              console.error("Server Error:", data.error || "Unknown error");
+              slotsContainer.innerHTML = `<p class='text-red-600'>Error: ${data.error}</p>`;
+              return;
             }
+  
+            slotsContainer.innerHTML = "";
+  
+            if (Object.keys(data.slots).length > 0) {
+              Object.entries(data.slots).forEach(([time, teachers]) => {
+                const slotDiv = document.createElement("div");
+                slotDiv.classList.add("p-4", "border", "rounded-lg", "shadow-md", "bg-white");
+  
+                slotDiv.innerHTML = `
+                  <p class="font-medium">${formatTimeRange(time)}</p>
+                  <p class="text-gray-700">Available with:</p>
+                  <ul class="text-gray-600">
+                    ${teachers.map(teacher => `<li>👤 ${teacher}</li>`).join("")}
+                  </ul>
+                `;
+  
+                slotsContainer.appendChild(slotDiv);
+              });
+            } else {
+              slotsContainer.innerHTML = "<p class='text-gray-600'>No available slots for this date.</p>";
+            }
+          })
+          .catch(error => {
+            console.error("Fetch Error:", error);
+            slotsContainer.innerHTML = "<p class='text-red-600'>Error loading slots.</p>";
           });
+      }
+  
+      // Initial load
+      fetchAvailableSlots(selectedDate);
+      updateSelectedDateDisplay(selectedDate);
+      updateSelectedButton(selectedDate);
+  
+      // Weekday button click handling
+      document.querySelectorAll(".week-day-button").forEach(button => {
+        button.addEventListener("click", function (event) {
+          event.preventDefault();
+          const newDate = this.getAttribute("data-date");
+          if (newDate) {
+            selectedDate = newDate;
+            fetchAvailableSlots(selectedDate);
+            updateSelectedButton(selectedDate);
+            updateSelectedDateDisplay(selectedDate);
+          }
         });
       });
-
-      // Function to format time from "HH:MM:SS" to "h:mm → h:mm"
-      function formatTimeRange(startTime) {
-        const timeParts = startTime.split(":");
-        const hour = parseInt(timeParts[0], 10);
-        const minute = timeParts[1];
-
-        // Create Date object for adding 30 minutes
-        const startDate = new Date(2000, 0, 1, hour, minute);
-        const endDate = new Date(startDate.getTime() + 30 * 60000); // Add 30 minutes
-
-        // Format times to "h:mm" format
-        const startFormatted = startDate.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true
-        });
-        
-        const endFormatted = endDate.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true
-        });
-
-        return `${startFormatted} → ${endFormatted}`;
-      }
-
-    </script>
-    
-    
-    
-
-
-  </div>
+    });
+  
+    // Format time from "HH:MM:SS" to "h:mm → h:mm"
+    function formatTimeRange(startTime) {
+      const timeParts = startTime.split(":");
+      const hour = parseInt(timeParts[0], 10);
+      const minute = timeParts[1];
+  
+      const startDate = new Date(2000, 0, 1, hour, minute);
+      const endDate = new Date(startDate.getTime() + 30 * 60000);
+  
+      const startFormatted = startDate.toLocaleTimeString("en-US", {
+        hour: "numeric", minute: "2-digit", hour12: true
+      });
+      const endFormatted = endDate.toLocaleTimeString("en-US", {
+        hour: "numeric", minute: "2-digit", hour12: true
+      });
+  
+      return `${startFormatted} → ${endFormatted}`;
+    }
+  </script>
+  
 {% endblock %}
 
 
