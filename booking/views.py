@@ -329,8 +329,12 @@ def student_booking_view(request):
   # First populate actual availability from DB
   for slot in all_slots:
     key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
-    email = slot.teacher.email
-    teacher_availability_by_teacher.setdefault(email, {})[key] = slot.is_available
+    try:
+      profile = slot.teacher.teacherprofile
+      teacher_availability_by_teacher.setdefault(profile, {})[key] = slot.is_available
+    except TeacherProfile.DoesNotExist:
+      continue  # skip teachers with no profile
+
 
   # Ensure full week × time_slots coverage per teacher (default to False if not set)
   for email in teacher_availability_by_teacher.keys():
