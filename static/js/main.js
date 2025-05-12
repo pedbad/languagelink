@@ -365,7 +365,68 @@
     }
 
 
+    // === Booking Modal Functionality ===
+    function openBookingModal(teacher, date, startTime, endTime, avatar) {
+      const modal = document.getElementById("bookingModal");
+      const modalTeacherName = document.getElementById("modalTeacherName");
+      const modalSlotDetails = document.getElementById("modalSlotDetails");
+      const modalAvatar = document.getElementById("modalAvatar");
+    
+      if (modalTeacherName) modalTeacherName.textContent = teacher;
+      if (modalSlotDetails) modalSlotDetails.textContent = `${date}, ${startTime} – ${endTime}`;
+    
+      if (modalAvatar) {
+        if (avatar) {
+          modalAvatar.src = avatar;
+        } else {
+          modalAvatar.src = "/static/core/img/default-profile.png";
+        }
+      }
+    
+      if (modal) {
+        modal.classList.remove("hidden");
+        modal.dataset.teacher = teacher;
+        modal.dataset.date = date;
+        modal.dataset.start = startTime;
+        modal.dataset.end = endTime;
+      }
+    }
+    
 
+    function closeBookingModal() {
+      const modal = document.getElementById("bookingModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function submitBooking() {
+      const modal = document.getElementById("bookingModal");
+      if (!modal) return;
+
+      const teacher = modal.dataset.teacher;
+      const date = modal.dataset.date;
+      const start = modal.dataset.start;
+      const end = modal.dataset.end;
+
+      alert(`Booking submitted for ${teacher} on ${date} at ${start} – ${end}`);
+      closeBookingModal();
+    }
+
+    // === Booking Modal Button Event Listeners ===
+    document.getElementById('close-booking-modal')?.addEventListener('click', closeBookingModal);
+    document.getElementById('cancel-booking-modal')?.addEventListener('click', closeBookingModal);
+    document.getElementById('submit-booking-modal')?.addEventListener('click', submitBooking);
+
+
+    document.querySelectorAll('.booking-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        const teacher = slot.dataset.teacher;
+        const date = slot.dataset.date;
+        const start = slot.dataset.start;
+        const end = slot.dataset.end;
+        const avatar = slot.dataset.avatar;
+        openBookingModal(teacher, date, start, end, avatar);
+      });
+    });
 
   });
 })();

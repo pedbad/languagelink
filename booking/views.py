@@ -326,15 +326,17 @@ def student_booking_view(request):
   # 🧠 Build: teacher_email → { "YYYY-MM-DD,HH:MM:SS": True/False }
   teacher_availability_by_teacher = {}
 
-  # First populate actual availability from DB
+  # First populate actual availability from DB — only for active advisors
   for slot in all_slots:
-    key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
     try:
       profile = slot.teacher.teacherprofile
+      if not profile.is_active_advisor:
+        continue  # 🚫 skip inactive advisors
+
+      key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
       teacher_availability_by_teacher.setdefault(profile, {})[key] = slot.is_available
     except TeacherProfile.DoesNotExist:
       continue  # skip teachers with no profile
-
 
   # Ensure full week × time_slots coverage per teacher (default to False if not set)
   for email in teacher_availability_by_teacher.keys():
