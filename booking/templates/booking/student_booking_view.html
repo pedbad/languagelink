@@ -99,26 +99,49 @@
                 {% with date_str=selected_date|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
                   {% with key=date_str|add:","|add:time_str %}
                     <td class="border border-gray-300 text-center">
-                      {% if slot_map|get_item:key %}
-                        <span
-                          class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
-                          data-teacher="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
-                          data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
-                          data-date="{{ date_str }}"
-                          data-start="{{ start_time|time:'H:i' }}"
-                          data-end="{{ end_time|time:'H:i' }}"
-                        >                                        
-                          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12l5 5L20 7"/>
-                          </svg>
-                        </span>
-                      {% else %}
-                        <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white mx-auto">
-                          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6 6l12 12M18 6l-12 12"/>
-                          </svg>
-                        </span>
-                      {% endif %}
+                      
+
+                      {% with availability=slot_map|get_item:key %}
+                        {% if availability %}
+                          {% with availability_obj=availability.booking %}
+                            {% if availability_obj %}
+                              <!-- ✅ Slot is BOOKED -->
+                              <span 
+                                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
+                                title="Already booked"
+                              >
+                                <!-- Clock Icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                                </svg>                                
+                              </span>
+                            {% else %}
+                              <!-- ✅ Slot is AVAILABLE -->
+                              <span
+                                class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
+                                data-teacher="{{ teacher }}"
+                                data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
+                                data-date="{{ date_str }}"
+                                data-start="{{ start_time|time:'H:i' }}"
+                                data-end="{{ end_time|time:'H:i' }}"
+                              >
+                                <!-- Tick Icon -->
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M5 12l5 5L20 7"/>
+                                </svg>
+                              </span>
+                            {% endif %}
+                          {% endwith %}
+                        {% else %}
+                          <!-- ❌ Slot is Unavailable -->
+                          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white mx-auto cursor-not-allowed" title="Unavailable">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M6 6l12 12M18 6l-12 12"/>
+                            </svg>
+                          </span>
+                        {% endif %}
+                      {% endwith %}
+
                     </td>                  
                   {% endwith %}
                 {% endwith %}

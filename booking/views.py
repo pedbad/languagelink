@@ -56,10 +56,15 @@ def teacher_availability_view(request):
   print(f"DEBUG: Retrieved Availability - {list(teacher_availabilities.values())}")
 
   # Convert queryset to dictionary for quick lookup
+  # availability_dict = {
+  #   f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}": slot.is_available
+  #   for slot in teacher_availabilities
+  # }
   availability_dict = {
-    f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}": slot.is_available
+    f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}": slot
     for slot in teacher_availabilities
   }
+
 
   print(f"DEBUG: Final Availability Dictionary - {availability_dict}")
 
@@ -334,7 +339,8 @@ def student_booking_view(request):
         continue  # 🚫 skip inactive advisors
 
       key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
-      teacher_availability_by_teacher.setdefault(profile, {})[key] = slot.is_available
+      teacher_availability_by_teacher.setdefault(profile, {})[key] = slot  # Save the slot object, not just True/False
+
     except TeacherProfile.DoesNotExist:
       continue  # skip teachers with no profile
 
