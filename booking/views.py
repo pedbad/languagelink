@@ -406,3 +406,59 @@ def get_available_slots(request):
     slots_dict[time_key].append(slot.teacher.email)
 
   return JsonResponse({"success": True, "slots": slots_dict})
+
+
+
+@csrf_exempt
+@require_POST
+@login_required
+def create_booking(request):
+  """
+  Creates a booking for the current student, given a valid availability slot.
+  Prevents double-booking.
+  """
+  try:
+    data = json.loads(request.body)
+    teacher_email = data.get("teacher")
+    date_str = data.get("date")
+    start_time_str = data.get("start")
+    end_time_str = data.get("end")
+
+    if not all([teacher_email, date_str, start_time_str, end_time_str]):
+      return JsonResponse({"error": "Missing required data"}, status=400)
+
+    # Parse strings to Python types
+    slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    start_time = datetime.strptime(start_time_str, "%H:%M").time()
+    end_time = datetime.strptime(end_time_str, "%H:%M").time()
+
+    # Prevent double-booking
+    try:
+      slot = TeacherAvailability.objects.get(
+        teacher__email=teacher_email,
+        date=slot_date,
+        start_time=start_time,
+        end_time=end_time,
+        is_available=True
+      )
+    except TeacherAvailability.DoesNotExist:
+      return JsonResponse({"error": "This slot is not available"}, status=404)
+
+    if hasattr(slot, "booking"):
+      return JsonResponse({"error": "Slot already booked"}, status=409)
+
+    # Create the booking
+    Booking.objects.create(
+      student=request.user,
+      teacher_availability=slot
+    )
+
+    # Optionally mark the slot as unavailable (one-time slot)
+    slot.is_available = False
+    slot.save(update_fields=["is_available"])
+
+    return JsonResponse({"success": True, "message": "Booking confirmed!"})
+
+  except Exception as e:
+    return JsonResponse({"error": str(e)}, status=500)
+
