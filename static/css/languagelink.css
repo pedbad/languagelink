@@ -1289,6 +1289,11 @@ video {
   background-color: var(--color-neutral-gray-brown);
 }
 
+.bg-pink-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 114 182 / var(--tw-bg-opacity));
+}
+
 .bg-primary-dark-teal {
   background-color: var(--color-primary-dark-teal);
 }
@@ -1321,10 +1326,6 @@ video {
 .bg-slate-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
-}
-
-.bg-vibrant-orange {
-  background-color: var(--color-vibrant-orange);
 }
 
 .bg-warm-brown {
@@ -1917,11 +1918,6 @@ footer {
 .hover\:bg-red-500:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-red-600:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-red-700:hover {
