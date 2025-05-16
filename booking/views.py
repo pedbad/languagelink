@@ -74,7 +74,7 @@ def teacher_availability_view(request):
     for start_time, _ in time_slots:
       key = f"{day_str},{start_time.strftime('%H:%M:%S')}"
       if key not in availability_dict:
-        availability_dict[key] = False  # Default to False
+        availability_dict[key] = None  # default to None
 
   # Prepare context for rendering the template
   context = {
@@ -368,8 +368,8 @@ def student_booking_view(request):
     "teacher_availability_by_teacher": teacher_availability_by_teacher,
   }
   
-  # import pprint
-  # pprint.pprint(teacher_availability_by_teacher)
+  import pprint
+  pprint.pprint(teacher_availability_by_teacher)
 
   return render(request, "booking/student_booking_view.html", context)
 

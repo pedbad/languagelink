@@ -293,7 +293,7 @@
           if (data.success) {
             // ✅ Instantly update button UI
             if (data.is_available) {
-              this.classList.remove('bg-red-500', 'hover:bg-red-600');
+              this.classList.remove('bg-pink-400', 'hover:bg-pink-500');
               this.classList.add('bg-green-500', 'hover:bg-green-600');
               this.innerHTML = `
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -301,7 +301,7 @@
                 </svg>`;
             } else {
               this.classList.remove('bg-green-500', 'hover:bg-green-600');
-              this.classList.add('bg-red-500', 'hover:bg-red-600');
+              this.classList.add('bg-pink-400', 'hover:bg-pink-500');
               this.innerHTML = `
                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M6 6l12 12M18 6l-12 12"/>
@@ -332,17 +332,17 @@
         const isAvailable = availabilityDict[key];
 
         if (isAvailable) {
-          button.classList.remove('bg-red-500', 'hover:bg-red-600');
+          button.classList.remove('bg-pink-400', 'hover:bg-pink-500');
           button.classList.add('bg-green-500', 'hover:bg-green-600');
           button.innerHTML = `
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M5 12l5 5L20 7"/>
             </svg>`;
         } else {
           button.classList.remove('bg-green-500', 'hover:bg-green-600');
-          button.classList.add('bg-red-500', 'hover:bg-red-600');
+          button.classList.add('bg-pink-400', 'hover:bg-pink-500');
           button.innerHTML = `
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M6 6l12 12M18 6l-12 12"/>
             </svg>`;
         }

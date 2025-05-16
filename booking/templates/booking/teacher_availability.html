@@ -112,51 +112,56 @@
               {% for start_time, end_time in time_slots %}
                 {% with date_str=day|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
                   {% with key=date_str|add:","|add:time_str %}
-                    {% with is_available=availability_dict|get_item:key|default_if_none:False %}
+                    {% with slot=availability_dict|get_item:key %}
                       <td class="border border-gray-300 p-2">
-                        {% with slot=availability_dict|get_item:key %}
-                          {% if slot and slot.booking %}
-                            <!-- Slot is BOOKED -->
-                            <span 
-                              class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
-                              title="Already booked"
-                            >
-                              <!-- Clock Icon -->
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                              </svg>                                
-                            </span>
-                          {% else %}
-                            <!-- Toggle Button -->
-                            <button 
-                              data-date="{{ date_str }}" 
-                              data-start-time="{{ time_str }}" 
-                              data-end-time="{{ end_time|time:'H:i:s' }}"
-                              class="toggle-slot flex items-center justify-center w-8 h-8 rounded-full shadow-md 
-                                {% if slot %} bg-green-500 text-white hover:bg-green-600 
-                                {% else %} bg-red-500 text-white hover:bg-red-600 {% endif %}
-                                {% if day < today %} cursor-not-allowed opacity-50 {% endif %}">
-                              {% if slot %}
-                                <!-- Check Icon -->
-                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M5 12l5 5L20 7"/>
-                                </svg>
-                              {% else %}
-                                <!-- X Icon -->
-                                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                  <path d="M6 6l12 12M18 6l-12 12"/>
-                                </svg>
-                              {% endif %}
-                            </button>
-                          {% endif %}
-                        {% endwith %}
-                      </td>                    
+
+                        {% if slot and slot.booking %}
+                          <!-- Slot is BOOKED -->
+                          <span 
+                            class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
+                            title="Already booked"
+                          >
+                            <!-- Clock Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                            </svg>                                
+                          </span>
+
+                        {% elif slot and slot.is_available %}
+                          <!-- Slot is AVAILABLE -->
+                          <button 
+                            data-date="{{ date_str }}" 
+                            data-start-time="{{ time_str }}" 
+                            data-end-time="{{ end_time|time:'H:i:s' }}"
+                            class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-green-500 text-white hover:bg-green-600 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
+                          >
+                            <!-- Check Icon -->
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M5 12l5 5L20 7"/>
+                            </svg>
+                          </button>
+
+                        {% else %}
+                          <!-- Slot is UNAVAILABLE (either False or slot doesn't exist) -->
+                          <button 
+                            data-date="{{ date_str }}" 
+                            data-start-time="{{ time_str }}" 
+                            data-end-time="{{ end_time|time:'H:i:s' }}"
+                            class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-pink-400 text-white hover:bg-pink-500 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
+                          >
+                            <!-- X Icon -->
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                              <path d="M6 6l12 12M18 6l-12 12"/>
+                            </svg>
+                          </button>
+                        {% endif %}
+
+                      </td>
                     {% endwith %}
                   {% endwith %}
                 {% endwith %}
               {% endfor %}
+
             </tr>
         
             <!-- Optional spacer row after Fridays -->
