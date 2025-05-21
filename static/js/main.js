@@ -390,12 +390,27 @@
         modal.dataset.start = startTime;
         modal.dataset.end = endTime;
       }
-    }
-    
+    }    
 
     function closeBookingModal() {
       const modal = document.getElementById("bookingModal");
       if (modal) modal.classList.add("hidden");
+    }
+
+
+    function showToast(message, color = 'green') {
+      const toast = document.getElementById("booking-toast");
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.classList.remove("bg-green-600", "bg-red-600");
+
+      toast.classList.add(color === 'green' ? "bg-green-600" : "bg-red-600");
+      toast.classList.remove("hidden");
+
+      setTimeout(() => {
+        toast.classList.add("hidden");
+      }, 2500);
     }
 
     function submitBooking() {
@@ -407,9 +422,60 @@
       const start = modal.dataset.start;
       const end = modal.dataset.end;
 
-      alert(`Booking submitted for ${teacher} on ${date} at ${start} – ${end}`);
-      closeBookingModal();
+      const submitBtn = document.getElementById("submit-booking-modal");
+      submitBtn.disabled = true;
+
+      fetch("/booking/booking/create/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": getCSRFToken(),
+        },
+        body: JSON.stringify({
+          teacher: teacher,
+          date: date,
+          start: start,
+          end: end
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          closeBookingModal();
+          showToast("Booking confirmed!", "green");
+
+          // 🎯 Replace the booked slot immediately
+          const selector = `.booking-slot[data-teacher="${CSS.escape(teacher)}"][data-date="${date}"][data-start="${start}"]`;
+          const slot = document.querySelector(selector);
+
+          if (slot) {
+            slot.outerHTML = `
+              <span 
+                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-default" 
+                title="Already booked"
+              >
+                <!-- Clock Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                </svg>                                
+              </span>
+            `;
+          }
+
+        } else {
+          // ❌ Show failure message in red toast
+          showToast(data.error || "Booking failed. Try again.", "red");
+        }
+      })
+      .catch(error => {
+        console.error("Booking error:", error);
+        showToast("Something went wrong. Please try again.", "red");
+      })
+      .finally(() => {
+        submitBtn.disabled = false;
+      });
     }
+
 
     // === Booking Modal Button Event Listeners ===
     document.getElementById('close-booking-modal')?.addEventListener('click', closeBookingModal);

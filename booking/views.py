@@ -326,7 +326,7 @@ def student_booking_view(request):
   # Fetch ALL availability (not just available=True) for the current week
   all_slots = TeacherAvailability.objects.filter(
     date__range=(week_start, week_end)
-  ).select_related("teacher")
+  ).select_related("teacher").select_related("booking")  # ✅ Add this if missing
 
   # 🧠 Build: teacher_email → { "YYYY-MM-DD,HH:MM:SS": True/False }
   teacher_availability_by_teacher = {}
@@ -435,8 +435,9 @@ def create_booking(request):
 
     # Parse strings to Python types
     slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-    start_time = datetime.strptime(start_time_str, "%H:%M").time()
-    end_time = datetime.strptime(end_time_str, "%H:%M").time()
+    start_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
+    end_time = datetime.strptime(end_time_str, "%H:%M:%S").time()
+
 
     # Prevent double-booking
     try:

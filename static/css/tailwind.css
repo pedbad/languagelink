@@ -49,3 +49,14 @@ footer {
   flex-shrink: 0;
   /* Prevent the footer from shrinking */
 }
+
+/* Optional: Slide from right effect */
+#booking-toast.slide-in {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+#booking-toast.hidden {
+  transform: translateX(100%);
+  opacity: 0;
+}

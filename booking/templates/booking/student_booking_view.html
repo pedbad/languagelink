@@ -93,14 +93,13 @@
                 <p class="text-xs text-gray-700 mt-1">
                   {{ teacher.user.email }}
                 </p>
-              </td>
-              
+              </td>              
               {% for start_time, end_time in time_slots %}
                 {% with date_str=selected_date|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
                   {% with key=date_str|add:","|add:time_str %}
                     <td class="border border-gray-300 text-center">
                       {% with availability=slot_map|get_item:key %}
-                        {% if availability and availability.is_available %}
+                        {% if availability %}
                           {% if availability.booking %}
                             <!-- ✅ Slot is BOOKED -->
                             <span 
@@ -112,15 +111,15 @@
                                 <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
                               </svg>                                
                             </span>
-                          {% else %}
+                          {% elif availability.is_available %}
                             <!-- ✅ Slot is AVAILABLE -->
                             <span
                               class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
-                              data-teacher="{{ teacher }}"
+                              data-teacher="{{ teacher.user.email }}"
                               data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
                               data-date="{{ date_str }}"
-                              data-start="{{ start_time|time:'H:i' }}"
-                              data-end="{{ end_time|time:'H:i' }}"
+                              data-start="{{ start_time|time:'H:i:s' }}"
+                              data-end="{{ end_time|time:'H:i:s' }}"
                               title="Click to book"
                             >
                               <!-- Tick Icon -->
@@ -128,9 +127,16 @@
                                 <path d="M5 12l5 5L20 7"/>
                               </svg>
                             </span>
+                          {% else %}
+                            <!-- ❌ Slot is Unavailable -->
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-400 text-white mx-auto cursor-not-allowed" title="Unavailable">
+                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 6l12 12M18 6l-12 12"/>
+                              </svg>
+                            </span>
                           {% endif %}
                         {% else %}
-                          <!-- ❌ Slot is Unavailable -->
+                          <!-- ❌ Slot is Empty/Unavailable -->
                           <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-400 text-white mx-auto cursor-not-allowed" title="Unavailable">
                             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                               <path d="M6 6l12 12M18 6l-12 12"/>
@@ -138,12 +144,9 @@
                           </span>
                         {% endif %}
                       {% endwith %}
-
-
                     </td>                  
                   {% endwith %}
-                {% endwith %}
-            
+                {% endwith %}            
               {% endfor %}
             </tr>
           {% endfor %}
@@ -191,6 +194,29 @@
     </div>
   </div>
 </div>
+
+<!-- Toast Notification -->
+<!-- <div id="booking-toast"
+     style="position: fixed; top: 25%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 9999; background-color: #16a34a; color: white;
+            padding: 1rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            font-size: 1rem; display: none;">
+  Booking confirmed!
+</div> -->
+
+<!-- Toast Notification -->
+<!-- Toast Notification -->
+<div id="booking-toast"
+     style="top: 25%; left: 50%; transform: translate(-50%, -50%);"
+     class="fixed z-[9999] bg-green-600 text-white px-5 py-3 rounded-lg shadow-xl text-sm sm:text-base hidden transition-opacity duration-300 ease-in-out">
+  Booking confirmed!
+</div>
+
+
+
+
+
+
 
 
 {% endblock %}

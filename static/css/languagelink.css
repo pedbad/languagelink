@@ -691,6 +691,10 @@ video {
   z-index: 50;
 }
 
+.z-\[9999\] {
+  z-index: 9999;
+}
+
 .-mx-4 {
   margin-left: -1rem;
   margin-right: -1rem;
@@ -1280,6 +1284,11 @@ video {
   background-color: rgb(34 197 94 / var(--tw-bg-opacity));
 }
 
+.bg-green-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(22 163 74 / var(--tw-bg-opacity));
+}
+
 .bg-indigo-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(224 231 255 / var(--tw-bg-opacity));
@@ -1772,6 +1781,12 @@ video {
   transition-duration: 150ms;
 }
 
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
 .transition-shadow {
   transition-property: box-shadow;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -1820,6 +1835,18 @@ main {
 footer {
   flex-shrink: 0;
   /* Prevent the footer from shrinking */
+}
+
+/* Optional: Slide from right effect */
+
+#booking-toast.slide-in {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+#booking-toast.hidden {
+  transform: translateX(100%);
+  opacity: 0;
 }
 
 .before\:mt-0\.5::before {
@@ -1910,24 +1937,19 @@ footer {
   background-color: rgb(22 163 74 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-pink-500:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(236 72 153 / var(--tw-bg-opacity));
+}
+
 .hover\:bg-red-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(254 202 202 / var(--tw-bg-opacity));
 }
 
-.hover\:bg-red-400:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
-}
-
 .hover\:bg-red-500:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(239 68 68 / var(--tw-bg-opacity));
-}
-
-.hover\:bg-red-600:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(220 38 38 / var(--tw-bg-opacity));
 }
 
 .hover\:bg-red-700:hover {
