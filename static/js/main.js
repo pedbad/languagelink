@@ -349,7 +349,6 @@
       });
     }
 
-
     
     // Function to get CSRF token from cookies
     function getCSRFToken() {
@@ -397,8 +396,7 @@
       if (modal) modal.classList.add("hidden");
     }
 
-
-    function showToast(message, color = 'green') {
+    function showBookingToast(message, color = 'green') {
       const toast = document.getElementById("booking-toast");
       if (!toast) return;
 
@@ -442,7 +440,7 @@
       .then(data => {
         if (data.success) {
           closeBookingModal();
-          showToast("Booking confirmed!", "green");
+          showBookingToast("Booking confirmed!", "green");
 
           // 🎯 Replace the booked slot immediately
           const selector = `.booking-slot[data-teacher="${CSS.escape(teacher)}"][data-date="${date}"][data-start="${start}"]`;
@@ -464,12 +462,12 @@
 
         } else {
           // ❌ Show failure message in red toast
-          showToast(data.error || "Booking failed. Try again.", "red");
+          showBookingToast(data.error || "Booking failed. Try again.", "red");
         }
       })
       .catch(error => {
         console.error("Booking error:", error);
-        showToast("Something went wrong. Please try again.", "red");
+        showBookingToast("Something went wrong. Please try again.", "red");
       })
       .finally(() => {
         submitBtn.disabled = false;
