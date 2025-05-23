@@ -28,7 +28,7 @@ def teacher_availability_view(request):
   if not (1 <= month <= 12):
     month = datetime.today().month  # Fallback to current month
 
-  print(f"DEBUG: Loading availability for {calendar.month_name[month]} ({month})")
+  #print(f"DEBUG: Loading availability for {calendar.month_name[month]} ({month})")
 
   # Get total days in the month and filter out weekends (Mon-Fri only)
   _, num_days = calendar.monthrange(year, month)
@@ -53,7 +53,7 @@ def teacher_availability_view(request):
     teacher=request.user, date__year=year, date__month=month
   )
 
-  print(f"DEBUG: Retrieved Availability - {list(teacher_availabilities.values())}")
+  #print(f"DEBUG: Retrieved Availability - {list(teacher_availabilities.values())}")
 
   # Convert queryset to dictionary for quick lookup
   # availability_dict = {
@@ -66,7 +66,7 @@ def teacher_availability_view(request):
   }
 
 
-  print(f"DEBUG: Final Availability Dictionary - {availability_dict}")
+  #print(f"DEBUG: Final Availability Dictionary - {availability_dict}")
 
   # Ensure all slots exist, defaulting to False if not stored in the DB
   for day in month_dates:
@@ -100,12 +100,12 @@ def toggle_availability(request):
   Toggles a specific time slot's availability for the logged-in teacher.
   """
 
-  print("DEBUG: Toggle Availability View Hit!")
+  #print("DEBUG: Toggle Availability View Hit!")
 
   if request.method == "POST":
     try:
       data = json.loads(request.body)
-      print(f"DEBUG: Received Data - {data}")
+      #print(f"DEBUG: Received Data - {data}")
 
       date_str = data.get("date")
       start_time_str = data.get("start_time")
@@ -130,12 +130,12 @@ def toggle_availability(request):
         end_time=end_time
       )
 
-      print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
+      #print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
 
       slot.is_available = not slot.is_available
       slot.save(update_fields=['is_available'])  # Save only `is_available` field
 
-      print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
+      #print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
 
       # Convert availability_dict keys into **strings** (JSON-safe)
       teacher_availabilities = TeacherAvailability.objects.filter(
@@ -157,19 +157,19 @@ def toggle_availability(request):
       print(f"ERROR: {e}")  # Log any errors
       return JsonResponse({"error": str(e)}, status=400)
 
-  print("DEBUG: Invalid Request Method")
+  #print("DEBUG: Invalid Request Method")
   return JsonResponse({"error": "Invalid request"}, status=400)
 
   """
   Toggles a specific time slot's availability for the logged-in teacher.
   """
 
-  print("DEBUG: Toggle Availability View Hit!")
+  #print("DEBUG: Toggle Availability View Hit!")
 
   if request.method == "POST":
     try:
       data = json.loads(request.body)
-      print(f"DEBUG: Received Data - {data}")
+      #print(f"DEBUG: Received Data - {data}")
 
       date_str = data.get("date")
       start_time_str = data.get("start_time")
@@ -194,12 +194,12 @@ def toggle_availability(request):
         end_time=end_time
       )
 
-      print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
+      #print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
 
       slot.is_available = not slot.is_available
       slot.save(update_fields=['is_available'])  # Save only `is_available` field
 
-      print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
+      #print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
 
       # Return the entire updated availability dictionary
       teacher_availabilities = TeacherAvailability.objects.filter(
@@ -221,19 +221,19 @@ def toggle_availability(request):
       print(f"ERROR: {e}")  # Log any errors
       return JsonResponse({"error": str(e)}, status=400)
 
-  print("DEBUG: Invalid Request Method")
+  #print("DEBUG: Invalid Request Method")
   return JsonResponse({"error": "Invalid request"}, status=400)
 
   """
   Toggles a specific time slot's availability for the logged-in teacher.
   """
 
-  print("DEBUG: Toggle Availability View Hit!")
+  #print("DEBUG: Toggle Availability View Hit!")
 
   if request.method == "POST":
     try:
       data = json.loads(request.body)
-      print(f"DEBUG: Received Data - {data}")
+      #print(f"DEBUG: Received Data - {data}")
 
       date_str = data.get("date")
       start_time_str = data.get("start_time")
@@ -258,12 +258,12 @@ def toggle_availability(request):
         end_time=end_time
       )
 
-      print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
+      #print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
 
       slot.is_available = not slot.is_available
       slot.save(update_fields=['is_available'])  # Save only `is_available` field
 
-      print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
+      #print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
 
       return JsonResponse({"success": True, "is_available": slot.is_available})
 
@@ -271,19 +271,16 @@ def toggle_availability(request):
       print(f"ERROR: {e}")  # Log any errors
       return JsonResponse({"error": str(e)}, status=400)
 
-  print("DEBUG: Invalid Request Method")
+  #print("DEBUG: Invalid Request Method")
   return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
 def student_booking_view(request):
-  # Only allow access to students
-  # if request.user.role != "student":
-  #   return redirect("student_profile")
-
+  # Get today's date
   today = date.today()
 
-  # Get selected date from query parameter or default to today
+  # Try to get selected date from query string, fallback to today
   selected_date_str = request.GET.get("date")
   if selected_date_str:
     try:
@@ -293,27 +290,39 @@ def student_booking_view(request):
   else:
     selected_date = today
 
-  # Week calculations (Monday to Friday)
+  # Determine start and end of the selected week (Monday to Friday)
   week_start = selected_date - timedelta(days=selected_date.weekday())
   week_end = week_start + timedelta(days=4)
+
+  # 🩹 Fix: If navigating to the current week and selected_date is in the past, use today instead
+  current_week_start = today - timedelta(days=today.weekday())
+  if week_start == current_week_start and selected_date < today:
+    selected_date = today
+
+  # Ensure selected_date is still within the visible week boundaries
+  if selected_date < week_start or selected_date > week_end:
+    selected_date = week_start
+
+  # Calculate previous and next week for navigation
   prev_week = week_start - timedelta(days=7)
   next_week = week_start + timedelta(days=7)
 
-  # Disable back navigation to weeks before current week
-  current_week_start = today - timedelta(days=today.weekday())
+  # Disable "Previous Week" button if already in the current week
   disable_prev_week = week_start <= current_week_start
 
-  # Generate list of weekdays in the current view
+  # List of dates for the current week (Mon–Fri)
   week_dates = [week_start + timedelta(days=i) for i in range(5)]
+
+  # Disable past days in the current week
   disabled_days = [d for d in week_dates if d < today] if week_start == current_week_start else []
 
-  # Month/year display
+  # Display format for the month/year heading
   if week_start.month == week_end.month:
     month_display = f"{calendar.month_name[week_start.month]} {week_start.year}"
   else:
     month_display = f"{calendar.month_name[week_start.month]} - {calendar.month_name[week_end.month]} {week_end.year}"
 
-  # Generate all 30-min time slots from 9:00 to 17:30
+  # Generate all 30-min time slots between 9:00–17:30
   time_slots = [
     (
       datetime(2000, 1, 1, hour, minute).time(),
@@ -323,38 +332,44 @@ def student_booking_view(request):
     for minute in (0, 30)
   ]
 
-  # Fetch ALL availability (not just available=True) for the current week
+  # Fetch all availability slots in the selected week, along with related teacher and booking
   all_slots = TeacherAvailability.objects.filter(
     date__range=(week_start, week_end)
-  ).select_related("teacher").select_related("booking")  # ✅ Add this if missing
+  ).select_related("teacher", "booking")
 
-  # 🧠 Build: teacher_email → { "YYYY-MM-DD,HH:MM:SS": True/False }
-  teacher_availability_by_teacher = {}
+  teacher_availability_by_email = {}
+  teacher_profiles = {}
 
-  # First populate actual availability from DB — only for active advisors
+  # Organize slots by teacher email and day+time key
   for slot in all_slots:
     try:
       profile = slot.teacher.teacherprofile
       if not profile.is_active_advisor:
-        continue  # 🚫 skip inactive advisors
+        continue  # Skip inactive advisors
 
+      teacher_email = slot.teacher.email
       key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
-      teacher_availability_by_teacher.setdefault(profile, {})[key] = slot  # Save the slot object, not just True/False
+
+      teacher_availability_by_email.setdefault(teacher_email, {})[key] = slot
+      teacher_profiles[teacher_email] = profile
 
     except TeacherProfile.DoesNotExist:
-      continue  # skip teachers with no profile
+      continue  # Skip teachers without profiles
 
-  # Ensure full week × time_slots coverage per teacher (default to False if not set)
-  for email in teacher_availability_by_teacher.keys():
+  # Ensure every time slot exists (even if not in DB)
+  for email in teacher_availability_by_email.keys():
     for day in week_dates:
       date_str = day.strftime('%Y-%m-%d')
       for start_time, _ in time_slots:
         key = f"{date_str},{start_time.strftime('%H:%M:%S')}"
-        if key not in teacher_availability_by_teacher[email]:
-          teacher_availability_by_teacher[email][key] = False
+        if key not in teacher_availability_by_email[email]:
+          teacher_availability_by_email[email][key] = None
 
+  # Debug print of final availability structure (optional)
+  # import pprint
+  # pprint.pprint(teacher_availability_by_email)
 
-  # 📦 Final context for template
+  # Pass all data to the template
   context = {
     "today": today,
     "selected_date": selected_date,
@@ -365,11 +380,9 @@ def student_booking_view(request):
     "disabled_days": disabled_days,
     "month_display": month_display,
     "time_slots": time_slots,
-    "teacher_availability_by_teacher": teacher_availability_by_teacher,
+    "teacher_availability_by_email": teacher_availability_by_email,
+    "teacher_profiles": teacher_profiles,
   }
-  
-  import pprint
-  pprint.pprint(teacher_availability_by_teacher)
 
   return render(request, "booking/student_booking_view.html", context)
 

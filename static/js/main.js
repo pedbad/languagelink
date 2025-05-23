@@ -396,6 +396,7 @@
       if (modal) modal.classList.add("hidden");
     }
 
+
     function showBookingToast(message, color = 'green') {
       const toast = document.getElementById("booking-toast");
       if (!toast) return;
@@ -410,6 +411,7 @@
         toast.classList.add("hidden");
       }, 2500);
     }
+
 
     function submitBooking() {
       const modal = document.getElementById("bookingModal");
@@ -474,12 +476,10 @@
       });
     }
 
-
     // === Booking Modal Button Event Listeners ===
     document.getElementById('close-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('cancel-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('submit-booking-modal')?.addEventListener('click', submitBooking);
-
 
     document.querySelectorAll('.booking-slot').forEach(slot => {
       slot.addEventListener('click', () => {

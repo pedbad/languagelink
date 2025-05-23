@@ -78,84 +78,82 @@
         </tr>
       </thead>
       <tbody>
-        {% if teacher_availability_by_teacher %}
-          {% for teacher, slot_map in teacher_availability_by_teacher.items %}
-            <tr class="text-center">
-              <td class="border border-gray-300 px-2 py-2 text-center">
-                {% if teacher.profile_picture %}
-                  <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
-                {% else %}
-                  <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full mx-auto">
-                {% endif %}
-                <p class="text-xs text-gray-700 mt-1">
-                  {{ teacher.user.first_name }} {{ teacher.user.last_name }}
-                </p>
-                <p class="text-xs text-gray-700 mt-1">
-                  {{ teacher.user.email }}
-                </p>
-              </td>              
-              {% for start_time, end_time in time_slots %}
-                {% with date_str=selected_date|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
-                  {% with key=date_str|add:","|add:time_str %}
-                    <td class="border border-gray-300 text-center">
-                      {% with availability=slot_map|get_item:key %}
-                        {% if availability %}
-                          {% if availability.booking %}
-                            <!-- ✅ Slot is BOOKED -->
-                            <span 
-                              class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
-                              title="Already booked"
-                            >
-                              <!-- Clock Icon -->
-                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                              </svg>                                
-                            </span>
-                          {% elif availability.is_available %}
-                            <!-- ✅ Slot is AVAILABLE -->
-                            <span
-                              class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
-                              data-teacher="{{ teacher.user.email }}"
-                              data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
-                              data-date="{{ date_str }}"
-                              data-start="{{ start_time|time:'H:i:s' }}"
-                              data-end="{{ end_time|time:'H:i:s' }}"
-                              title="Click to book"
-                            >
-                              <!-- Tick Icon -->
-                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 12l5 5L20 7"/>
-                              </svg>
-                            </span>
-                          {% else %}
-                            <!-- ❌ Slot is Unavailable -->
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-400 text-white mx-auto cursor-not-allowed" title="Unavailable">
-                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M6 6l12 12M18 6l-12 12"/>
-                              </svg>
-                            </span>
-                          {% endif %}
-                        {% else %}
-                          <!-- ❌ Slot is Empty/Unavailable -->
-                          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-400 text-white mx-auto cursor-not-allowed" title="Unavailable">
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M6 6l12 12M18 6l-12 12"/>
-                            </svg>
-                          </span>
-                        {% endif %}
+        {% if teacher_profiles %}
+          {% for teacher_email in teacher_profiles %}
+            {% with slot_map=teacher_availability_by_email|get_item:teacher_email %}
+              {% with teacher=slot_map|get_item:"profile" %}
+                <tr class="text-center">
+                  <!-- Teacher Info -->
+                  <td class="border border-gray-300 px-2 py-2 text-center">
+                    {% if teacher.profile_picture %}
+                      <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
+                    {% else %}
+                      <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full mx-auto">
+                    {% endif %}
+                    <p class="text-xs text-gray-700 mt-1">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</p>
+                    <p class="text-xs text-gray-700 mt-1">{{ teacher_email }}</p>
+                  </td>
+
+                  <!-- Time Slots for selected_date only -->
+                  {% with date_str=selected_date|date:"Y-m-d" %}
+                    {% for start_time, end_time in time_slots %}
+                      {% with time_str=start_time|time:"H:i:s" %}
+                        {% with key=date_str|add:","|add:time_str %}
+                          <td class="border border-gray-300 text-center">
+                            {% with availability=slot_map|get_item:key %}
+                              {% if availability %}
+                                {% if availability.booking %}
+                                  <!-- Booked -->
+                                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-default" title="Already booked">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                      <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                                    </svg>
+                                  </span>
+                                {% elif availability.is_available %}
+                                  <!-- Available -->
+                                  <span class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
+                                        data-teacher="{{ teacher_email }}"
+                                        data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
+                                        data-date="{{ date_str }}"
+                                        data-start="{{ start_time|time:'H:i:s' }}"
+                                        data-end="{{ end_time|time:'H:i:s' }}"
+                                        title="Click to book">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M5 12l5 5L20 7"/>
+                                    </svg>
+                                  </span>
+                                {% else %}
+                                  <!-- Unavailable -->
+                                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-400 text-white mx-auto cursor-not-allowed" title="Unavailable">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                      <path d="M6 6l12 12M18 6l-12 12"/>
+                                    </svg>
+                                  </span>
+                                {% endif %}
+                              {% else %}
+                                <!-- No Slot Defined -->
+                                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-400 text-white mx-auto cursor-not-allowed" title="Unavailable">
+                                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 6l12 12M18 6l-12 12"/>
+                                  </svg>
+                                </span>
+                              {% endif %}
+                            {% endwith %}
+                          </td>
+                        {% endwith %}
                       {% endwith %}
-                    </td>                  
+                    {% endfor %}
                   {% endwith %}
-                {% endwith %}            
-              {% endfor %}
-            </tr>
+                </tr>
+              {% endwith %}
+            {% endwith %}
           {% endfor %}
         {% else %}
           <tr>
             <td colspan="{{ time_slots|length|add:1 }}" class="text-center text-gray-500 py-4">No available slots.</td>
           </tr>
         {% endif %}
-      </tbody>      
+      </tbody>
     </table>
   </div>
 </div>
