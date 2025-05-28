@@ -365,31 +365,56 @@
 
 
     // === Booking Modal Functionality ===
-    function openBookingModal(teacher, date, startTime, endTime, avatar) {
+    function openBookingModal(teacherName, teacherEmail, date, startTime, endTime, avatar) {
       const modal = document.getElementById("bookingModal");
       const modalTeacherName = document.getElementById("modalTeacherName");
+      const modalTeacherEmail = document.getElementById("modalTeacherEmail");
       const modalSlotDetails = document.getElementById("modalSlotDetails");
       const modalAvatar = document.getElementById("modalAvatar");
-    
-      if (modalTeacherName) modalTeacherName.textContent = teacher;
-      if (modalSlotDetails) modalSlotDetails.textContent = `${date}, ${startTime} – ${endTime}`;
-    
-      if (modalAvatar) {
-        if (avatar) {
-          modalAvatar.src = avatar;
-        } else {
-          modalAvatar.src = "/static/core/img/default-profile.png";
-        }
+
+      // Format date
+      const dateObj = new Date(date);
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      const formattedDate = dateObj.toLocaleDateString('en-GB', options);
+
+      // Format time
+      const formatTime = (t) => {
+        const [hour, minute] = t.split(':');
+        const d = new Date();
+        d.setHours(parseInt(hour));
+        d.setMinutes(parseInt(minute));
+        return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' });
+      };
+      const formattedStart = formatTime(startTime);
+      const formattedEnd = formatTime(endTime);
+
+      // Update modal text
+      if (modalSlotDetails) {
+        modalSlotDetails.textContent = `${formattedDate} from ${formattedStart} to ${formattedEnd}`;
       }
-    
+
+      if (modalTeacherName) {
+        modalTeacherName.textContent = `Advisor: ${teacherName}`;
+      }
+
+      if (modalTeacherEmail) {
+        modalTeacherEmail.textContent = `Email: ${teacherEmail}`;
+      }
+
+      if (modalAvatar) {
+        modalAvatar.src = avatar || "/static/core/img/default-profile.png";
+      }
+
+      // Store values for submission
       if (modal) {
         modal.classList.remove("hidden");
-        modal.dataset.teacher = teacher;
+        modal.dataset.teacher = teacherEmail;
         modal.dataset.date = date;
         modal.dataset.start = startTime;
         modal.dataset.end = endTime;
       }
-    }    
+    }
+
 
     function closeBookingModal() {
       const modal = document.getElementById("bookingModal");
@@ -413,10 +438,38 @@
     }
 
 
+    /**
+     * Generates the HTML for a newly booked slot.
+     * Includes all necessary data attributes for modal functionality.
+     */
+    function createBookedSlotHTML({ teacherName, teacherEmail, avatar, date, start, end }) {
+      return `
+        <span 
+          class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
+          title="You have booked this slot"
+          data-teacher-name="${teacherName}"
+          data-teacher-email="${teacherEmail}"
+          data-avatar="${avatar}"
+          data-date="${date}"
+          data-start="${start}"
+          data-end="${end}"
+        >
+          <!-- Clock Icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+          </svg>
+        </span>
+      `;
+    }
+
+
+
+    // === Handles submission of a booking request ===
     function submitBooking() {
       const modal = document.getElementById("bookingModal");
       if (!modal) return;
 
+      // Extract booking details from the modal's data attributes
       const teacher = modal.dataset.teacher;
       const date = modal.dataset.date;
       const start = modal.dataset.start;
@@ -431,12 +484,7 @@
           "Content-Type": "application/json",
           "X-CSRFToken": getCSRFToken(),
         },
-        body: JSON.stringify({
-          teacher: teacher,
-          date: date,
-          start: start,
-          end: end
-        })
+        body: JSON.stringify({ teacher, date, start, end })
       })
       .then(response => response.json())
       .then(data => {
@@ -444,26 +492,21 @@
           closeBookingModal();
           showBookingToast("Booking confirmed!", "green");
 
-          // 🎯 Replace the booked slot immediately
+          // 🎯 Replace the booked slot dynamically
           const selector = `.booking-slot[data-teacher="${CSS.escape(teacher)}"][data-date="${date}"][data-start="${start}"]`;
           const slot = document.querySelector(selector);
 
           if (slot) {
-            slot.outerHTML = `
-              <span 
-                class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-default" 
-                title="Already booked"
-              >
-                <!-- Clock Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                </svg>                                
-              </span>
-            `;
+            slot.outerHTML = createBookedSlotHTML({
+              teacherName: data.teacher_name,      // e.g., "Jane Doe"
+              teacherEmail: data.teacher_email,    // e.g., "jane@cam.ac.uk"
+              avatar: data.teacher_avatar,         // e.g., "/media/profile_pictures/jane.jpg"
+              date: date,
+              start: start,
+              end: end
+            });
           }
-
         } else {
-          // ❌ Show failure message in red toast
           showBookingToast(data.error || "Booking failed. Try again.", "red");
         }
       })
@@ -476,6 +519,8 @@
       });
     }
 
+
+
     // === Booking Modal Button Event Listeners ===
     document.getElementById('close-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('cancel-booking-modal')?.addEventListener('click', closeBookingModal);
@@ -483,47 +528,84 @@
 
     document.querySelectorAll('.booking-slot').forEach(slot => {
       slot.addEventListener('click', () => {
-        const teacher = slot.dataset.teacher;
+        const teacherEmail = slot.dataset.teacher;  // This is used for backend
+        const teacherName = slot.dataset.teacherName || teacherEmail;  // fallback just in case
         const date = slot.dataset.date;
         const start = slot.dataset.start;
         const end = slot.dataset.end;
         const avatar = slot.dataset.avatar;
-        openBookingModal(teacher, date, start, end, avatar);
+
+        openBookingModal(teacherName, teacherEmail, date, start, end, avatar);
       });
     });
 
 
+
     // === Booked Slot Info Modal Logic ===
-    function openBookedInfoModal(name, email, date, start, end) {
+    function openBookedInfoModal(name, email, date, start, end, avatar) {
       const modal = document.getElementById("bookedInfoModal");
       const nameEl = document.getElementById("booked-teacher-name");
       const emailEl = document.getElementById("booked-teacher-email");
       const timeEl = document.getElementById("booked-slot-datetime");
+      const avatarEl = document.getElementById("booked-teacher-avatar");
+      if (avatarEl) {
+        avatarEl.src = avatar || "/static/core/img/default-profile.png";
+      }
+
 
       if (modal) {
         nameEl.textContent = `Advisor: ${name}`;
         emailEl.textContent = `Email: ${email}`;
-        timeEl.textContent = `${date}, ${start} – ${end}`;
+
+        // ✅ Format the date to "Wednesday 28 May 2025"
+        const dateObj = new Date(date);
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const formattedDate = dateObj.toLocaleDateString('en-GB', options);
+
+        // ✅ Format time from "09:00:00" to "9:00am"
+        const formatTime = (t) => {
+          const [hour, minute] = t.split(':');
+          const d = new Date();
+          d.setHours(parseInt(hour));
+          d.setMinutes(parseInt(minute));
+          return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+        };
+
+        const formattedStart = formatTime(start);
+        const formattedEnd = formatTime(end);
+
+        timeEl.textContent = `You have a slot booked on ${formattedDate} from ${formattedStart} to ${formattedEnd}`;
+
         modal.classList.remove("hidden");
       }
     }
+
 
     function closeBookedInfoModal() {
       const modal = document.getElementById("bookedInfoModal");
       if (modal) modal.classList.add("hidden");
     }
 
-    // Attach click handlers to clock icons
-    document.querySelectorAll('.booked-slot').forEach(slot => {
-      slot.addEventListener('click', () => {
-        const name = slot.dataset.teacherName;
-        const email = slot.dataset.teacherEmail;
-        const date = slot.dataset.date;
-        const start = slot.dataset.start;
-        const end = slot.dataset.end;
-        openBookedInfoModal(name, email, date, start, end);
-      });
+    // ✅ Delegated event handler for clock icon clicks (booked slots)
+    document.getElementById('availability-table')?.addEventListener('click', function (e) {
+      // Look for the closest clicked element with class 'booked-slot'
+      const slot = e.target.closest('.booked-slot');
+      if (!slot) return; // If not a booked slot, exit
+
+      // Extract relevant booking details from the dataset
+      const name = slot.dataset.teacherName;
+      const email = slot.dataset.teacherEmail;
+      const date = slot.dataset.date;
+      const start = slot.dataset.start;
+      const end = slot.dataset.end;
+      const avatar = slot.dataset.avatar;
+
+      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end });
+
+      // Show the modal with all the booking info
+      openBookedInfoModal(name, email, date, start, end, avatar);
     });
+
 
     document.getElementById("close-booked-info-modal")?.addEventListener("click", closeBookedInfoModal);
 

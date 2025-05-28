@@ -1,11 +1,18 @@
+# Python stdlib
+import json
+import calendar
+from datetime import datetime, timedelta, date
+from urllib.parse import urlparse
+
+# Django core
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST  # Add this to enforce POST requests
-from datetime import datetime, timedelta, date
-import calendar
-import json
+from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
+from django.core.files.storage import default_storage
+
+# Local app
 from .models import TeacherAvailability, Booking
 
 
@@ -434,6 +441,7 @@ def create_booking(request):
   """
   Creates a booking for the current student, given a valid availability slot.
   Prevents double-booking and enforces only one booking per day.
+  Returns teacher metadata and booking ID for future frontend features.
   """
   try:
     data = json.loads(request.body)
@@ -445,23 +453,21 @@ def create_booking(request):
     if not all([teacher_email, date_str, start_time_str, end_time_str]):
       return JsonResponse({"error": "Missing required data"}, status=400)
 
-    # Parse strings to Python types
+    # Parse strings to proper types
     slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     start_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
     end_time = datetime.strptime(end_time_str, "%H:%M:%S").time()
 
-    # Check for existing booking by this student on the same date
-    existing_booking = Booking.objects.filter(
+    # Prevent multiple bookings per day
+    if Booking.objects.filter(
       student=request.user,
       teacher_availability__date=slot_date
-    ).exists()
-
-    if existing_booking:
+    ).exists():
       return JsonResponse({
         "error": "You already have a booking on this day."
       }, status=400)
 
-    # Look up the availability slot
+    # Get availability slot
     try:
       slot = TeacherAvailability.objects.get(
         teacher__email=teacher_email,
@@ -473,21 +479,42 @@ def create_booking(request):
     except TeacherAvailability.DoesNotExist:
       return JsonResponse({"error": "This slot is not available"}, status=404)
 
-    # Check if already booked
+    # Prevent double-booking this slot
     if hasattr(slot, "booking"):
       return JsonResponse({"error": "Slot already booked"}, status=409)
 
-    # Create the booking
-    Booking.objects.create(
+    # Create booking and mark slot unavailable
+    booking = Booking.objects.create(
       student=request.user,
       teacher_availability=slot
     )
-
-    # Optionally mark the slot as unavailable (one-time slot)
     slot.is_available = False
     slot.save(update_fields=["is_available"])
 
-    return JsonResponse({"success": True, "message": "Booking confirmed!"})
+    # Safely fetch teacher profile info
+    teacher = slot.teacher
+    teacher_name = f"{teacher.first_name} {teacher.last_name}".strip()
+    teacher_email = teacher.email
+    default_avatar = "/static/core/img/default-profile.png"
+
+    try:
+      profile = teacher.teacherprofile
+      # Ensure image exists in storage (extra defensive)
+      avatar_url = profile.profile_picture.url if profile.profile_picture else default_avatar
+      parsed_path = urlparse(avatar_url).path.lstrip("/")
+      teacher_avatar = avatar_url if default_storage.exists(parsed_path) else default_avatar
+    except TeacherProfile.DoesNotExist:
+      teacher_avatar = default_avatar
+
+    # ✅ Return booking ID and metadata
+    return JsonResponse({
+      "success": True,
+      "message": "Booking confirmed!",
+      "booking_id": booking.id,
+      "teacher_name": teacher_name,
+      "teacher_email": teacher_email,
+      "teacher_avatar": teacher_avatar,
+    })
 
   except Exception as e:
     return JsonResponse({"error": str(e)}, status=500)

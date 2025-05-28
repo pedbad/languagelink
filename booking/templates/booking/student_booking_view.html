@@ -52,7 +52,7 @@
   </div>
 
   <!-- Availability Table -->
-  <div class="overflow-x-auto mt-6 mb-28">
+  <div id="availability-table" class="overflow-x-auto mt-6 mb-28">
     <table class="w-full border-collapse border border-gray-300 text-sm sm:text-base mb-10">
       <thead>
         <tr>
@@ -108,8 +108,9 @@
                                         data-teacher-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
                                         data-teacher-email="{{ teacher_email }}"
                                         data-date="{{ date_str }}"
-                                        data-start="{{ start_time|time:'H:i:s' }}"
-                                        data-end="{{ end_time|time:'H:i:s' }}"
+                                        data-start="{{ start_time|time:'H:i' }}"
+                                        data-end="{{ end_time|time:'H:i' }}"
+                                        data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
                                         title="You have booked this slot">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                       <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
@@ -119,6 +120,7 @@
                                   <!-- Available -->
                                   <span class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
                                         data-teacher="{{ teacher_email }}"
+                                        data-teacher-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
                                         data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
                                         data-date="{{ date_str }}"
                                         data-start="{{ start_time|time:'H:i:s' }}"
@@ -180,9 +182,19 @@
 
     <!-- Modal Content -->
     <div class="text-center">
-      <img id="modalAvatar" src="{% static 'core/img/default-profile.png' %}" alt="Teacher Avatar" class="w-16 h-16 rounded-full mx-auto mb-3">
-      <h2 id="modalTeacherName" class="text-lg font-semibold text-gray-800 mb-2">Teacher Name</h2>
-      <p id="modalSlotDetails" class="text-gray-600 mb-4">Date & Time</p>
+      <!-- Date Info -->
+      <p id="modalSlotDetails" class="text-gray-600 text-center mb-4">
+        Wednesday 28 May 2025 from 9:30 to 10:00
+      </p>
+
+      <!-- Avatar + Teacher Info -->
+      <div class="flex items-center justify-center gap-4 mb-4">
+        <img id="modalAvatar" src="{% static 'core/img/default-profile.png' %}" alt="Teacher Avatar" class="w-12 h-12 rounded-full">
+        <div class="text-left">
+          <p id="modalTeacherName" class="text-sm font-semibold text-gray-800">Advisor: Firstname Lastname</p>
+          <p id="modalTeacherEmail" class="text-sm text-gray-600">Email: email@example.com</p>
+        </div>
+      </div>
 
       <!-- Modal Actions -->
       <div class="mt-6 flex justify-end space-x-3">
@@ -213,12 +225,25 @@
     </button>
 
     <!-- Modal Content -->
-    <div class="text-center">
-      <h2 class="text-lg font-semibold text-gray-800 mb-2">You have already booked this slot</h2>
-      <p id="booked-teacher-name" class="text-gray-700 mb-1">Advisor: John Doe</p>
-      <p id="booked-teacher-email" class="text-gray-600 mb-2">Email: john@example.com</p>
-      <p id="booked-slot-datetime" class="text-gray-500">Wednesday 28 May, 9:00 – 9:30</p>
+    <div class="text-center px-4">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">You have already booked this slot</h2>
+
+      <p id="booked-slot-datetime" class="text-base text-gray-700 mb-4">
+        <!-- This is filled dynamically -->
+        You have a slot booked on …
+      </p>
+
+      <div class="flex items-center justify-center mt-4 space-x-4">
+        <img id="booked-teacher-avatar" src="{% static 'core/img/default-profile.png' %}" 
+            alt="Teacher Avatar" class="h-10 w-10 rounded-full object-cover">
+        <div class="text-left">
+          <p id="booked-teacher-name" class="text-sm font-semibold text-gray-800">Advisor: John Doe</p>
+          <p id="booked-teacher-email" class="text-sm text-gray-600">Email: john@example.com</p>
+        </div>
+      </div>
+
     </div>
+
   </div>
 </div>
 
