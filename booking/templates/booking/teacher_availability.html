@@ -3,26 +3,17 @@
 {% load booking_filters %}
 
 {% block content %}
-  <div class="container mx-auto mt-10">
-    <h1 class="text-3xl font-light text-gray-900 text-center mb-6">
-      {{ request.user.first_name }} {{ request.user.last_name }}'s Availability Page
-    </h1>
-    <hr class="my-4 border-1 border-gray-300 mb-6"> 
+  <div id="teacher-availability-page">
+    <div class="container mx-auto mt-10">
+      <h1 class="text-3xl font-light text-gray-900 text-center mb-6">
+        {{ request.user.first_name }} {{ request.user.last_name }}'s Availability Page
+      </h1>
+      <hr class="my-4 border-1 border-gray-300 mb-6"> 
 
-    <!-- Month Navigation -->
-    <div class="flex items-center justify-center gap-4 mb-4">
-      <!-- Previous Month Button -->
-      {% if prev_year > today.year %}
-        <a href="?year={{ prev_year }}&month={{ prev_month }}" 
-          class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
-          <!-- Heroicon Left Arrow -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-          </svg>
-          Previous Month
-        </a>
-      {% elif prev_year == today.year %}
-        {% if prev_month >= today.month %}
+      <!-- Month Navigation -->
+      <div class="flex items-center justify-center gap-4 mb-4">
+        <!-- Previous Month Button -->
+        {% if prev_year > today.year %}
           <a href="?year={{ prev_year }}&month={{ prev_month }}" 
             class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
             <!-- Heroicon Left Arrow -->
@@ -31,6 +22,25 @@
             </svg>
             Previous Month
           </a>
+        {% elif prev_year == today.year %}
+          {% if prev_month >= today.month %}
+            <a href="?year={{ prev_year }}&month={{ prev_month }}" 
+              class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+              <!-- Heroicon Left Arrow -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Previous Month
+            </a>
+          {% else %}
+            <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
+              <!-- Heroicon Left Arrow -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Previous Month
+            </span>
+          {% endif %}
         {% else %}
           <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
             <!-- Heroicon Left Arrow -->
@@ -40,158 +50,147 @@
             Previous Month
           </span>
         {% endif %}
-      {% else %}
-        <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
-          <!-- Heroicon Left Arrow -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+
+        <!-- Month & Year (Always Centered) -->
+        <h2 class="text-xl font-semibold text-gray-800 text-center flex-1">
+          {{ current_month }} {{ current_year }}
+        </h2>      
+
+        <!-- Next Month Button -->
+        <a href="?year={{ next_year }}&month={{ next_month }}" 
+          class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+          Next Month
+          <!-- Heroicon Right Arrow -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
-          Previous Month
-        </span>
-      {% endif %}
+        </a>
+      </div>
 
-      <!-- Month & Year (Always Centered) -->
-      <h2 class="text-xl font-semibold text-gray-800 text-center flex-1">
-        {{ current_month }} {{ current_year }}
-      </h2>      
-
-      <!-- Next Month Button -->
-      <a href="?year={{ next_year }}&month={{ next_month }}" 
-        class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
-        Next Month
-        <!-- Heroicon Right Arrow -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-        </svg>
-      </a>
-    </div>
-
-    
-    <!-- Availability Table -->
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse border border-gray-300 text-sm sm:text-base mb-10">
-        <thead>
-          <!-- AM / PM Header Row -->
-          <tr>
-            <th class="border border-gray-300 px-4 py-2 text-left"></th> <!-- Empty for date column -->
-            <th colspan="6" class="border border-gray-300 px-4 py-1 text-center font-semibold bg-amber-100 text-gray-900 text-sm">
-              Morning Availability
-            </th>
-            <th colspan="12" class="border border-gray-300 px-4 py-1 text-center font-semibold bg-sky-100 text-gray-900 text-sm">
-              Afternoon Availability
-            </th>            
-          </tr>
-    
-          <!-- Time Slots Row -->
-          <tr class="bg-gray-100">
-            <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
-            {% for start_time, end_time in time_slots %}
-              <th class="border border-gray-300 px-2 py-1 text-xs whitespace-nowrap">
-                {{ start_time|date:"g:i" }}
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3 mx-auto">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
-                </svg>
-                {{ end_time|date:"g:i" }}
+      
+      <!-- Availability Table -->
+      <div class="overflow-x-auto">
+        <table id="availability-table" class="w-full border-collapse border border-gray-300 text-sm sm:text-base mb-10">
+          <thead>
+            <!-- AM / PM Header Row -->
+            <tr>
+              <th class="border border-gray-300 px-4 py-2 text-left"></th> <!-- Empty for date column -->
+              <th colspan="6" class="border border-gray-300 px-4 py-1 text-center font-semibold bg-amber-100 text-gray-900 text-sm">
+                Morning Availability
               </th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for day in month_dates %}
-            <tr class="text-center 
-              {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} border-l-4 border-deep-teal {% endif %}
-              {% if day < today %} bg-gray-200 opacity-60 {% endif %}">
-        
-              <!-- Date Column -->
-              <td class="border border-gray-300 px-4 py-2 font-semibold 
-                {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} bg-deep-teal text-white font-bold {% else %} text-gray-700 {% endif %}">
-                {{ day|date:"D, jS" }}
-              </td>
-        
-              <!-- Time Slots -->
+              <th colspan="12" class="border border-gray-300 px-4 py-1 text-center font-semibold bg-sky-100 text-gray-900 text-sm">
+                Afternoon Availability
+              </th>            
+            </tr>
+      
+            <!-- Time Slots Row -->
+            <tr class="bg-gray-100">
+              <th class="border border-gray-300 px-4 py-2 text-left">Date</th>
               {% for start_time, end_time in time_slots %}
-                {% with date_str=day|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
-                  {% with key=date_str|add:","|add:time_str %}
-                    {% with slot=availability_dict|get_item:key %}
-                      <td class="border border-gray-300 p-2">
+                <th class="border border-gray-300 px-2 py-1 text-xs whitespace-nowrap">
+                  {{ start_time|date:"g:i" }}
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-3 w-3 mx-auto">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                  </svg>
+                  {{ end_time|date:"g:i" }}
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for day in month_dates %}
+              <tr class="text-center 
+                {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} border-l-4 border-deep-teal {% endif %}
+                {% if day < today %} bg-gray-200 opacity-60 {% endif %}">
+          
+                <!-- Date Column -->
+                <td class="border border-gray-300 px-4 py-2 font-semibold 
+                  {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} bg-deep-teal text-white font-bold {% else %} text-gray-700 {% endif %}">
+                  {{ day|date:"D, jS" }}
+                </td>
+          
+                <!-- Time Slots -->
+                {% for start_time, end_time in time_slots %}
+                  {% with date_str=day|date:"Y-m-d" time_str=start_time|time:"H:i:s" %}
+                    {% with key=date_str|add:","|add:time_str %}
+                      {% with slot=availability_dict|get_item:key %}
+                        <td class="border border-gray-300 p-2">
 
-                        {% if slot and slot.booking %}
-                          <!-- Slot is BOOKED -->
-                          <span 
-                            class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
-                            title="Already booked"
-                          >
-                            <!-- Clock Icon -->
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                              <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                            </svg>                                
-                          </span>
+                          {% if slot and slot.has_booking %}
+                            <!-- Slot is BOOKED -->
+                            <button 
+                              class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
+                              title="Already booked"
+                              data-name="{{ slot.student_name }}"
+                              data-email="{{ slot.student_email }}"
+                              data-avatar="{{ slot.student_avatar }}"
+                              data-date="{{ date_str }}"
+                              data-start="{{ time_str }}"
+                              data-end="{{ end_time|time:'H:i:s' }}"
+                            >
+                              <!-- Clock Icon -->
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
+                              </svg>                                
+                            </button>
 
-                        {% elif slot and slot.is_available %}
-                          <!-- Slot is AVAILABLE -->
-                          <button 
-                            data-date="{{ date_str }}" 
-                            data-start-time="{{ time_str }}" 
-                            data-end-time="{{ end_time|time:'H:i:s' }}"
-                            class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-green-500 text-white hover:bg-green-600 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
-                          >
-                            <!-- Check Icon -->
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M5 12l5 5L20 7"/>
-                            </svg>
-                          </button>
 
-                        {% else %}
-                          <!-- Slot is UNAVAILABLE (either False or slot doesn't exist) -->
-                          <button 
-                            data-date="{{ date_str }}" 
-                            data-start-time="{{ time_str }}" 
-                            data-end-time="{{ end_time|time:'H:i:s' }}"
-                            class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-pink-400 text-white hover:bg-pink-500 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
-                          >
-                            <!-- X Icon -->
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                              <path d="M6 6l12 12M18 6l-12 12"/>
-                            </svg>
-                          </button>
-                        {% endif %}
 
-                      </td>
+                          {% elif slot and slot.is_available %}
+                            <!-- Slot is AVAILABLE -->
+                            <button 
+                              data-date="{{ date_str }}" 
+                              data-start-time="{{ time_str }}" 
+                              data-end-time="{{ end_time|time:'H:i:s' }}"
+                              class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-green-500 text-white hover:bg-green-600 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
+                            >
+                              <!-- Check Icon -->
+                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M5 12l5 5L20 7"/>
+                              </svg>
+                            </button>
+
+                          {% else %}
+                            <!-- Slot is UNAVAILABLE (either False or slot doesn't exist) -->
+                            <button 
+                              data-date="{{ date_str }}" 
+                              data-start-time="{{ time_str }}" 
+                              data-end-time="{{ end_time|time:'H:i:s' }}"
+                              class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-pink-400 text-white hover:bg-pink-500 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
+                            >
+                              <!-- X Icon -->
+                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 6l12 12M18 6l-12 12"/>
+                              </svg>
+                            </button>
+                          {% endif %}
+
+                        </td>
+                      {% endwith %}
                     {% endwith %}
                   {% endwith %}
-                {% endwith %}
-              {% endfor %}
+                {% endfor %}
 
-            </tr>
-        
-            <!-- Optional spacer row after Fridays -->
-            {% if day|date:"D" == "Fri" %}
-              <tr>
-                <td colspan="{{ time_slots|length|add:1 }}" class="h-2 bg-slate-200 border-l-4 border-r-4 border-transparent"></td>
               </tr>
-            {% endif %}
-          {% endfor %}
-        </tbody>
-        
-      </table>
-    </div>
+          
+              <!-- Optional spacer row after Fridays -->
+              {% if day|date:"D" == "Fri" %}
+                <tr>
+                  <td colspan="{{ time_slots|length|add:1 }}" class="h-2 bg-slate-200 border-l-4 border-r-4 border-transparent"></td>
+                </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+          
+        </table>
+      </div>
 
-    <hr class="my-4 border-1 border-gray-300 mb-10"> 
-    
-    <!-- Bottom Month Navigation -->
-    <div class="flex justify-center gap-2 mt-6 mb-12">
-      <!-- Previous Month Button -->
-      {% if prev_year > today.year %}
-        <a href="?year={{ prev_year }}&month={{ prev_month }}" 
-          class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
-          <!-- Heroicon Left Arrow -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
-          </svg>
-          Previous Month
-        </a>
-      {% elif prev_year == today.year %}
-        {% if prev_month >= today.month %}
+      <hr class="my-4 border-1 border-gray-300 mb-10"> 
+      
+      <!-- Bottom Month Navigation -->
+      <div class="flex justify-center gap-2 mt-6 mb-12">
+        <!-- Previous Month Button -->
+        {% if prev_year > today.year %}
           <a href="?year={{ prev_year }}&month={{ prev_month }}" 
             class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
             <!-- Heroicon Left Arrow -->
@@ -200,6 +199,25 @@
             </svg>
             Previous Month
           </a>
+        {% elif prev_year == today.year %}
+          {% if prev_month >= today.month %}
+            <a href="?year={{ prev_year }}&month={{ prev_month }}" 
+              class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+              <!-- Heroicon Left Arrow -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Previous Month
+            </a>
+          {% else %}
+            <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
+              <!-- Heroicon Left Arrow -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+              </svg>
+              Previous Month
+            </span>
+          {% endif %}
         {% else %}
           <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
             <!-- Heroicon Left Arrow -->
@@ -209,34 +227,58 @@
             Previous Month
           </span>
         {% endif %}
-      {% else %}
-        <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
-          <!-- Heroicon Left Arrow -->
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+
+        <!-- Next Month Button -->
+        <a href="?year={{ next_year }}&month={{ next_month }}" 
+          class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+          Next Month
+          <!-- Heroicon Right Arrow -->
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
           </svg>
-          Previous Month
-        </span>
-      {% endif %}
-
-      <!-- Next Month Button -->
-      <a href="?year={{ next_year }}&month={{ next_month }}" 
-        class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
-        Next Month
-        <!-- Heroicon Right Arrow -->
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 ml-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
-        </svg>
-      </a>
+        </a>
+      </div>
     </div>
+  </div><!-- eof #teacher-availability-page-->
 
 
+  <!-- 📅 Booked Slot Info Modal (Unified Style) -->
+  <div id="bookedInfoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
 
-    
-    
+      <!-- Close Button -->
+      <button id="close-booked-info-modal" type="button"
+              class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+        <span class="sr-only">Close</span>
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
 
+      <!-- Modal Content -->
+      <div class="text-center px-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">You have already booked this slot</h2>
 
+        <p id="booked-slot-datetime" class="text-base text-gray-700 mb-4">
+          <!-- Will be filled dynamically -->
+          You have a slot booked on …
+        </p>
+
+        <div class="flex items-center justify-center mt-4 space-x-4">
+          <img id="booked-student-avatar" src="{% static 'core/img/default-profile.png' %}"
+              alt="Student Avatar" class="h-10 w-10 rounded-full object-cover">
+          <div class="text-left">
+            <p id="booked-student-name" class="text-sm font-semibold text-gray-800">Student: John Doe</p>
+            <p id="booked-student-email" class="text-sm text-gray-600">Email: john@example.com</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
+
+
+
 {% endblock %}
 
 

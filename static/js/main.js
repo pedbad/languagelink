@@ -567,46 +567,88 @@
 
 
     // === Booked Slot Info Modal Logic ===
+    // function openBookedInfoModal(name, email, date, start, end, avatar) {
+    //   const modal = document.getElementById("bookedInfoModal");
+    //   const nameEl = document.getElementById("booked-teacher-name");
+    //   const emailEl = document.getElementById("booked-teacher-email");
+    //   const timeEl = document.getElementById("booked-slot-datetime");
+    //   const avatarEl = document.getElementById("booked-teacher-avatar");
+    //   if (avatarEl) {
+    //     avatarEl.src = (!avatar || avatar === "undefined") 
+    //       ? "/static/core/img/default-profile.png" 
+    //       : avatar;
+    //   }
+
+
+
+    //   if (modal) {
+    //     nameEl.textContent = `Advisor: ${name}`;
+    //     emailEl.textContent = `Email: ${email}`;
+
+    //     // ✅ Format the date to "Wednesday 28 May 2025"
+    //     const dateObj = new Date(date);
+    //     const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    //     const formattedDate = dateObj.toLocaleDateString('en-GB', options);
+
+    //     // ✅ Format time from "09:00:00" to "9:00am"
+    //     const formatTime = (t) => {
+    //       const [hour, minute] = t.split(':');
+    //       const d = new Date();
+    //       d.setHours(parseInt(hour));
+    //       d.setMinutes(parseInt(minute));
+    //       return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+    //     };
+
+    //     const formattedStart = formatTime(start);
+    //     const formattedEnd = formatTime(end);
+
+    //     timeEl.textContent = `You have a slot booked on ${formattedDate} from ${formattedStart} to ${formattedEnd}`;
+
+    //     modal.classList.remove("hidden");
+    //   }
+    // }
+
     function openBookedInfoModal(name, email, date, start, end, avatar) {
       const modal = document.getElementById("bookedInfoModal");
-      const nameEl = document.getElementById("booked-teacher-name");
-      const emailEl = document.getElementById("booked-teacher-email");
+      const isTeacherPage = document.getElementById("teacher-availability-page") !== null;
+
+      // Use correct element IDs based on page context
+      const nameEl = document.getElementById(isTeacherPage ? "booked-student-name" : "booked-teacher-name");
+      const emailEl = document.getElementById(isTeacherPage ? "booked-student-email" : "booked-teacher-email");
+      const avatarEl = document.getElementById(isTeacherPage ? "booked-student-avatar" : "booked-teacher-avatar");
       const timeEl = document.getElementById("booked-slot-datetime");
-      const avatarEl = document.getElementById("booked-teacher-avatar");
+
+      if (nameEl) nameEl.textContent = isTeacherPage ? `Student: ${name}` : `Advisor: ${name}`;
+      if (emailEl) emailEl.textContent = `Email: ${email}`;
       if (avatarEl) {
-        avatarEl.src = (!avatar || avatar === "undefined") 
-          ? "/static/core/img/default-profile.png" 
+        avatarEl.src = (!avatar || avatar === "undefined")
+          ? "/static/core/img/default-profile.png"
           : avatar;
       }
 
+      // Format date and time
+      const dateObj = new Date(date);
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      const formattedDate = dateObj.toLocaleDateString('en-GB', options);
 
+      const formatTime = (t) => {
+        const [hour, minute] = t.split(':');
+        const d = new Date();
+        d.setHours(parseInt(hour));
+        d.setMinutes(parseInt(minute));
+        return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+      };
 
-      if (modal) {
-        nameEl.textContent = `Advisor: ${name}`;
-        emailEl.textContent = `Email: ${email}`;
+      const formattedStart = formatTime(start);
+      const formattedEnd = formatTime(end);
 
-        // ✅ Format the date to "Wednesday 28 May 2025"
-        const dateObj = new Date(date);
-        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const formattedDate = dateObj.toLocaleDateString('en-GB', options);
-
-        // ✅ Format time from "09:00:00" to "9:00am"
-        const formatTime = (t) => {
-          const [hour, minute] = t.split(':');
-          const d = new Date();
-          d.setHours(parseInt(hour));
-          d.setMinutes(parseInt(minute));
-          return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
-        };
-
-        const formattedStart = formatTime(start);
-        const formattedEnd = formatTime(end);
-
+      if (timeEl) {
         timeEl.textContent = `You have a slot booked on ${formattedDate} from ${formattedStart} to ${formattedEnd}`;
-
-        modal.classList.remove("hidden");
       }
+
+      if (modal) modal.classList.remove("hidden");
     }
+
 
 
     function closeBookedInfoModal() {
@@ -616,23 +658,23 @@
 
     // ✅ Delegated event handler for clock icon clicks (booked slots)
     document.getElementById('availability-table')?.addEventListener('click', function (e) {
-      // Look for the closest clicked element with class 'booked-slot'
       const slot = e.target.closest('.booked-slot');
-      if (!slot) return; // If not a booked slot, exit
+      if (!slot) return;
 
-      // Extract relevant booking details from the dataset
-      const name = slot.dataset.teacherName;
-      const email = slot.dataset.teacherEmail;
+      const isTeacherPage = document.getElementById("teacher-availability-page") !== null;
+
+      const name = isTeacherPage ? slot.dataset.name : slot.dataset.teacherName;
+      const email = isTeacherPage ? slot.dataset.email : slot.dataset.teacherEmail;
       const date = slot.dataset.date;
       const start = slot.dataset.start;
       const end = slot.dataset.end;
       const avatar = slot.dataset.avatar;
 
-      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end });
+      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end, isTeacherPage });
 
-      // Show the modal with all the booking info
       openBookedInfoModal(name, email, date, start, end, avatar);
     });
+
 
 
     document.getElementById("close-booked-info-modal")?.addEventListener("click", closeBookedInfoModal);

@@ -21,75 +21,90 @@ from .models import TeacherAvailability, Booking
 def teacher_availability_view(request):
   """
   Displays a teacher's availability for a selected month,
-  allowing them to toggle slots on/off.
+  allowing them to toggle slots on/off and view booking details.
   """
 
-  # Restrict access to teachers only
   if request.user.role != 'teacher':
     return redirect('teacher_profile')
 
-  # Get year and month from query params (default to current month)
   year = int(request.GET.get('year', datetime.today().year))
   month = int(request.GET.get('month', datetime.today().month))
 
-  # Ensure the month is valid (1-12)
   if not (1 <= month <= 12):
-    month = datetime.today().month  # Fallback to current month
+    month = datetime.today().month
 
-  #print(f"DEBUG: Loading availability for {calendar.month_name[month]} ({month})")
-
-  # Get total days in the month and filter out weekends (Mon-Fri only)
   _, num_days = calendar.monthrange(year, month)
   month_dates = [
     date(year, month, day)
     for day in range(1, num_days + 1)
-    if date(year, month, day).weekday() < 5  # Exclude weekends
+    if date(year, month, day).weekday() < 5
   ]
 
-  # Define 30-minute slots from 9:00 AM to 5:30 PM
   time_slots = [
     (
       datetime(2000, 1, 1, hour, minute).time(),
       (datetime(2000, 1, 1, hour, minute) + timedelta(minutes=30)).time(),
     )
-    for hour in range(9, 18)  # 9:00 AM - 5:30 PM
+    for hour in range(9, 18)
     for minute in (0, 30)
   ]
 
-  # Fetch existing availability records for the teacher
   teacher_availabilities = TeacherAvailability.objects.filter(
     teacher=request.user, date__year=year, date__month=month
-  )
+  ).select_related("booking__student")
 
-  #print(f"DEBUG: Retrieved Availability - {list(teacher_availabilities.values())}")
+  availability_dict = {}
 
-  # Convert queryset to dictionary for quick lookup
-  # availability_dict = {
-  #   f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}": slot.is_available
-  #   for slot in teacher_availabilities
-  # }
-  availability_dict = {
-    f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}": slot
-    for slot in teacher_availabilities
-  }
+  for slot in teacher_availabilities:
+    key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
 
+    slot_info = {
+      "is_available": slot.is_available,
+      "has_booking": False,
+      "student_name": None,
+      "student_email": None,
+      "student_avatar": None,
+    }
 
-  #print(f"DEBUG: Final Availability Dictionary - {availability_dict}")
+    if hasattr(slot, "booking"):
+      student = slot.booking.student
+      slot_info["has_booking"] = True
+      slot_info["student_name"] = f"{student.first_name} {student.last_name}".strip()
+      slot_info["student_email"] = student.email
 
-  # Ensure all slots exist, defaulting to False if not stored in the DB
+      try:
+        profile = student.studentprofile
+        if profile.profile_picture:
+          avatar_url = profile.profile_picture.url
+          if avatar_url.startswith("/"):
+            avatar_url = request.build_absolute_uri(avatar_url)
+          slot_info["student_avatar"] = avatar_url
+        else:
+          slot_info["student_avatar"] = request.build_absolute_uri("/static/core/img/default-profile.png")
+      except:
+        slot_info["student_avatar"] = request.build_absolute_uri("/static/core/img/default-profile.png")
+
+    availability_dict[key] = slot_info
+
+  # Fill in empty slots with default values
   for day in month_dates:
     day_str = day.strftime('%Y-%m-%d')
     for start_time, _ in time_slots:
       key = f"{day_str},{start_time.strftime('%H:%M:%S')}"
       if key not in availability_dict:
-        availability_dict[key] = None  # default to None
+        availability_dict[key] = {
+          "is_available": False,
+          "has_booking": False,
+          "student_name": None,
+          "student_email": None,
+          "student_avatar": None,
+        }
 
-  # Prepare context for rendering the template
   context = {
     "today": date.today(),
     "month_dates": month_dates,
     "time_slots": time_slots,
-    "availability_dict": availability_dict,  # Pass availability to template
+    "availability_dict": availability_dict,
     "current_month": calendar.month_name[month],
     "current_year": year,
     "prev_month": (month - 1) if month > 1 else 12,
