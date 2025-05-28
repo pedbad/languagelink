@@ -402,8 +402,13 @@
       }
 
       if (modalAvatar) {
-        modalAvatar.src = avatar || "/static/core/img/default-profile.png";
+        if (!avatar || avatar === "undefined") {
+          modalAvatar.src = "/static/core/img/default-profile.png";
+        } else {
+          modalAvatar.src = avatar;
+        }
       }
+
 
       // Store values for submission
       if (modal) {
@@ -443,24 +448,33 @@
      * Includes all necessary data attributes for modal functionality.
      */
     function createBookedSlotHTML({ teacherName, teacherEmail, avatar, date, start, end }) {
+      let safeAvatar = avatar;
+      if (!avatar || avatar === "undefined" || avatar.trim() === "") {
+        safeAvatar = "/static/core/img/default-profile.png";
+      }
+
+      // Fully escape the avatar URL for HTML injection
+      const escapedAvatar = safeAvatar.replace(/"/g, "&quot;");
+
       return `
         <span 
           class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
           title="You have booked this slot"
           data-teacher-name="${teacherName}"
           data-teacher-email="${teacherEmail}"
-          data-avatar="${avatar}"
+          data-avatar="${escapedAvatar}"
           data-date="${date}"
           data-start="${start}"
           data-end="${end}"
         >
-          <!-- Clock Icon -->
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
           </svg>
         </span>
       `;
     }
+
+
 
 
 
@@ -497,14 +511,24 @@
           const slot = document.querySelector(selector);
 
           if (slot) {
+            const parent = slot.parentElement;
+
+            // Replace with new HTML
             slot.outerHTML = createBookedSlotHTML({
-              teacherName: data.teacher_name,      // e.g., "Jane Doe"
-              teacherEmail: data.teacher_email,    // e.g., "jane@cam.ac.uk"
-              avatar: data.teacher_avatar,         // e.g., "/media/profile_pictures/jane.jpg"
+              teacherName: data.teacher_name,
+              teacherEmail: data.teacher_email,
+              avatar: data.teacher_avatar,
               date: date,
               start: start,
               end: end
             });
+
+            // ✅ Reselect new slot immediately (for any future logic or debugging)
+            const newSelector = `.booked-slot[data-teacher-email="${CSS.escape(data.teacher_email)}"][data-date="${date}"][data-start="${start}"]`;
+            const newSlot = parent.querySelector(newSelector);
+            console.log("🎯 New slot DOM confirmed:", newSlot?.dataset.avatar);
+            console.log("🔥 Booking confirmed avatar path:", data.teacher_avatar);
+
           }
         } else {
           showBookingToast(data.error || "Booking failed. Try again.", "red");
@@ -520,24 +544,25 @@
     }
 
 
-
     // === Booking Modal Button Event Listeners ===
     document.getElementById('close-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('cancel-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('submit-booking-modal')?.addEventListener('click', submitBooking);
 
-    document.querySelectorAll('.booking-slot').forEach(slot => {
-      slot.addEventListener('click', () => {
-        const teacherEmail = slot.dataset.teacher;  // This is used for backend
-        const teacherName = slot.dataset.teacherName || teacherEmail;  // fallback just in case
-        const date = slot.dataset.date;
-        const start = slot.dataset.start;
-        const end = slot.dataset.end;
-        const avatar = slot.dataset.avatar;
+    document.getElementById('availability-table')?.addEventListener('click', function (e) {
+      const slot = e.target.closest('.booking-slot');
+      if (!slot) return;
 
-        openBookingModal(teacherName, teacherEmail, date, start, end, avatar);
-      });
+      const teacherEmail = slot.dataset.teacher;
+      const teacherName = slot.dataset.teacherName || teacherEmail;
+      const date = slot.dataset.date;
+      const start = slot.dataset.start;
+      const end = slot.dataset.end;
+      const avatar = slot.dataset.avatar;
+
+      openBookingModal(teacherName, teacherEmail, date, start, end, avatar);
     });
+
 
 
 
@@ -549,8 +574,11 @@
       const timeEl = document.getElementById("booked-slot-datetime");
       const avatarEl = document.getElementById("booked-teacher-avatar");
       if (avatarEl) {
-        avatarEl.src = avatar || "/static/core/img/default-profile.png";
+        avatarEl.src = (!avatar || avatar === "undefined") 
+          ? "/static/core/img/default-profile.png" 
+          : avatar;
       }
+
 
 
       if (modal) {

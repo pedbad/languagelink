@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 
@@ -441,7 +442,7 @@ def create_booking(request):
   """
   Creates a booking for the current student, given a valid availability slot.
   Prevents double-booking and enforces only one booking per day.
-  Returns teacher metadata and booking ID for future frontend features.
+  Returns teacher metadata and booking ID for frontend updates.
   """
   try:
     data = json.loads(request.body)
@@ -453,21 +454,18 @@ def create_booking(request):
     if not all([teacher_email, date_str, start_time_str, end_time_str]):
       return JsonResponse({"error": "Missing required data"}, status=400)
 
-    # Parse strings to proper types
+    # Parse string inputs
     slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     start_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
     end_time = datetime.strptime(end_time_str, "%H:%M:%S").time()
 
-    # Prevent multiple bookings per day
-    if Booking.objects.filter(
-      student=request.user,
-      teacher_availability__date=slot_date
-    ).exists():
+    # Enforce 1 booking per student per day
+    if Booking.objects.filter(student=request.user, teacher_availability__date=slot_date).exists():
       return JsonResponse({
         "error": "You already have a booking on this day."
       }, status=400)
 
-    # Get availability slot
+    # Get the available slot
     try:
       slot = TeacherAvailability.objects.get(
         teacher__email=teacher_email,
@@ -479,42 +477,59 @@ def create_booking(request):
     except TeacherAvailability.DoesNotExist:
       return JsonResponse({"error": "This slot is not available"}, status=404)
 
-    # Prevent double-booking this slot
+    # Prevent double booking
     if hasattr(slot, "booking"):
       return JsonResponse({"error": "Slot already booked"}, status=409)
 
-    # Create booking and mark slot unavailable
+    # Create booking
     booking = Booking.objects.create(
       student=request.user,
       teacher_availability=slot
     )
+
+    # Mark slot as unavailable
     slot.is_available = False
     slot.save(update_fields=["is_available"])
 
-    # Safely fetch teacher profile info
+    # Prepare teacher metadata
     teacher = slot.teacher
     teacher_name = f"{teacher.first_name} {teacher.last_name}".strip()
-    teacher_email = teacher.email
     default_avatar = "/static/core/img/default-profile.png"
+    teacher_avatar = default_avatar
 
     try:
       profile = teacher.teacherprofile
-      # Ensure image exists in storage (extra defensive)
-      avatar_url = profile.profile_picture.url if profile.profile_picture else default_avatar
-      parsed_path = urlparse(avatar_url).path.lstrip("/")
-      teacher_avatar = avatar_url if default_storage.exists(parsed_path) else default_avatar
-    except TeacherProfile.DoesNotExist:
-      teacher_avatar = default_avatar
+      if profile.profile_picture:
+        try:
+          avatar_url = profile.profile_picture.url
 
-    # ✅ Return booking ID and metadata
+          # Optional check for production; skip in dev
+          is_dev = settings.DEBUG and settings.MEDIA_URL in avatar_url
+
+          if is_dev or default_storage.exists(profile.profile_picture.name):
+            teacher_avatar = avatar_url
+
+        except Exception as img_err:
+          print("⚠️ Avatar resolution error:", img_err)
+
+    except TeacherProfile.DoesNotExist:
+      pass
+
+    # Normalize to absolute URL
+    if teacher_avatar.startswith("/"):
+      teacher_avatar = request.build_absolute_uri(teacher_avatar)
+
+    print("📸 Avatar sent to frontend:", teacher_avatar)
+
     return JsonResponse({
       "success": True,
       "message": "Booking confirmed!",
       "booking_id": booking.id,
       "teacher_name": teacher_name,
-      "teacher_email": teacher_email,
+      "teacher_email": teacher.email,
       "teacher_avatar": teacher_avatar,
     })
 
   except Exception as e:
-    return JsonResponse({"error": str(e)}, status=500)
+    print("❌ Unexpected error during booking:", str(e))
+    return JsonResponse({"error": "An unexpected error occurred."}, status=500)
