@@ -492,5 +492,41 @@
       });
     });
 
+
+    // === Booked Slot Info Modal Logic ===
+    function openBookedInfoModal(name, email, date, start, end) {
+      const modal = document.getElementById("bookedInfoModal");
+      const nameEl = document.getElementById("booked-teacher-name");
+      const emailEl = document.getElementById("booked-teacher-email");
+      const timeEl = document.getElementById("booked-slot-datetime");
+
+      if (modal) {
+        nameEl.textContent = `Advisor: ${name}`;
+        emailEl.textContent = `Email: ${email}`;
+        timeEl.textContent = `${date}, ${start} – ${end}`;
+        modal.classList.remove("hidden");
+      }
+    }
+
+    function closeBookedInfoModal() {
+      const modal = document.getElementById("bookedInfoModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    // Attach click handlers to clock icons
+    document.querySelectorAll('.booked-slot').forEach(slot => {
+      slot.addEventListener('click', () => {
+        const name = slot.dataset.teacherName;
+        const email = slot.dataset.teacherEmail;
+        const date = slot.dataset.date;
+        const start = slot.dataset.start;
+        const end = slot.dataset.end;
+        openBookedInfoModal(name, email, date, start, end);
+      });
+    });
+
+    document.getElementById("close-booked-info-modal")?.addEventListener("click", closeBookedInfoModal);
+
+
   });
 })();

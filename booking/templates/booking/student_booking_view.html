@@ -81,11 +81,11 @@
         {% if teacher_profiles %}
           {% for teacher_email in teacher_profiles %}
             {% with slot_map=teacher_availability_by_email|get_item:teacher_email %}
-              {% with teacher=slot_map|get_item:"profile" %}
+              {% with teacher=teacher_profiles|get_item:teacher_email %}
                 <tr class="text-center">
                   <!-- Teacher Info -->
                   <td class="border border-gray-300 px-2 py-2 text-center">
-                    {% if teacher.profile_picture %}
+                    {% if teacher and teacher.profile_picture %}
                       <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
                     {% else %}
                       <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full mx-auto">
@@ -103,8 +103,14 @@
                             {% with availability=slot_map|get_item:key %}
                               {% if availability %}
                                 {% if availability.booking %}
-                                  <!-- Booked -->
-                                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-default" title="Already booked">
+                                  <!-- Booked (Clickable for Modal Info) -->
+                                  <span class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer"
+                                        data-teacher-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
+                                        data-teacher-email="{{ teacher_email }}"
+                                        data-date="{{ date_str }}"
+                                        data-start="{{ start_time|time:'H:i:s' }}"
+                                        data-end="{{ end_time|time:'H:i:s' }}"
+                                        title="You have booked this slot">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                       <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
                                     </svg>
@@ -192,6 +198,30 @@
     </div>
   </div>
 </div>
+
+<!-- Booked Slot Info Modal -->
+<div id="bookedInfoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
+
+    <!-- Close Button -->
+    <button id="close-booked-info-modal" type="button"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+      <span class="sr-only">Close</span>
+      <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Modal Content -->
+    <div class="text-center">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">You have already booked this slot</h2>
+      <p id="booked-teacher-name" class="text-gray-700 mb-1">Advisor: John Doe</p>
+      <p id="booked-teacher-email" class="text-gray-600 mb-2">Email: john@example.com</p>
+      <p id="booked-slot-datetime" class="text-gray-500">Wednesday 28 May, 9:00 – 9:30</p>
+    </div>
+  </div>
+</div>
+
 
 <!-- Toast Notification -->
 <div id="booking-toast"
