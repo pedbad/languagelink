@@ -460,8 +460,8 @@
         <span 
           class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
           title="You have booked this slot"
-          data-teacher-name="${teacherName}"
-          data-teacher-email="${teacherEmail}"
+          data-user-name="${teacherName}"
+          data-user-email="${teacherEmail}"
           data-avatar="${escapedAvatar}"
           data-date="${date}"
           data-start="${start}"
@@ -548,6 +548,7 @@
     document.getElementById('close-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('cancel-booking-modal')?.addEventListener('click', closeBookingModal);
     document.getElementById('submit-booking-modal')?.addEventListener('click', submitBooking);
+    document.getElementById("close-booked-info-modal")?.addEventListener("click", closeBookedInfoModal);
 
     document.getElementById('availability-table')?.addEventListener('click', function (e) {
       const slot = e.target.closest('.booking-slot');
@@ -625,28 +626,25 @@
       if (modal) modal.classList.add("hidden");
     }
 
-    // ✅ Delegated event handler for clock icon clicks (booked slots)
+    // Delegated event handler for clock icon clicks (booked slots)
     document.getElementById('availability-table')?.addEventListener('click', function (e) {
       const slot = e.target.closest('.booked-slot');
       if (!slot) return;
 
-      const isTeacherPage = document.getElementById("teacher-availability-page") !== null;
-
-      const name = isTeacherPage ? slot.dataset.name : slot.dataset.teacherName;
-      const email = isTeacherPage ? slot.dataset.email : slot.dataset.teacherEmail;
+      const name = slot.dataset.userName;
+      const email = slot.dataset.userEmail;
       const date = slot.dataset.date;
       const start = slot.dataset.start;
       const end = slot.dataset.end;
       const avatar = slot.dataset.avatar;
 
-      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end, isTeacherPage });
+      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end });
 
       openBookedInfoModal(name, email, date, start, end, avatar);
     });
 
 
-
-    document.getElementById("close-booked-info-modal")?.addEventListener("click", closeBookedInfoModal);
+    
 
 
   });

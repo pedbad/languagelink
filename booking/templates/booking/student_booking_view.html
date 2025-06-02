@@ -107,8 +107,8 @@
                                       {% if availability.booking.student.email == student_email %}
                                         <!-- ✅ Booked by this student: clickable modal -->
                                         <span class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer"
-                                              data-teacher-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
-                                              data-teacher-email="{{ teacher_email }}"
+                                              data-user-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
+                                              data-user-email="{{ teacher_email }}"
                                               data-date="{{ date_str }}"
                                               data-start="{{ start_time|time:'H:i' }}"
                                               data-end="{{ end_time|time:'H:i' }}"
