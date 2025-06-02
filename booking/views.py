@@ -405,6 +405,7 @@ def student_booking_view(request):
     "time_slots": time_slots,
     "teacher_availability_by_email": teacher_availability_by_email,
     "teacher_profiles": teacher_profiles,
+    "student_email": request.user.email,  
   }
 
   return render(request, "booking/student_booking_view.html", context)
