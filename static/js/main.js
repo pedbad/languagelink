@@ -564,64 +564,34 @@
     });
 
 
-
-
-    // === Booked Slot Info Modal Logic ===
-    // function openBookedInfoModal(name, email, date, start, end, avatar) {
-    //   const modal = document.getElementById("bookedInfoModal");
-    //   const nameEl = document.getElementById("booked-teacher-name");
-    //   const emailEl = document.getElementById("booked-teacher-email");
-    //   const timeEl = document.getElementById("booked-slot-datetime");
-    //   const avatarEl = document.getElementById("booked-teacher-avatar");
-    //   if (avatarEl) {
-    //     avatarEl.src = (!avatar || avatar === "undefined") 
-    //       ? "/static/core/img/default-profile.png" 
-    //       : avatar;
-    //   }
-
-
-
-    //   if (modal) {
-    //     nameEl.textContent = `Advisor: ${name}`;
-    //     emailEl.textContent = `Email: ${email}`;
-
-    //     // ✅ Format the date to "Wednesday 28 May 2025"
-    //     const dateObj = new Date(date);
-    //     const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    //     const formattedDate = dateObj.toLocaleDateString('en-GB', options);
-
-    //     // ✅ Format time from "09:00:00" to "9:00am"
-    //     const formatTime = (t) => {
-    //       const [hour, minute] = t.split(':');
-    //       const d = new Date();
-    //       d.setHours(parseInt(hour));
-    //       d.setMinutes(parseInt(minute));
-    //       return d.toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
-    //     };
-
-    //     const formattedStart = formatTime(start);
-    //     const formattedEnd = formatTime(end);
-
-    //     timeEl.textContent = `You have a slot booked on ${formattedDate} from ${formattedStart} to ${formattedEnd}`;
-
-    //     modal.classList.remove("hidden");
-    //   }
-    // }
-
     function openBookedInfoModal(name, email, date, start, end, avatar) {
       const modal = document.getElementById("bookedInfoModal");
-      const isTeacherPage = document.getElementById("teacher-availability-page") !== null;
-
-      // Use correct element IDs based on page context
-      const nameEl = document.getElementById(isTeacherPage ? "booked-student-name" : "booked-teacher-name");
-      const emailEl = document.getElementById(isTeacherPage ? "booked-student-email" : "booked-teacher-email");
-      const avatarEl = document.getElementById(isTeacherPage ? "booked-student-avatar" : "booked-teacher-avatar");
+      const headingEl = document.getElementById("booked-slot-heading");
+      const nameEl = document.getElementById("booked-user-name");
+      const emailEl = document.getElementById("booked-user-email");
+      const avatarEl = document.getElementById("booked-user-avatar");
       const timeEl = document.getElementById("booked-slot-datetime");
 
-      if (nameEl) nameEl.textContent = isTeacherPage ? `Student: ${name}` : `Advisor: ${name}`;
-      if (emailEl) emailEl.textContent = `Email: ${email}`;
+      const isTeacherPage = document.getElementById("teacher-availability-page") !== null;
+
+      // Dynamic heading
+      if (headingEl) {
+        headingEl.textContent = isTeacherPage 
+          ? "This slot is booked by a student" 
+          : "You have already booked this slot";
+      }
+
+      // Name prefix
+      if (nameEl) {
+        nameEl.textContent = isTeacherPage ? `Student: ${name}` : `Advisor: ${name}`;
+      }
+
+      if (emailEl) {
+        emailEl.textContent = `Email: ${email}`;
+      }
+
       if (avatarEl) {
-        avatarEl.src = (!avatar || avatar === "undefined")
+        avatarEl.src = (!avatar || avatar === "undefined" || avatar.trim() === "")
           ? "/static/core/img/default-profile.png"
           : avatar;
       }
@@ -648,7 +618,6 @@
 
       if (modal) modal.classList.remove("hidden");
     }
-
 
 
     function closeBookedInfoModal() {

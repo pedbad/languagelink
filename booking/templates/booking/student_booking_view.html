@@ -229,8 +229,7 @@
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
 
       <!-- Close Button -->
-      <button id="close-booked-info-modal" type="button"
-              class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+      <button id="close-booked-info-modal" type="button" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
         <span class="sr-only">Close</span>
         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -239,26 +238,26 @@
 
       <!-- Modal Content -->
       <div class="text-center px-4">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">You have already booked this slot</h2>
+        <h2 id="booked-slot-heading" class="text-lg font-semibold text-gray-800 mb-4">
+          You have already booked this slot
+        </h2>
 
         <p id="booked-slot-datetime" class="text-base text-gray-700 mb-4">
-          <!-- This is filled dynamically -->
           You have a slot booked on …
         </p>
 
         <div class="flex items-center justify-center mt-4 space-x-4">
-          <img id="booked-teacher-avatar" src="{% static 'core/img/default-profile.png' %}" 
-              alt="Teacher Avatar" class="h-10 w-10 rounded-full object-cover">
+          <img id="booked-user-avatar" src="{% static 'core/img/default-profile.png' %}" alt="Profile Avatar" class="h-10 w-10 rounded-full object-cover">
           <div class="text-left">
-            <p id="booked-teacher-name" class="text-sm font-semibold text-gray-800">Advisor: John Doe</p>
-            <p id="booked-teacher-email" class="text-sm text-gray-600">Email: john@example.com</p>
+            <p id="booked-user-name" class="text-sm font-semibold text-gray-800">Advisor: John Doe</p>
+            <p id="booked-user-email" class="text-sm text-gray-600">Email: john@example.com</p>
           </div>
         </div>
-
       </div>
 
     </div>
   </div>
+
 
 
   <!-- Toast Notification -->
