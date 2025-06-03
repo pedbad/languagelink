@@ -2,6 +2,7 @@
 import json
 import calendar
 from datetime import datetime, timedelta, date
+from html import escape
 from urllib.parse import urlparse
 
 # Django core
@@ -71,6 +72,8 @@ def teacher_availability_view(request):
       slot_info["has_booking"] = True
       slot_info["student_name"] = f"{student.first_name} {student.last_name}".strip()
       slot_info["student_email"] = student.email
+      slot_info["student_message"] = slot.booking.message or ""
+
 
       try:
         profile = student.studentprofile
@@ -98,6 +101,7 @@ def teacher_availability_view(request):
           "student_name": None,
           "student_email": None,
           "student_avatar": None,
+          "student_message": "",
         }
 
   context = {
@@ -466,6 +470,7 @@ def create_booking(request):
     date_str = data.get("date")
     start_time_str = data.get("start")
     end_time_str = data.get("end")
+    message = data.get("message", "").strip()[:300]  # Enforce length defensively
 
     if not all([teacher_email, date_str, start_time_str, end_time_str]):
       return JsonResponse({"error": "Missing required data"}, status=400)
@@ -497,10 +502,11 @@ def create_booking(request):
     if hasattr(slot, "booking"):
       return JsonResponse({"error": "Slot already booked"}, status=409)
 
-    # Create booking
+    # Create booking with message
     booking = Booking.objects.create(
       student=request.user,
-      teacher_availability=slot
+      teacher_availability=slot,
+      message=message
     )
 
     # Mark slot as unavailable
@@ -544,6 +550,7 @@ def create_booking(request):
       "teacher_name": teacher_name,
       "teacher_email": teacher.email,
       "teacher_avatar": teacher_avatar,
+      "student_message": escape(booking.message),
     })
 
   except Exception as e:

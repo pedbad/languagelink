@@ -447,7 +447,7 @@
      * Generates the HTML for a newly booked slot.
      * Includes all necessary data attributes for modal functionality.
      */
-    function createBookedSlotHTML({ teacherName, teacherEmail, avatar, date, start, end }) {
+    function createBookedSlotHTML({ teacherName, teacherEmail, avatar, date, start, end, message }) {
       let safeAvatar = avatar;
       if (!avatar || avatar === "undefined" || avatar.trim() === "") {
         safeAvatar = "/static/core/img/default-profile.png";
@@ -455,6 +455,10 @@
 
       // Fully escape the avatar URL for HTML injection
       const escapedAvatar = safeAvatar.replace(/"/g, "&quot;");
+      const escapedMessage = (message || "")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
 
       return `
         <span 
@@ -466,6 +470,7 @@
           data-date="${date}"
           data-start="${start}"
           data-end="${end}"
+          data-message="${escapedMessage}"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
@@ -473,9 +478,6 @@
         </span>
       `;
     }
-
-
-
 
 
     // === Handles submission of a booking request ===
@@ -488,9 +490,13 @@
       const date = modal.dataset.date;
       const start = modal.dataset.start;
       const end = modal.dataset.end;
+      const messageEl = document.getElementById("bookingMessage");
+      const message = messageEl ? messageEl.value.trim().slice(0, 300) : "";
 
       const submitBtn = document.getElementById("submit-booking-modal");
       submitBtn.disabled = true;
+
+      console.log("📤 Sending booking:", { teacher, date, start, end, message });
 
       fetch("/booking/booking/create/", {
         method: "POST",
@@ -498,11 +504,12 @@
           "Content-Type": "application/json",
           "X-CSRFToken": getCSRFToken(),
         },
-        body: JSON.stringify({ teacher, date, start, end })
+        body: JSON.stringify({ teacher, date, start, end, message })
       })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
+          if (messageEl) messageEl.value = "";
           closeBookingModal();
           showBookingToast("Booking confirmed!", "green");
 
@@ -520,10 +527,11 @@
               avatar: data.teacher_avatar,
               date: date,
               start: start,
-              end: end
+              end: end,
+              message: message
             });
 
-            // ✅ Reselect new slot immediately (for any future logic or debugging)
+            // Reselect new slot immediately (for any future logic or debugging)
             const newSelector = `.booked-slot[data-teacher-email="${CSS.escape(data.teacher_email)}"][data-date="${date}"][data-start="${start}"]`;
             const newSlot = parent.querySelector(newSelector);
             console.log("🎯 New slot DOM confirmed:", newSlot?.dataset.avatar);
@@ -550,6 +558,10 @@
     document.getElementById('submit-booking-modal')?.addEventListener('click', submitBooking);
     document.getElementById("close-booked-info-modal")?.addEventListener("click", closeBookedInfoModal);
 
+    // STUDENT ACTION: Handle clicks on available booking slots
+    // This only applies to elements with the class .booking-slot
+    // and is used to open the modal where the student confirms a booking.
+
     document.getElementById('availability-table')?.addEventListener('click', function (e) {
       const slot = e.target.closest('.booking-slot');
       if (!slot) return;
@@ -565,7 +577,7 @@
     });
 
 
-    function openBookedInfoModal(name, email, date, start, end, avatar) {
+    function openBookedInfoModal(name, email, date, start, end, avatar, message) {
       const modal = document.getElementById("bookedInfoModal");
       const headingEl = document.getElementById("booked-slot-heading");
       const nameEl = document.getElementById("booked-user-name");
@@ -574,6 +586,19 @@
       const timeEl = document.getElementById("booked-slot-datetime");
 
       const isTeacherPage = document.getElementById("teacher-availability-page") !== null;
+
+      const messageEl = document.getElementById("booked-student-message");
+      const messageContainer = document.getElementById("booked-student-message-container");
+
+      if (messageEl && messageContainer) {
+        if (message && message.trim() !== "") {
+          messageEl.textContent = message;
+          messageContainer.classList.remove("hidden");
+        } else {
+          messageContainer.classList.add("hidden");
+          messageEl.textContent = "";
+        }
+      }      
 
       // Dynamic heading
       if (headingEl) {
@@ -626,7 +651,8 @@
       if (modal) modal.classList.add("hidden");
     }
 
-    // Delegated event handler for clock icon clicks (booked slots)
+    // TEACHER ACTION: Handle clicks on booked slots (clock icons)
+    // This is used to show booking details (student name, email, avatar, message, etc.)
     document.getElementById('availability-table')?.addEventListener('click', function (e) {
       const slot = e.target.closest('.booked-slot');
       if (!slot) return;
@@ -637,10 +663,12 @@
       const start = slot.dataset.start;
       const end = slot.dataset.end;
       const avatar = slot.dataset.avatar;
+      const message = slot.dataset.message || "";
 
-      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end });
+      // NOTE: This function is for *viewing* booked slot details, not for making bookings
+      console.log('📅 Delegated Booked Slot Clicked:', { name, email, date, start, end, message });
 
-      openBookedInfoModal(name, email, date, start, end, avatar);
+      openBookedInfoModal(name, email, date, start, end, avatar, message);
     });
 
 

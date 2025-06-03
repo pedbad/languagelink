@@ -127,6 +127,7 @@
                               data-date="{{ date_str }}"
                               data-start="{{ time_str }}"
                               data-end="{{ end_time|time:'H:i:s' }}"
+                              data-message="{{ slot.student_message|default:''|escape }}"
                             >
                               <!-- Clock Icon -->
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
@@ -270,6 +271,11 @@
             <p id="booked-user-name" class="text-sm font-semibold text-gray-800">Student: John Doe</p>
             <p id="booked-user-email" class="text-sm text-gray-600">Email: john@example.com</p>
           </div>
+        </div>
+        <!-- Optional Message from Student -->
+        <div id="booked-student-message-container" class="mt-6 hidden">
+          <p class="text-sm font-semibold text-gray-800 mb-1">Student Message:</p>
+          <p id="booked-student-message" class="text-sm text-gray-700 whitespace-pre-line"></p>
         </div>
       </div>
 

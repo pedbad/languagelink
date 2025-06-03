@@ -31,11 +31,19 @@ class Booking(models.Model):
     """
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="bookings")
     teacher_availability = models.OneToOneField(TeacherAvailability, on_delete=models.CASCADE, related_name="booking")
+    booked_at = models.DateTimeField(auto_now_add=True)
 
-    booked_at = models.DateTimeField(auto_now_add=True)  # Timestamp when booking was made
+    # Optional short message from student (max 300 characters)
+    message = models.CharField(
+        max_length=300,
+        blank=True,
+        null=True,
+        help_text="Optional message from student when booking this slot."
+    )
 
     class Meta:
         ordering = ['teacher_availability__date', 'teacher_availability__start_time']
 
     def __str__(self):
         return f"{self.student.email} booked {self.teacher_availability}"
+
