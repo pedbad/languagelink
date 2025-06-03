@@ -176,9 +176,6 @@
     }
 
 
-
-
-
     // === Toggle Online Hosting Availability Dynamically ===
     const onlineCheckbox = document.getElementById('can_host_online');
     const onlineLabel = document.getElementById('online-toggle-label');
@@ -308,7 +305,7 @@
                 </svg>`;
             }
 
-            // ✅ Refresh availability_dict **in the template**
+            // Refresh availability_dict **in the template**
             updateAvailabilityUI(data.availability_dict);
           } else {
             console.error('Failed to toggle availability:', data.error);
@@ -316,19 +313,19 @@
         } catch (error) {
           console.error('Error:', error);
         } finally {
-          // ✅ Re-enable button after request completes
+          // Re-enable button after request completes
           this.disabled = false;
         }
       });
     });
 
-    // ✅ Function to update the availability UI based on new data from the backend
+    // Function to update the availability UI based on new data from the backend
     function updateAvailabilityUI(availabilityDict) {
       document.querySelectorAll('.toggle-slot').forEach(button => {
         const date = button.getAttribute('data-date');
         const startTime = button.getAttribute('data-start-time');
 
-        const key = `${date},${startTime}`;  // ✅ Match Django's new string key format
+        const key = `${date},${startTime}`;  // Match Django's new string key format
         const isAvailable = availabilityDict[key];
 
         if (isAvailable) {

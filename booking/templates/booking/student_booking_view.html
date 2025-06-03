@@ -107,13 +107,15 @@
                                       {% if availability.booking.student.email == student_email %}
                                         <!-- Booked by this student: clickable modal -->
                                         <span class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer"
-                                              data-user-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
-                                              data-user-email="{{ teacher_email }}"
-                                              data-date="{{ date_str }}"
-                                              data-start="{{ start_time|time:'H:i' }}"
-                                              data-end="{{ end_time|time:'H:i' }}"
-                                              data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
-                                              title="You have booked this slot">
+                                          title = "You have booked this slot"
+                                          data-user-name = "{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
+                                          data-user-email = "{{ teacher_email }}"
+                                          data-date = "{{ date_str }}"
+                                          data-start = "{{ start_time|time:'H:i' }}"
+                                          data-end = "{{ end_time|time:'H:i' }}"
+                                          data-avatar = "{{ teacher.profile_picture.url|default:'/static/core/img/default-profile.png' }}"
+                                          data-message = "{{ availability.booking.message|default:''|escape }}"
+                                        >
                                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
                                           </svg>
@@ -222,7 +224,6 @@
         <!-- Divider -->
         <hr class="my-4 border-t border-gray-200">
 
-
         <!-- Modal Actions -->
         <div class="mt-6 flex justify-end space-x-3">
           <button id="submit-booking-modal" type="button"
@@ -237,6 +238,7 @@
       </div>
     </div>
   </div>
+
 
   <!-- Booked Slot Info Modal -->
   <div id="bookedInfoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -267,11 +269,25 @@
             <p id="booked-user-email" class="text-sm text-gray-600">Email: john@example.com</p>
           </div>
         </div>
+
+      </div><!-- eof .text-center-->
+      
+      <!-- Divider -->
+      <hr class="my-4 border-t border-gray-200">
+
+      <!-- Optional Message from Student -->
+      <div id="booked-student-message-container" class="mt-6 hidden">
+        <div class="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-1">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+          </svg>
+          <span>Your message to the Advisor:</span>
+        </div>
+        <p id="booked-student-message" class="text-sm text-gray-700 whitespace-pre-line"></p>
       </div>
 
     </div>
   </div>
-
 
 
   <!-- Toast Notification -->
