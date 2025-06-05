@@ -239,7 +239,23 @@
           </svg>
         </a>
       </div>
-    </div>
+
+
+      <hr class="my-4 border-1 border-primary-dark-teal">
+
+      <div class="mt-6 mb-20 text-center">
+        {% if request.user.role == 'admin' %}
+          <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+            Back to Dashboard
+          </a>
+        {% elif request.user.role == 'teacher' %}
+          <a href="{% url 'teacher_profile' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+            Back to Profile
+          </a>
+        {% endif %}
+      </div>
+
+    </div><!-- eof .container -->
   </div><!-- eof #teacher-availability-page-->
 
 

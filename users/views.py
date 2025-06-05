@@ -97,6 +97,10 @@ def student_profile_view(request, student_id=None):
   except ObjectDoesNotExist:
     raise Http404("This student does not have a profile.")
 
+  # Check if questionnaire is completed
+  has_completed_questionnaire = student_profile.questionnaires.filter(completed=True).exists()
+
+
   # Determine if editing is allowed
   is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_student)
 
@@ -116,6 +120,7 @@ def student_profile_view(request, student_id=None):
     'is_student': is_student,
     'is_editing': is_editing,
     'form': form,
+    'has_completed_questionnaire': has_completed_questionnaire,
   })
 
 

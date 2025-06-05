@@ -1157,6 +1157,10 @@ video {
   white-space: nowrap;
 }
 
+.whitespace-pre-line {
+  white-space: pre-line;
+}
+
 .rounded {
   border-radius: 0.25rem;
 }
@@ -1203,12 +1207,21 @@ video {
   border-right-width: 4px;
 }
 
+.border-t {
+  border-top-width: 1px;
+}
+
 .border-accent-bright-lime {
   border-color: var(--color-accent-bright-lime);
 }
 
 .border-deep-teal {
   border-color: var(--color-deep-teal);
+}
+
+.border-gray-200 {
+  --tw-border-opacity: 1;
+  border-color: rgb(229 231 235 / var(--tw-border-opacity));
 }
 
 .border-gray-300 {
@@ -1336,6 +1349,10 @@ video {
 .bg-slate-200 {
   --tw-bg-opacity: 1;
   background-color: rgb(226 232 240 / var(--tw-bg-opacity));
+}
+
+.bg-vibrant-orange {
+  background-color: var(--color-vibrant-orange);
 }
 
 .bg-warm-brown {
@@ -2003,6 +2020,10 @@ footer {
   border-color: rgb(59 130 246 / var(--tw-border-opacity));
 }
 
+.focus\:border-deep-teal:focus {
+  border-color: var(--color-deep-teal);
+}
+
 .focus\:border-primary-dark-teal:focus {
   border-color: var(--color-primary-dark-teal);
 }
@@ -2073,6 +2094,10 @@ footer {
 .focus\:ring-red-500:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(239 68 68 / var(--tw-ring-opacity));
+}
+
+.focus\:ring-vibrant-orange:focus {
+  --tw-ring-color: var(--color-vibrant-orange);
 }
 
 .focus\:ring-warm-brown:focus {

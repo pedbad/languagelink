@@ -22,6 +22,19 @@
     <div class="flex-1">
       <!-- Profile View Mode -->
       {% if not is_editing %}
+        <div class="mt-6 flex">
+            <a href="{% url 'teacher_availability' %}"
+              class="flex items-center justify-center bg-vibrant-orange text-white px-4 py-2 mb-4 rounded-lg 
+                      hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50 w-full">
+              <!-- Add `mr-2` so the icon and text have breathing room -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
+                <path d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" />
+                <!-- (Calendar icon path) -->
+              </svg>
+              Set Availibility
+            </a>
+          </div>
+
         <p class="text-lg"><strong>Name:</strong> {{ teacher_profile.user.first_name }} {{ teacher_profile.user.last_name }}</p>
         <p class="text-lg"><strong>Email:</strong> {{ teacher_profile.user.email }}</p>
         <hr class="my-4 border-1 border-primary-dark-teal">
@@ -164,59 +177,55 @@
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
         
           <!-- In-Person Hosting Availability Toggle -->
-<div class="mb-6">
-  <label class="block text-lg font-medium text-gray-700">In-Person Hosting Availability</label>
+          <div class="mb-6">
+            <label class="block text-lg font-medium text-gray-700">In-Person Hosting Availability</label>
 
-  <!-- Display Current Status -->
-  <p class="text-gray-800 mb-2">
-    Current Status: 
-    <strong id="in-person-status-text" class="{% if teacher_profile.can_host_in_person %}text-[#10454F]{% else %}text-[#B02907]{% endif %}">
-      {% if teacher_profile.can_host_in_person %} 
-        Available for in-person meetings 
-      {% else %} 
-        Not available for in-person meetings 
-      {% endif %}
-    </strong>
-  </p>
+            <!-- Display Current Status -->
+            <p class="text-gray-800 mb-2">
+              Current Status: 
+              <strong id="in-person-status-text" class="{% if teacher_profile.can_host_in_person %}text-[#10454F]{% else %}text-[#B02907]{% endif %}">
+                {% if teacher_profile.can_host_in_person %} 
+                  Available for in-person meetings 
+                {% else %} 
+                  Not available for in-person meetings 
+                {% endif %}
+              </strong>
+            </p>
 
-  <!-- Toggle Styled Button -->
-  <label class="inline-flex items-center cursor-pointer">
-    <input type="checkbox" name="can_host_in_person" id="can_host_in_person" class="hidden"
-      {% if teacher_profile.can_host_in_person %}checked{% endif %}>
+            <!-- Toggle Styled Button -->
+            <label class="inline-flex items-center cursor-pointer">
+              <input type="checkbox" name="can_host_in_person" id="can_host_in_person" class="hidden"
+                {% if teacher_profile.can_host_in_person %}checked{% endif %}>
 
-    <span id="in-person-toggle-label"
-      class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
-      {% if teacher_profile.can_host_in_person %}
-        bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
-      {% else %}
-        bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
-      {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
-      
-      <!-- Hero Icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
-        {% if teacher_profile.can_host_in_person %}
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
-        {% else %}
-          <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
-        {% endif %}
-      </svg>
+              <span id="in-person-toggle-label"
+                class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
+                {% if teacher_profile.can_host_in_person %}
+                  bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
+                {% else %}
+                  bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
+                {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
+                
+                <!-- Hero Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+                  {% if teacher_profile.can_host_in_person %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
+                  {% endif %}
+                </svg>
 
-      <span>
-        {% if teacher_profile.can_host_in_person %}
-          Disable In-Person Meetings
-        {% else %}
-          Enable In-Person Meetings
-        {% endif %}
-      </span>
-    </span>
-  </label>
-</div>
+                <span>
+                  {% if teacher_profile.can_host_in_person %}
+                    Disable In-Person Meetings
+                  {% else %}
+                    Enable In-Person Meetings
+                  {% endif %}
+                </span>
+              </span>
+            </label>
+          </div>
 
-<hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle -->
-
-          
-          
-          
+          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle -->
           
           <!-- Online Hosting Availability Toggle -->
           <div class="mb-6">
@@ -268,8 +277,7 @@
           </div>
 
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle -->
-
-          
+ 
           <!-- Toggle Advising Status Section -->
           <div class="mb-6">
             <label class="block text-lg font-medium text-gray-700">Advising Status</label>
@@ -316,7 +324,6 @@
           </div>
 
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle button -->
-
 
           <!-- Change Your Password Section -->
           <a href="{% url 'password_change' %}" 
