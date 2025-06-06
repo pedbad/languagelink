@@ -556,3 +556,82 @@ def create_booking(request):
   except Exception as e:
     print("❌ Unexpected error during booking:", str(e))
     return JsonResponse({"error": "An unexpected error occurred."}, status=500)
+
+
+@login_required
+def student_bookings_list(request):
+  if request.user.role != "student":
+    return redirect("student_profile")
+
+  today = date.today()
+  upcoming = Booking.objects.filter(
+    student=request.user,
+    teacher_availability__date__gte=today
+  ).select_related(
+    "teacher_availability",
+    "teacher_availability__teacher"
+  ).order_by(
+    "teacher_availability__date",
+    "teacher_availability__start_time"
+  )
+
+  # Build a context-friendly list with all needed fields:
+  booking_items = []
+  for booking in upcoming:
+    teacher = booking.teacher_availability.teacher
+
+    # Pick either the teacher’s profile picture or the default:
+    try:
+      profile = teacher.teacherprofile
+      if profile.profile_picture:
+        avatar_url = profile.profile_picture.url
+      else:
+        avatar_url = "/static/core/img/default-profile.png"
+    except TeacherProfile.DoesNotExist:
+      avatar_url = "/static/core/img/default-profile.png"
+
+    # Compute a “final” URL string:
+    if avatar_url.startswith("/"):
+      avatar_full_url = request.build_absolute_uri(avatar_url)
+    else:
+      avatar_full_url = avatar_url
+
+    booking_items.append({
+      "date": booking.teacher_availability.date,
+      "start_time": booking.teacher_availability.start_time,
+      "end_time": booking.teacher_availability.end_time,
+      "teacher_name": f"{teacher.first_name} {teacher.last_name}".strip(),
+      "teacher_email": teacher.email,
+      "teacher_avatar": avatar_full_url,
+      "student_message": booking.message or "",
+      "teacher_id": teacher.id,
+    })
+
+  return render(request, "booking/student_bookings_list.html", {
+    "bookings": booking_items
+  })
+
+
+@login_required
+def teacher_bookings_list(request):
+    """
+    Show the logged-in teacher all of their upcoming booked slots, in chronological order.
+    """
+    if request.user.role != "teacher":
+        return redirect("teacher_profile")  # or raise Http404
+
+    today = date.today()
+    upcoming = Booking.objects.filter(
+        teacher_availability__teacher=request.user,
+        teacher_availability__date__gte=today
+    ).select_related(
+        "teacher_availability",
+        "student"
+    ).order_by(
+        "teacher_availability__date",
+        "teacher_availability__start_time"
+    )
+
+    return render(request, "booking/teacher_bookings_list.html", {
+        "bookings": upcoming
+    })

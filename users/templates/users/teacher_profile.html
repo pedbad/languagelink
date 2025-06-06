@@ -12,9 +12,17 @@
     <!-- Profile Picture -->
     <div class="bg-white shadow-md rounded-lg p-4 w-40">
       {% if teacher_profile.profile_picture %}
-        <img src="{{ teacher_profile.profile_picture.url }}" alt="Profile Picture" class="h-32 w-32 object-cover rounded-full mx-auto">
+        <img
+          src="{{ teacher_profile.profile_picture.url }}"
+          alt="Profile Picture"
+          class="h-32 w-32 object-cover rounded-full mx-auto"
+        />
       {% else %}
-        <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-32 w-32 object-cover rounded-full mx-auto">
+        <img
+          src="{% static 'core/img/default-profile.png' %}"
+          alt="Default Profile"
+          class="h-32 w-32 object-cover rounded-full mx-auto"
+        />
       {% endif %}
     </div>
 
@@ -23,17 +31,18 @@
       <!-- Profile View Mode -->
       {% if not is_editing %}
         <div class="mt-6 flex">
-            <a href="{% url 'teacher_availability' %}"
-              class="flex items-center justify-center bg-vibrant-orange text-white px-4 py-2 mb-4 rounded-lg 
-                      hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50 w-full">
-              <!-- Add `mr-2` so the icon and text have breathing room -->
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
-                <path d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" />
-                <!-- (Calendar icon path) -->
-              </svg>
-              Set Availibility
-            </a>
-          </div>
+          <a href="{% url 'teacher_availability' %}"
+            class="flex items-center justify-center bg-vibrant-orange text-white px-4 py-2 mb-4 rounded-lg 
+                    hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50 w-full">
+            <!-- Add `mr-2` so the icon and text have breathing room -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
+              <!-- (Calendar icon path) -->
+              <path d="M12.75 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM7.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM8.25 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM9.75 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM10.5 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM12.75 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM14.25 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" />
+              <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" />
+            </svg>
+            Set Availibility
+          </a>
+        </div>
 
         <p class="text-lg"><strong>Name:</strong> {{ teacher_profile.user.first_name }} {{ teacher_profile.user.last_name }}</p>
         <p class="text-lg"><strong>Email:</strong> {{ teacher_profile.user.email }}</p>
@@ -92,9 +101,10 @@
             <span>Edit Profile</span>
           </a>
         {% endif %}
+
       {% else %}
       
-      <!-- Profile EDIT MODE FORM -->
+        <!-- Profile EDIT MODE FORM -->
         <form method="POST" enctype="multipart/form-data" class="mb-10">
           {% csrf_token %}
 
@@ -194,23 +204,46 @@
 
             <!-- Toggle Styled Button -->
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" name="can_host_in_person" id="can_host_in_person" class="hidden"
-                {% if teacher_profile.can_host_in_person %}checked{% endif %}>
+              <input
+                type="checkbox"
+                name="can_host_in_person"
+                id="can_host_in_person"
+                class="hidden"
+                {% if teacher_profile.can_host_in_person %}checked{% endif %}
+              />
 
-              <span id="in-person-toggle-label"
+              <span
+                id="in-person-toggle-label"
                 class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
-                {% if teacher_profile.can_host_in_person %}
-                  bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
-                {% else %}
-                  bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
-                {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
-                
-                <!-- Hero Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
                   {% if teacher_profile.can_host_in_person %}
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
+                    bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
                   {% else %}
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
+                    bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
+                  {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50"
+              >
+                <!-- Hero Icon -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="h-5 w-5 mr-2"
+                >
+                  {% if teacher_profile.can_host_in_person %}
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                    <!-- ❌ X Icon (Disable) -->
+                  {% else %}
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 12l5 5L19 7"
+                    />
+                    <!-- ✔ Checkmark Icon (Enable) -->
                   {% endif %}
                 </svg>
 
@@ -230,38 +263,60 @@
           <!-- Online Hosting Availability Toggle -->
           <div class="mb-6">
             <label class="block text-lg font-medium text-gray-700">Online Hosting Availability</label>
-
+            
             <!-- Display Current Status -->
             <p class="text-gray-800 mb-2">
               Current Status: 
-              <strong id="online-status-text" class="{% if teacher_profile.can_host_online %}text-[#10454F]{% else %}text-[#B02907]{% endif %}">
-                {% if teacher_profile.can_host_online %} 
-                  Available for online meetings 
-                {% else %} 
-                  Not available for online meetings 
+              <strong
+                id="online-status-text"
+                class="{% if teacher_profile.can_host_online %}text-[#10454F]{% else %}text-[#B02907]{% endif %}"
+              >
+                {% if teacher_profile.can_host_online %}
+                  Available for online meetings
+                {% else %}
+                  Not available for online meetings
                 {% endif %}
               </strong>
             </p>
 
             <!-- Toggle Styled Button -->
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" name="can_host_online" id="can_host_online" class="hidden"
-                {% if teacher_profile.can_host_online %}checked{% endif %}>
+              <input
+                type="checkbox"
+                name="can_host_online"
+                id="can_host_online"
+                class="hidden"
+                {% if teacher_profile.can_host_online %}checked{% endif %}
+              >
 
-              <span id="online-toggle-label"
-                class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
-                {% if teacher_profile.can_host_online %}
-                  bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
-                {% else %}
-                  bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
-                {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
-                
-                <!-- Hero Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+              <span
+                id="online-toggle-label"
+                class="
+                  flex items-center text-white text-sm font-medium
+                  px-5 py-2 rounded-lg shadow-md transition-all duration-200
                   {% if teacher_profile.can_host_online %}
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Disable) -->
+                    bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
                   {% else %}
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Enable) -->
+                    bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
+                  {% endif %}
+                  focus:outline-none focus:ring-2 focus:ring-opacity-50
+                "
+              >
+                <!-- Hero Icon -->
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="h-5 w-5 mr-2"
+                >
+                  {% if teacher_profile.can_host_online %}
+                    <!-- ❌ X Icon (Disable) -->
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  {% else %}
+                    <!-- ✔ Checkmark Icon (Enable) -->
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7" />
                   {% endif %}
                 </svg>
 
@@ -285,30 +340,58 @@
             <!-- Display Current Status -->
             <p class="text-gray-800 mb-2">
               Current Status: 
-              <strong id="status-text" class="{% if teacher_profile.is_active_advisor %}text-[#10454F]{% else %}text-[#B02907]{% endif %}">
-                {% if teacher_profile.is_active_advisor %} Active {% else %} Inactive {% endif %}
+              <strong
+                id="status-text"
+                class="{% if teacher_profile.is_active_advisor %}text-[#10454F]{% else %}text-[#B02907]{% endif %}"
+              >
+                {% if teacher_profile.is_active_advisor %}
+                  Active
+                {% else %}
+                  Inactive
+                {% endif %}
               </strong>
             </p>
 
             <!-- Toggle Checkbox Styled as Button -->
             <label class="inline-flex items-center cursor-pointer">
-              <input type="checkbox" name="is_active_advisor" id="is_active_advisor" class="hidden"
-                {% if teacher_profile.is_active_advisor %}checked{% endif %}>
-
-              <span id="toggle-label"
+              <input
+                type="checkbox"
+                name="is_active_advisor"
+                id="is_active_advisor"
+                class="hidden"
+                {% if teacher_profile.is_active_advisor %}checked{% endif %}
+              >
+              <span
+                id="toggle-label"
                 class="flex items-center text-white text-sm font-medium px-5 py-2 rounded-lg shadow-md transition-all duration-200
-                {% if teacher_profile.is_active_advisor %}
-                  bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
-                {% else %}
-                  bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
-                {% endif %} focus:outline-none focus:ring-2 focus:ring-opacity-50">
-                
+                      {% if teacher_profile.is_active_advisor %}
+                        bg-[#B02907] hover:bg-[#992405] focus:ring-[#B02907]
+                      {% else %}
+                        bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F]
+                      {% endif %}
+                      focus:outline-none focus:ring-2 focus:ring-opacity-50"
+              >
                 <!-- Hero Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="h-5 w-5 mr-2"
+                >
                   {% if teacher_profile.is_active_advisor %}
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path> <!-- ❌ X Icon (Inactive) -->
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />  <!-- ❌ X Icon (Deactivate) -->
                   {% else %}
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 12l5 5L19 7"></path> <!-- ✔ Checkmark Icon (Active) -->
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M5 12l5 5L19 7"
+                    />  <!-- ✔ Checkmark Icon (Activate) -->
                   {% endif %}
                 </svg>
 
@@ -321,19 +404,41 @@
                 </span>
               </span>
             </label>
+
           </div>
 
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Toggle button -->
 
           <!-- Change Your Password Section -->
-          <a href="{% url 'password_change' %}" 
-            class="flex items-center justify-center bg-deep-teal text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4">
-              <!-- Icon -->
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
-              </svg>
-              <!-- Text -->
-              <span>Change Your Password</span>
+          <a
+            href="{% url 'password_change' %}"
+            class="flex items-center justify-center 
+                  bg-deep-teal text-white text-xs font-medium 
+                  px-4 py-2 rounded-lg hover:bg-teal-600 
+                  focus:outline-none focus:ring-2 focus:ring-primary-dark-teal 
+                  focus:ring-opacity-50 mt-4"
+          >
+            <!-- Icon -->
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="h-5 w-5 mr-2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 
+                  16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 
+                  011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 
+                  2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 
+                  0 015.25 6H10"
+              />
+            </svg>
+            <!-- Text -->
+            <span>Change Your Password</span>
           </a>
 
           <!-- Save and Cancel Buttons -->
