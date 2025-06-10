@@ -610,15 +610,12 @@ def student_bookings_list(request):
   return render(request, "booking/student_bookings_list.html", {
     "bookings": booking_items
   })
-
-
+  
+  
 @login_required
 def teacher_bookings_list(request):
-    """
-    Show the logged-in teacher all of their upcoming booked slots, in chronological order.
-    """
     if request.user.role != "teacher":
-        return redirect("teacher_profile")  # or raise Http404
+        return redirect("teacher_profile")
 
     today = date.today()
     upcoming = Booking.objects.filter(
@@ -626,12 +623,42 @@ def teacher_bookings_list(request):
         teacher_availability__date__gte=today
     ).select_related(
         "teacher_availability",
-        "student"
+        "student",
+        "student__studentprofile"
     ).order_by(
         "teacher_availability__date",
         "teacher_availability__start_time"
     )
 
+    booking_items = []
+    for booking in upcoming:
+        student = booking.student
+
+        # pick student avatar or default
+        try:
+            profile = student.studentprofile
+            avatar = profile.profile_picture.url if profile.profile_picture else "/static/core/img/default-profile.png"
+        except:
+            avatar = "/static/core/img/default-profile.png"
+
+        # make it absolute if needed
+        if avatar.startswith("/"):
+            avatar = request.build_absolute_uri(avatar)
+
+        booking_items.append({
+            "date": booking.teacher_availability.date,
+            "start_time": booking.teacher_availability.start_time,
+            "end_time": booking.teacher_availability.end_time,
+            "student_name": f"{student.first_name} {student.last_name}".strip(),
+            "student_email": student.email,
+            "student_avatar": avatar,
+            "student_message": booking.message or "",
+            "student_id": student.id,
+        })
+
     return render(request, "booking/teacher_bookings_list.html", {
-        "bookings": upcoming
+        "bookings": booking_items
     })
+
+
+
