@@ -1,7 +1,11 @@
+# Python stdlib
+import re
+
 # Django Imports
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
+from datetime import datetime
 from django.db.models import BooleanField, Value as V, Case, When, Exists, OuterRef, Q
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -356,24 +360,24 @@ def teacher_student_list_view(request):
   """
   Displays a list of active students with support for:
   - Sorting (first name, last name, email, date registered, questionnaire status)
-  - Searching by name, email, or date registered
+  - Searching by name, email, or date registered (month names, days, “Jun 16”, etc)
   - Pagination for better usability
   """
-  # 1. Extract query parameters from GET request
-  sort = request.GET.get('sort', 'date_joined')       # Default sort by date_joined
-  order = request.GET.get('order', 'desc')            # Default descending order
-  search_query = request.GET.get('search', '')        # Search query from input
-  items_per_page = int(request.GET.get('items_per_page', 25))  # Default items per page
-  page_number = request.GET.get('page', 1)            # Current page number
+  # 1) Extract query params
+  sort = request.GET.get('sort', 'date_joined')
+  order = request.GET.get('order', 'desc')
+  search_query = request.GET.get('search', '').strip()
+  items_per_page = int(request.GET.get('items_per_page', 25))
+  page_number   = request.GET.get('page', 1)
 
-  # 2. Determine sorting direction (add '-' for descending)
+  # 2) Sort direction
   if order == 'desc':
     sort = f"-{sort}"
 
-  # 3. Query the active students only
+  # 3) Base queryset: only active students, annotate questionnaire status
   students = (
     CustomUser.objects.filter(role='student', is_active=True)
-    .select_related('studentprofile')  # Avoid extra queries for studentprofile
+    .select_related('studentprofile')
     .annotate(
       questionnaire_completed=Exists(
         Questionnaire.objects.filter(
@@ -384,34 +388,68 @@ def teacher_student_list_view(request):
     )
   )
 
-  # 4. Apply search filters
+  # 4) “Smart” search
   if search_query:
-    students = students.filter(
+    q = (
       Q(first_name__icontains=search_query) |
-      Q(last_name__icontains=search_query) |
-      Q(email__icontains=search_query) |
-      Q(date_joined__icontains=search_query)
+      Q(last_name__icontains=search_query)  |
+      Q(email__icontains=search_query)
     )
 
-  # 5. Apply sorting
+    # a) Month name (“June” or “Jun”)
+    for fmt in ('%B','%b'):
+      try:
+        m = datetime.strptime(search_query, fmt).month
+        q |= Q(date_joined__month=m)
+        break
+      except ValueError:
+        pass
+
+    # b) Day‐of‐month only (“16”)
+    if re.fullmatch(r'\d{1,2}', search_query):
+      day = int(search_query)
+      if 1 <= day <= 31:
+        q |= Q(date_joined__day=day)
+
+    # c) Month + day (“June 16” or “Jun 16”)
+    for fmt in ('%B %d','%b %d'):
+      try:
+        dt = datetime.strptime(search_query, fmt)
+        q |= (
+          Q(date_joined__month=dt.month) &
+          Q(date_joined__day=dt.day)
+        )
+        break
+      except ValueError:
+        pass
+      
+    # ⇒ d) **Year only** (“2024”, “2025”)
+    if re.fullmatch(r'\d{4}', search_query):
+      year = int(search_query)
+      q |= Q(date_joined__year=year)
+
+    #  d) (Optional) Time strings if you ever record time in student models:
+    # if re.fullmatch(r'\d{1,2}:\d{2}', search_query):
+    #   q |= Q(date_joined__hour=int(search_query.split(':')[0]))
+
+    students = students.filter(q)
+
+  # 5) Apply sorting
   students = students.order_by(sort)
 
-  # 6. Paginate results
+  # 6) Paginate
   paginator = Paginator(students, items_per_page)
-  page_obj = paginator.get_page(page_number)
+  page_obj  = paginator.get_page(page_number)
 
-  # 7. Context for the template
-  context = {
-    'students': page_obj,                       # Paginated student queryset
-    'page_obj': page_obj,                       # Page object for pagination
+  # 7) Render
+  return render(request, 'users/student_list.html', {
+    'students':     page_obj,
+    'page_obj':     page_obj,
     'current_sort': request.GET.get('sort', 'date_joined'),
-    'current_order': request.GET.get('order', 'desc'),
-    'items_per_page': items_per_page,
+    'current_order':order,
+    'items_per_page':items_per_page,
     'search_query': search_query,
-  }
-
-  # 8. Render the template
-  return render(request, 'users/student_list.html', context)
+  })
 
 
 @login_required
