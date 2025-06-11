@@ -1,6 +1,6 @@
 # Python stdlib
 import json
-import calendar
+import re,calendar
 from datetime import datetime, timedelta, date
 from html import escape
 from urllib.parse import urlparse
@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
+from django.db.models import Q
 
 # Local app
 from .models import TeacherAvailability, Booking
@@ -614,51 +615,92 @@ def student_bookings_list(request):
   
 @login_required
 def teacher_bookings_list(request):
-    if request.user.role != "teacher":
-        return redirect("teacher_profile")
+  if request.user.role != "teacher":
+    return redirect("teacher_profile")
 
-    today = date.today()
-    upcoming = Booking.objects.filter(
-        teacher_availability__teacher=request.user,
-        teacher_availability__date__gte=today
-    ).select_related(
-        "teacher_availability",
-        "student",
-        "student__studentprofile"
-    ).order_by(
-        "teacher_availability__date",
-        "teacher_availability__start_time"
+  today = date.today()
+  search_query = request.GET.get("search", "").strip()
+
+  # Base queryset
+  qs = Booking.objects.filter(
+      teacher_availability__teacher=request.user,
+      teacher_availability__date__gte=today
+    ) \
+    .select_related("teacher_availability", "student", "student__studentprofile")
+
+  if search_query:
+    # 1) name/email
+    q = (
+      Q(student__first_name__icontains=search_query) |
+      Q(student__last_name__icontains=search_query)  |
+      Q(student__email__icontains=search_query)
     )
 
-    booking_items = []
-    for booking in upcoming:
-        student = booking.student
+    # 2) time HH:MM
+    if re.match(r'^\d{1,2}:\d{2}$', search_query):
+      q |= Q(teacher_availability__start_time__startswith=search_query) \
+         | Q(teacher_availability__end_time__startswith=search_query)
 
-        # pick student avatar or default
-        try:
-            profile = student.studentprofile
-            avatar = profile.profile_picture.url if profile.profile_picture else "/static/core/img/default-profile.png"
-        except:
-            avatar = "/static/core/img/default-profile.png"
+    # 3) month name (“June” or “Jun”)
+    for fmt in ('%B','%b'):
+      try:
+        m = datetime.strptime(search_query, fmt).month
+        q |= Q(teacher_availability__date__month=m)
+        break
+      except ValueError:
+        pass
 
-        # make it absolute if needed
-        if avatar.startswith("/"):
-            avatar = request.build_absolute_uri(avatar)
+    # 4) day-of-month only (“16”)
+    if re.match(r'^\d{1,2}$', search_query):
+      day = int(search_query)
+      if 1 <= day <= 31:
+        q |= Q(teacher_availability__date__day=day)
 
-        booking_items.append({
-            "date": booking.teacher_availability.date,
-            "start_time": booking.teacher_availability.start_time,
-            "end_time": booking.teacher_availability.end_time,
-            "student_name": f"{student.first_name} {student.last_name}".strip(),
-            "student_email": student.email,
-            "student_avatar": avatar,
-            "student_message": booking.message or "",
-            "student_id": student.id,
-        })
+    # 5) month + day (“June 16” or “Jun 16”)
+    for fmt in ('%B %d','%b %d'):
+      try:
+        dt = datetime.strptime(search_query, fmt)
+        q |= (
+          Q(teacher_availability__date__month=dt.month) &
+          Q(teacher_availability__date__day=dt.day)
+        )
+        break
+      except ValueError:
+        pass
 
-    return render(request, "booking/teacher_bookings_list.html", {
-        "bookings": booking_items
+    qs = qs.filter(q)
+
+  upcoming = qs.order_by(
+    "teacher_availability__date",
+    "teacher_availability__start_time"
+  )
+
+  booking_items = []
+  for booking in upcoming:
+    student = booking.student
+    # avatar logic...
+    try:
+      pic = student.studentprofile.profile_picture
+      avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except:
+      avatar = "/static/core/img/default-profile.png"
+    if avatar.startswith("/"):
+      avatar = request.build_absolute_uri(avatar)
+
+    booking_items.append({
+      "date":            booking.teacher_availability.date,
+      "start_time":      booking.teacher_availability.start_time,
+      "end_time":        booking.teacher_availability.end_time,
+      "student_name":    f"{student.first_name} {student.last_name}".strip(),
+      "student_email":   student.email,
+      "student_avatar":  avatar,
+      "student_message": booking.message or "",
+      "student_id":      student.id,
     })
 
+  return render(request, "booking/teacher_bookings_list.html", {
+    "bookings":     booking_items,
+    "search_query": search_query,
+  })
 
 

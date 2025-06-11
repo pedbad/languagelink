@@ -196,7 +196,6 @@ def toggle_can_host_in_person(request):
 
   
 
-  
 @login_required
 def toggle_can_host_online(request):
   """
