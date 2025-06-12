@@ -561,8 +561,13 @@ def create_booking(request):
 
 @login_required
 def student_bookings_list(request):
+    # only teachers may stay here
   if request.user.role != "student":
-    return redirect("student_profile")
+    if request.user.role == "admin":
+      return redirect("admin_dashboard")
+    if request.user.role == "teacher":
+      return redirect("teacher_profile")
+    return redirect("login")
 
   today = date.today()
   upcoming = Booking.objects.filter(
@@ -615,8 +620,13 @@ def student_bookings_list(request):
   
 @login_required
 def teacher_bookings_list(request):
+  # only teachers may stay here
   if request.user.role != "teacher":
-    return redirect("teacher_profile")
+    if request.user.role == "admin":
+      return redirect("admin_dashboard")
+    if request.user.role == "student":
+      return redirect("student_profile")
+    return redirect("login")
 
   today = date.today()
   search_query = request.GET.get("search", "").strip()
@@ -703,25 +713,25 @@ def teacher_bookings_list(request):
     "search_query": search_query,
   })
   
-  
 
 @login_required
 def admin_bookings_list(request):
-    # only admins may stay here
+  # only admins may stay here
   if request.user.role != "admin":
-    # teachers go back to their profile…
     if request.user.role == "teacher":
       return redirect("teacher_profile")
-    # students go back to theirs…
-    elif request.user.role == "student":
+    if request.user.role == "student":
       return redirect("student_profile")
-    # anything else (just in case) goes home
     return redirect("login")
 
-  today        = date.today()
-  q_text       = request.GET.get("search", "").strip()
+  # 1) Sorting params
+  sort_key = request.GET.get("sort", "date")   # "date", "adv_name", or "stu_name"
+  order    = request.GET.get("order", "asc")   # "asc" or "desc"
 
-  # include teacherprofile so we can grab avatar without extra queries
+  today  = date.today()
+  q_text = request.GET.get("search", "").strip()
+
+  # 2) Base queryset
   qs = Booking.objects.filter(
       teacher_availability__date__gte=today
     ).select_related(
@@ -732,6 +742,7 @@ def admin_bookings_list(request):
       "student__studentprofile",
     )
 
+  # 3) “Smart” search
   if q_text:
     q = (
       Q(student__first_name__icontains=q_text) |
@@ -742,12 +753,14 @@ def admin_bookings_list(request):
       Q(teacher_availability__teacher__email__icontains=q_text)
     )
 
-    # time “HH:MM” → match both start & end
+    # time “HH:MM”
     if re.fullmatch(r"\d{1,2}:\d{2}", q_text):
-      q |= Q(teacher_availability__start_time__startswith=q_text) \
-         | Q(teacher_availability__end_time__startswith=q_text)
+      q |= (
+        Q(teacher_availability__start_time__startswith=q_text) |
+        Q(teacher_availability__end_time__startswith=q_text)
+      )
 
-    # month name (“June” / “Jun”)
+    # month name “June” / “Jun”
     for fmt in ("%B","%b"):
       try:
         m = datetime.strptime(q_text, fmt).month
@@ -756,17 +769,17 @@ def admin_bookings_list(request):
       except ValueError:
         pass
 
-    # day‐of‐month only (“16”)
+    # day‐of‐month only “16”
     if re.fullmatch(r"\d{1,2}", q_text):
       d = int(q_text)
       if 1 <= d <= 31:
         q |= Q(teacher_availability__date__day=d)
 
-    # year only (“2024”)
+    # year only “2024”
     if re.fullmatch(r"\d{4}", q_text):
       q |= Q(teacher_availability__date__year=int(q_text))
 
-    # full “Month Day” (“June 16”)
+    # full “Month Day” “June 16”
     for fmt in ("%B %d","%b %d"):
       try:
         dt = datetime.strptime(q_text, fmt)
@@ -780,13 +793,37 @@ def admin_bookings_list(request):
 
     qs = qs.filter(q)
 
-  upcoming = qs.order_by(
-    "teacher_availability__date",
-    "teacher_availability__start_time"
-  )
+  # 4) Apply sorting
+  if sort_key == "date":
+    if order == "asc":
+      qs = qs.order_by("teacher_availability__date",
+                       "teacher_availability__start_time")
+    else:
+      qs = qs.order_by("-teacher_availability__date",
+                       "-teacher_availability__start_time")
 
+  elif sort_key == "adv_name":
+    prefix = "" if order == "asc" else "-"
+    qs = qs.order_by(
+      f"{prefix}teacher_availability__teacher__first_name",
+      f"{prefix}teacher_availability__teacher__last_name"
+    )
+
+  elif sort_key == "stu_name":
+    prefix = "" if order == "asc" else "-"
+    qs = qs.order_by(
+      f"{prefix}student__first_name",
+      f"{prefix}student__last_name"
+    )
+
+  else:
+    # fallback to date
+    qs = qs.order_by("teacher_availability__date",
+                     "teacher_availability__start_time")
+
+  # 5) Build flat list for template
   items = []
-  for b in upcoming:
+  for b in qs:
     s = b.student
     t = b.teacher_availability.teacher
 
@@ -823,10 +860,12 @@ def admin_bookings_list(request):
       "message":    b.message or "",
     })
 
+  # 6) Render with current_sort/order for the header arrows
   return render(request, "booking/admin_bookings_list.html", {
-    "bookings":     items,
-    "search_query": q_text,
+    "bookings":      items,
+    "search_query":  q_text,
+    "current_sort":  sort_key,
+    "current_order": order,
   })
-
-  
+ 
 
