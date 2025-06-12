@@ -702,5 +702,131 @@ def teacher_bookings_list(request):
     "bookings":     booking_items,
     "search_query": search_query,
   })
+  
+  
 
+@login_required
+def admin_bookings_list(request):
+    # only admins may stay here
+  if request.user.role != "admin":
+    # teachers go back to their profile…
+    if request.user.role == "teacher":
+      return redirect("teacher_profile")
+    # students go back to theirs…
+    elif request.user.role == "student":
+      return redirect("student_profile")
+    # anything else (just in case) goes home
+    return redirect("login")
+
+  today        = date.today()
+  q_text       = request.GET.get("search", "").strip()
+
+  # include teacherprofile so we can grab avatar without extra queries
+  qs = Booking.objects.filter(
+      teacher_availability__date__gte=today
+    ).select_related(
+      "teacher_availability",
+      "teacher_availability__teacher",
+      "teacher_availability__teacher__teacherprofile",
+      "student",
+      "student__studentprofile",
+    )
+
+  if q_text:
+    q = (
+      Q(student__first_name__icontains=q_text) |
+      Q(student__last_name__icontains=q_text)  |
+      Q(student__email__icontains=q_text)     |
+      Q(teacher_availability__teacher__first_name__icontains=q_text) |
+      Q(teacher_availability__teacher__last_name__icontains=q_text)  |
+      Q(teacher_availability__teacher__email__icontains=q_text)
+    )
+
+    # time “HH:MM” → match both start & end
+    if re.fullmatch(r"\d{1,2}:\d{2}", q_text):
+      q |= Q(teacher_availability__start_time__startswith=q_text) \
+         | Q(teacher_availability__end_time__startswith=q_text)
+
+    # month name (“June” / “Jun”)
+    for fmt in ("%B","%b"):
+      try:
+        m = datetime.strptime(q_text, fmt).month
+        q |= Q(teacher_availability__date__month=m)
+        break
+      except ValueError:
+        pass
+
+    # day‐of‐month only (“16”)
+    if re.fullmatch(r"\d{1,2}", q_text):
+      d = int(q_text)
+      if 1 <= d <= 31:
+        q |= Q(teacher_availability__date__day=d)
+
+    # year only (“2024”)
+    if re.fullmatch(r"\d{4}", q_text):
+      q |= Q(teacher_availability__date__year=int(q_text))
+
+    # full “Month Day” (“June 16”)
+    for fmt in ("%B %d","%b %d"):
+      try:
+        dt = datetime.strptime(q_text, fmt)
+        q |= (
+          Q(teacher_availability__date__month=dt.month) &
+          Q(teacher_availability__date__day=dt.day)
+        )
+        break
+      except ValueError:
+        pass
+
+    qs = qs.filter(q)
+
+  upcoming = qs.order_by(
+    "teacher_availability__date",
+    "teacher_availability__start_time"
+  )
+
+  items = []
+  for b in upcoming:
+    s = b.student
+    t = b.teacher_availability.teacher
+
+    # student avatar
+    try:
+      pic = s.studentprofile.profile_picture
+      stu_avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except:
+      stu_avatar = "/static/core/img/default-profile.png"
+    if stu_avatar.startswith("/"):
+      stu_avatar = request.build_absolute_uri(stu_avatar)
+
+    # advisor avatar
+    try:
+      pic = t.teacherprofile.profile_picture
+      adv_avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except:
+      adv_avatar = "/static/core/img/default-profile.png"
+    if adv_avatar.startswith("/"):
+      adv_avatar = request.build_absolute_uri(adv_avatar)
+
+    items.append({
+      "date":       b.teacher_availability.date,
+      "start":      b.teacher_availability.start_time,
+      "end":        b.teacher_availability.end_time,
+      "stu_name":   f"{s.first_name} {s.last_name}".strip(),
+      "stu_email":  s.email,
+      "stu_avatar": stu_avatar,
+      "adv_name":   f"{t.first_name} {t.last_name}".strip(),
+      "adv_email":  t.email,
+      "adv_avatar": adv_avatar,
+      "adv_id":     t.id,
+      "stu_id":     s.id,
+      "message":    b.message or "",
+    })
+
+  return render(request, "booking/admin_bookings_list.html", {
+    "bookings":     items,
+    "search_query": q_text,
+  })
+
+  
 

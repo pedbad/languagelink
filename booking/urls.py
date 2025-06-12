@@ -8,6 +8,7 @@ from .views import (
   create_booking,
   student_bookings_list,
   teacher_bookings_list,
+  admin_bookings_list,
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
   path('booking/create/', create_booking, name='create_booking'),
   path("student/bookings/", student_bookings_list, name="student_bookings_list"),
   path("teacher/bookings/", teacher_bookings_list, name="teacher_bookings_list"),
+  path("admin/bookings/", admin_bookings_list, name="admin_bookings_list"),
 ]

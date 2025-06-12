@@ -306,52 +306,84 @@ def student_resource_view(request):
 
 
 
-# View for Listing All Advisors
 @login_required
 def student_advisors_view(request):
   """
-  Displays a list of all advisors (teachers) with sorting and search functionality.
+  Displays a list of all advisors (teachers) with sorting and search functionality,
+  including name/email, month names, day numbers, month+day, and year filtering.
   """
-  # Extract sorting and search parameters
-  sort = request.GET.get('sort', 'user__date_joined')  # Default sorting by user date joined
-  order = request.GET.get('order', 'desc')  # Default order is descending
-  search_query = request.GET.get('search', '')  # Search query
+  # 1) Extract query params
+  sort         = request.GET.get('sort', 'user__date_joined')
+  order        = request.GET.get('order', 'desc')
+  search_query = request.GET.get('search', '').strip()
+  items_per_page = int(request.GET.get('items_per_page', 25))
+  page_number  = request.GET.get('page', 1)
 
-  # Determine sorting direction (prepend '-' for descending)
+  # 2) Sort direction
   if order == 'desc':
     sort = f"-{sort}"
 
-  # Query all advisors (teachers) with optional search filter
-  advisors = TeacherProfile.objects.select_related('user').filter(
-    Q(user__first_name__icontains=search_query) |
-    Q(user__last_name__icontains=search_query) |
-    Q(user__email__icontains=search_query)
-  )
+  # 3) Base queryset
+  advisors = TeacherProfile.objects.select_related('user')
 
-  # Apply sorting safely
-  valid_sort_fields = ['user__first_name', 'user__last_name', 'user__email', 'user__date_joined']
-  if sort.lstrip('-') in valid_sort_fields:
-    advisors = advisors.order_by(sort)
-  else:
-    advisors = advisors.order_by('user__date_joined')  # Fallback to default sorting
+  # 4) “Smart” search
+  if search_query:
+    q = (
+      Q(user__first_name__icontains=search_query) |
+      Q(user__last_name__icontains=search_query)  |
+      Q(user__email__icontains=search_query)
+    )
 
-  # Pagination setup
-  items_per_page = int(request.GET.get('items_per_page', 25))  # Default 25 items per page
+    # a) Full month name (“June”) or abbrev (“Jun”)
+    for fmt in ('%B','%b'):
+      try:
+        month = datetime.strptime(search_query, fmt).month
+        q |= Q(user__date_joined__month=month)
+        break
+      except ValueError:
+        pass
+
+    # b) Day‐of‐month only (“16”)
+    if re.fullmatch(r'\d{1,2}', search_query):
+      day = int(search_query)
+      if 1 <= day <= 31:
+        q |= Q(user__date_joined__day=day)
+
+    # c) Month + day (“June 16” / “Jun 16”)
+    for fmt in ('%B %d','%b %d'):
+      try:
+        dt = datetime.strptime(search_query, fmt)
+        q |= (
+          Q(user__date_joined__month=dt.month) &
+          Q(user__date_joined__day=dt.day)
+        )
+        break
+      except ValueError:
+        pass
+
+    # d) Year only (“2024”)
+    if re.fullmatch(r'\d{4}', search_query):
+      q |= Q(user__date_joined__year=int(search_query))
+
+    advisors = advisors.filter(q)
+
+  # 5) Apply sorting safely
+  valid = ['user__first_name','user__last_name','user__email','user__date_joined']
+  advisors = advisors.order_by(sort if sort.lstrip('-') in valid else 'user__date_joined')
+
+  # 6) Paginate
   paginator = Paginator(advisors, items_per_page)
-  page_number = request.GET.get('page', 1)
-  page_obj = paginator.get_page(page_number)
+  page_obj  = paginator.get_page(page_number)
 
-  # Context for the template
-  context = {
-    'teachers': page_obj,  # Paginated advisors queryset
-    'page_obj': page_obj,  # Page object for pagination
-    'current_sort': request.GET.get('sort', 'user__date_joined'),
-    'current_order': request.GET.get('order', 'desc'),
+  # 7) Render
+  return render(request, 'users/advisor_list.html', {
+    'teachers':       page_obj,
+    'page_obj':       page_obj,
+    'current_sort':   request.GET.get('sort', 'user__date_joined'),
+    'current_order':  order,
     'items_per_page': items_per_page,
-    'search_query': search_query,
-  }
-
-  return render(request, 'users/advisor_list.html', context)
+    'search_query':   search_query,
+  })
 
 
 # View for Listing All Students
