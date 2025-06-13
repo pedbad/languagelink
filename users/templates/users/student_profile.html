@@ -13,7 +13,7 @@
     <!-- Profile Image Placeholder or Uploaded Image -->
     <div class="bg-white shadow-md rounded-lg p-4 w-40 
       {% if is_student and has_completed_questionnaire and not is_editing %}
-        mt-6
+        mt-2
       {% endif %}">
       {% if student_profile.profile_picture %}
         <img src="{{ student_profile.profile_picture.url }}" alt="Profile Picture" class="h-32 w-32 object-cover rounded-full mx-auto">
@@ -26,11 +26,13 @@
     <div class="flex-1">
       {% if not is_editing %}
         {% if is_student and has_completed_questionnaire %}
-          <div class="mt-6 flex">
+          <div class="mt-2 flex space-x-4">
+            <!-- Left button -->
             <a href="{% url 'student_booking_view' %}"
-              class="flex items-center justify-center bg-vibrant-orange text-white px-4 py-2 mb-4 rounded-lg 
-                      hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50 w-full">
-              <!-- Add `mr-2` so the icon and text have breathing room -->
+              class="flex-1 inline-flex items-center justify-center bg-vibrant-orange text-white 
+                      text-lg px-6 py-3 rounded-lg hover:bg-dark-orange focus:outline-none 
+                      focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50">
+              <!-- calendar icon -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
                 <!-- (Calendar icon path) -->
                 <path d="M12.75 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM7.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM8.25 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM9.75 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM10.5 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM12.75 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM14.25 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" />
@@ -38,7 +40,23 @@
               </svg>
               Book a Meeting with an Advisor
             </a>
-          </div>
+
+            <!-- Right button -->
+            <a href="{% url 'student_bookings_list' %}"
+              class="flex-1 inline-flex items-center justify-center bg-deep-teal text-white 
+                      text-lg px-6 py-3 rounded-lg hover:bg-primary-dark-teal focus:outline-none 
+                      focus:ring-2 focus:ring-deep-teal focus:ring-opacity-50">
+              <!-- calendar-list icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
+                <!-- (Calendar icon path) -->
+                <path d="M12.75 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM7.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM8.25 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM9.75 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM10.5 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM12.75 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM14.25 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" />
+                <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" />
+              </svg>
+              Your Upcoming Bookings
+            </a>
+          </div><!-- eof mt-6 flex space-x-4 -->
+          <hr class="my-4 border-1 border-primary-dark-teal">
+          
         {% endif %}
         <!-- Name Section -->
         <p class="text-lg"><strong>Name:</strong> {{ student_profile.user.first_name }} {{ student_profile.user.last_name }}</p>
