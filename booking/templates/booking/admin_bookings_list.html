@@ -268,7 +268,17 @@
     <p class="text-center text-gray-600">No bookings found.</p>
   {% endif %}
 
-  <hr class="mt-6 mb-24 border-primary-dark-teal">
+
+  <hr class="my-6 border-1 border-primary-dark-teal"> <!-- Divider after pagination -->
+
+  <div class="mt-6 mb-24 text-center">
+    {% if request.user.role == 'admin' %}
+      <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+        Back to Dashboard
+      </a>
+    {% endif %}
+  </div>
+
 {% endblock %}
 
 

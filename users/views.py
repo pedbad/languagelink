@@ -162,16 +162,21 @@ def teacher_profile_view(request, teacher_id=None):
   is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_teacher)
 
   if request.method == 'POST' and is_editing:
-    form = TeacherProfileForm(request.POST, request.FILES, instance=teacher_profile, user=teacher_user)
+    form = TeacherProfileForm(
+      request.POST, request.FILES, 
+      instance=teacher_profile, 
+      user=teacher_user
+    )
 
     if form.is_valid():
-      updated_profile = form.save(commit=False)
+      # Save user & profile in one shot
+      updated_profile = form.save()
 
       # Handle the toggle for advising availability
-      updated_profile.is_active_advisor = request.POST.get('is_active_advisor') == "on"
-
+      updated_profile.is_active_advisor = (request.POST.get('is_active_advisor') == 'on')
       updated_profile.save()
-      return redirect('teacher_profile')  # Redirect to profile after saving
+
+      return redirect('teacher_profile')
 
   else:
     form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing and teacher_profile else None

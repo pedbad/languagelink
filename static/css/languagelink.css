@@ -715,6 +715,11 @@ video {
   margin-bottom: 1rem;
 }
 
+.my-6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
 .-ml-px {
   margin-left: -1px;
 }
@@ -2011,6 +2016,10 @@ footer {
   background-color: rgb(236 72 153 / var(--tw-bg-opacity));
 }
 
+.hover\:bg-primary-dark-teal:hover {
+  background-color: var(--color-primary-dark-teal);
+}
+
 .hover\:bg-red-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(254 202 202 / var(--tw-bg-opacity));
@@ -2318,10 +2327,6 @@ footer {
     flex-shrink: 0;
   }
 
-  .md\:grid-cols-2 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .md\:text-xl {
     font-size: 1.25rem;
     line-height: 1.75rem;
@@ -2352,6 +2357,10 @@ footer {
 
   .lg\:w-6\/12 {
     width: 50%;
+  }
+
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .lg\:flex-row {

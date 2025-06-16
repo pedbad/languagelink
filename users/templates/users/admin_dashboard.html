@@ -13,7 +13,7 @@
   <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Welcome Message -->
 
   <!-- Cards Section -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
     <!-- Students Card -->
     <a href="{% url 'teacher_student_list' %}" class="block bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 group">
       <div class="flex flex-col items-center text-center">
@@ -55,9 +55,42 @@
       </div>
     </a>
     <!-- end of Advisors Card -->
+
+    <!-- All Bookings Card -->
+    <a href="{% url 'admin_bookings_list' %}"
+      class="block bg-white shadow-md rounded-lg p-6 hover:shadow-lg transition-shadow duration-300 group">
+      <div class="flex flex-col items-center text-center">
+        <!-- Icon with Circular Background -->
+        <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary-dark-teal
+                    transition-all duration-200 transform group-hover:scale-110 group-hover:bg-bright-teal">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.5" stroke="white"
+              class="w-10 h-10 transition-colors duration-200 group-hover:stroke-primary-dark-teal">            
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 2.994v2.25m10.5-2.25v2.25m-14.252 13.5V7.491a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v11.251m-18 0a2.25 2.25 0 0 0 2.25 2.25h13.5a2.25 2.25 0 0 0 2.25-2.25m-18 0v-7.5a2.25 2.25 0 0 1 2.25-2.25h13.5a2.25 2.25 0 0 1 2.25 2.25v7.5m-6.75-6h2.25m-9 2.25h4.5m.002-2.25h.005v.006H12v-.006Zm-.001 4.5h.006v.006h-.006v-.005Zm-2.25.001h.005v.006H9.75v-.006Zm-2.25 0h.005v.005h-.006v-.005Zm6.75-2.247h.005v.005h-.005v-.005Zm0 2.247h.006v.006h-.006v-.006Zm2.25-2.248h.006V15H16.5v-.005Z" />
+          </svg>
+        </div>
+        <!-- Title with List Icon -->
+        <h2 class="text-xl font-semibold mt-4 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke-width="1.5" stroke="currentColor"
+              class="w-5 h-5 mr-2 text-primary-dark-teal">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Z"/>
+          </svg>
+          List All Bookings
+        </h2>
+        <!-- Description -->
+        <p class="text-sm text-gray-600 mt-2">View upcoming scheduled meeting.</p>
+      </div>
+    </a>
+
   </div>
   <!-- end of Cards Section -->
 
   <hr class="mt-6 mb-12 border-1 border-primary-dark-teal"> <!-- Divider after Cards -->
 </div>
 {% endblock %}
+
+
+
+
