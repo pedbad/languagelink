@@ -17,6 +17,7 @@ from django.db.models import Q
 
 # Local app
 from .models import TeacherAvailability, Booking
+from users.models import TeacherProfile
 
 
 @login_required
@@ -561,7 +562,7 @@ def create_booking(request):
 
 @login_required
 def student_bookings_list(request):
-    # only teachers may stay here
+  # only students may stay here
   if request.user.role != "student":
     if request.user.role == "admin":
       return redirect("admin_dashboard")
@@ -580,6 +581,16 @@ def student_bookings_list(request):
     "teacher_availability__date",
     "teacher_availability__start_time"
   )
+  
+  # count how many upcoming slots there are
+  upcoming_count = upcoming.count()
+
+
+  past_count = Booking.objects.filter(
+      student=request.user,
+      teacher_availability__date__lt=today
+  ).count()
+
 
   # Build a context-friendly list with all needed fields:
   booking_items = []
@@ -614,7 +625,10 @@ def student_bookings_list(request):
     })
 
   return render(request, "booking/student_bookings_list.html", {
-    "bookings": booking_items
+    "bookings": booking_items,
+    "upcoming_count": upcoming_count,
+    "past_count": past_count,
+    "show_past": False,
   })
   
   
@@ -867,5 +881,64 @@ def admin_bookings_list(request):
     "current_sort":  sort_key,
     "current_order": order,
   })
+  
+  
+@login_required
+def student_bookings_past(request):
+  if request.user.role != "student":
+    if request.user.role == "admin":
+      return redirect("admin_dashboard")
+    if request.user.role == "teacher":
+      return redirect("teacher_profile")
+    return redirect("login")  
+    
+  today = date.today()
+
+  past_qs = Booking.objects.filter(
+    student=request.user,
+    teacher_availability__date__lt=today
+  ).select_related(
+    "teacher_availability", "teacher_availability__teacher"
+  ).order_by(
+    "-teacher_availability__date",
+    "-teacher_availability__start_time"
+  )
+
+  # build items exactly as in student_bookings_list…
+  booking_items = []
+  for b in past_qs:
+    t = b.teacher_availability.teacher
+    # same avatar logic…
+    try:
+      pic = t.teacherprofile.profile_picture
+      avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except TeacherProfile.DoesNotExist:
+      avatar = "/static/core/img/default-profile.png"
+    avatar = request.build_absolute_uri(avatar) if avatar.startswith("/") else avatar
+
+    booking_items.append({
+      "date":        b.teacher_availability.date,
+      "start_time":  b.teacher_availability.start_time,
+      "end_time":    b.teacher_availability.end_time,
+      "teacher_name":f"{t.first_name} {t.last_name}".strip(),
+      "teacher_email":t.email,
+      "teacher_avatar":avatar,
+      "student_message": b.message or "",
+      "teacher_id":  t.id,
+    })
+
+  # also compute how many upcoming remain, so the toggle link can show “Upcoming (N)”
+  upcoming_count = Booking.objects.filter(
+    student=request.user,
+    teacher_availability__date__gte=today
+  ).count()
+
+  return render(request, "booking/student_bookings_past.html", {
+    "bookings":      booking_items,
+    "past_count":    past_qs.count(),
+    "upcoming_count": upcoming_count,
+    "show_past": True,
+  })
+
  
 
