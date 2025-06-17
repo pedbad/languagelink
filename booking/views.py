@@ -629,6 +629,8 @@ def student_bookings_list(request):
     "upcoming_count": upcoming_count,
     "past_count": past_count,
     "show_past": False,
+    "list_url":  "student_bookings_list",
+    "past_url":  "student_bookings_past",
   })
   
   
@@ -653,19 +655,19 @@ def teacher_bookings_list(request):
     .select_related("teacher_availability", "student", "student__studentprofile")
 
   if search_query:
-    # 1) name/email
+    # name/email
     q = (
       Q(student__first_name__icontains=search_query) |
       Q(student__last_name__icontains=search_query)  |
       Q(student__email__icontains=search_query)
     )
 
-    # 2) time HH:MM
+    # time HH:MM
     if re.match(r'^\d{1,2}:\d{2}$', search_query):
       q |= Q(teacher_availability__start_time__startswith=search_query) \
          | Q(teacher_availability__end_time__startswith=search_query)
 
-    # 3) month name (“June” or “Jun”)
+    # month name (“June” or “Jun”)
     for fmt in ('%B','%b'):
       try:
         m = datetime.strptime(search_query, fmt).month
@@ -674,7 +676,7 @@ def teacher_bookings_list(request):
       except ValueError:
         pass
 
-    # 4) day-of-month only (“16”)
+    # day-of-month only (“16”)
     if re.match(r'^\d{1,2}$', search_query):
       day = int(search_query)
       if 1 <= day <= 31:
@@ -698,6 +700,13 @@ def teacher_bookings_list(request):
     "teacher_availability__date",
     "teacher_availability__start_time"
   )
+  
+  # how many future vs past?
+  upcoming_count = upcoming.count()
+  past_count = Booking.objects.filter(
+    teacher_availability__teacher=request.user,
+    teacher_availability__date__lt=today
+  ).count()
 
   booking_items = []
   for booking in upcoming:
@@ -723,8 +732,13 @@ def teacher_bookings_list(request):
     })
 
   return render(request, "booking/teacher_bookings_list.html", {
-    "bookings":     booking_items,
+    "bookings": booking_items,
     "search_query": search_query,
+    "upcoming_count": upcoming_count,
+    "past_count": past_count,
+    "show_past": False,
+    "list_url": "teacher_bookings_list",
+    "past_url": "teacher_bookings_past",
   })
   
 
@@ -934,11 +948,79 @@ def student_bookings_past(request):
   ).count()
 
   return render(request, "booking/student_bookings_past.html", {
-    "bookings":      booking_items,
-    "past_count":    past_qs.count(),
+    "bookings": booking_items,
+    "past_count": past_qs.count(),
     "upcoming_count": upcoming_count,
     "show_past": True,
+    "list_url": "student_bookings_list",
+    "past_url": "student_bookings_past",
   })
+  
+  
+@login_required
+def teacher_bookings_past(request):
+  # only teachers stay here
+  if request.user.role != "teacher":
+    if request.user.role == "admin":
+      return redirect("admin_dashboard")
+    if request.user.role == "student":
+      return redirect("student_profile")
+    return redirect("login")
+
+  today = date.today()
+  past_qs = Booking.objects.filter(
+    teacher_availability__teacher=request.user,
+    teacher_availability__date__lt=today
+  ).select_related(
+    "teacher_availability",
+    "student",
+    "student__studentprofile"
+  ).order_by(
+    "-teacher_availability__date",
+    "-teacher_availability__start_time"
+  )
+
+  # build the same flat list shape
+  booking_items = []
+  for b in past_qs:
+    student = b.student
+    # avatar logic …
+    try:
+      pic = student.studentprofile.profile_picture
+      avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except:
+      avatar = "/static/core/img/default-profile.png"
+    avatar = (request.build_absolute_uri(avatar)
+            if avatar.startswith("/") else avatar)
+
+    booking_items.append({
+      "date":           b.teacher_availability.date,
+      "start_time":     b.teacher_availability.start_time,
+      "end_time":       b.teacher_availability.end_time,
+      "student_name":   f"{student.first_name} {student.last_name}".strip(),
+      "student_email":  student.email,
+      "student_avatar": avatar,
+      "student_message": b.message or "",
+      "student_id":     student.id,
+    })
+
+  # counts for toggle
+  upcoming_count = Booking.objects.filter(
+    teacher_availability__teacher=request.user,
+    teacher_availability__date__gte=today
+  ).count()
+  past_count = past_qs.count()
+
+  return render(request, "booking/teacher_bookings_past.html", {
+    "bookings":       booking_items,
+    "upcoming_count": upcoming_count,
+    "past_count":     past_count,
+    "show_past":      True,
+    "list_url":       "teacher_bookings_list",
+    "past_url":       "teacher_bookings_past",
+    "search_query":   "",   # optional: keep same context shape
+  })
+
 
  
 

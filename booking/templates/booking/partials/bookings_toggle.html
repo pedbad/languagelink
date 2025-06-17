@@ -1,24 +1,42 @@
 {# booking/partials/bookings_toggle.html #}
 <div class="flex justify-center space-x-4 mb-6">
-  <!-- Upcoming button (orange) -->
-  <a href="{% url 'student_bookings_list' %}"
-     class="inline-flex items-center px-4 py-2 bg-vibrant-orange text-white rounded-lg 
-            hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50">
+  {# Upcoming button #}
+  <a href="{% url list_url %}"
+     class="inline-flex items-center px-4 py-2 rounded-lg
+            {% if not show_past %}
+              bg-vibrant-orange text-white hover:bg-dark-orange focus:ring-vibrant-orange
+            {% else %}
+              bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-gray-400
+            {% endif %}">
     Upcoming
-    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                 bg-white text-vibrant-orange">
+    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                 {% if not show_past %}
+                   bg-white text-vibrant-orange
+                 {% else %}
+                   bg-gray-100 text-gray-500
+                 {% endif %}">
       {{ upcoming_count }}
     </span>
   </a>
 
-  <!-- Past button (teal) -->
-  <a href="{% url 'student_bookings_past' %}"
-     class="inline-flex items-center px-4 py-2 bg-deep-teal text-white rounded-lg 
-            hover:bg-primary-dark-teal focus:outline-none focus:ring-2 focus:ring-deep-teal focus:ring-opacity-50">
-    Past
-    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                 bg-white text-deep-teal">
-      {{ past_count }}
-    </span>
-  </a>
+  {# Past button (only if your view supplied a past_url) #}
+  {% if past_url %}
+    <a href="{% url past_url %}"
+       class="inline-flex items-center px-4 py-2 rounded-lg
+              {% if show_past %}
+                bg-deep-teal text-white hover:bg-primary-dark-teal focus:ring-deep-teal
+              {% else %}
+                bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-gray-400
+              {% endif %}">
+      Past
+      <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                   {% if show_past %}
+                     bg-white text-deep-teal
+                   {% else %}
+                     bg-gray-100 text-gray-500
+                   {% endif %}">
+        {{ past_count }}
+      </span>
+    </a>
+  {% endif %}
 </div>
