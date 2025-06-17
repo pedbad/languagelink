@@ -1,0 +1,24 @@
+{# booking/partials/bookings_toggle.html #}
+<div class="flex justify-center space-x-4 mb-6">
+  <!-- Upcoming button (orange) -->
+  <a href="{% url 'student_bookings_list' %}"
+     class="inline-flex items-center px-4 py-2 bg-vibrant-orange text-white rounded-lg 
+            hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50">
+    Upcoming
+    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                 bg-white text-vibrant-orange">
+      {{ upcoming_count }}
+    </span>
+  </a>
+
+  <!-- Past button (teal) -->
+  <a href="{% url 'student_bookings_past' %}"
+     class="inline-flex items-center px-4 py-2 bg-deep-teal text-white rounded-lg 
+            hover:bg-primary-dark-teal focus:outline-none focus:ring-2 focus:ring-deep-teal focus:ring-opacity-50">
+    Past
+    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                 bg-white text-deep-teal">
+      {{ past_count }}
+    </span>
+  </a>
+</div>

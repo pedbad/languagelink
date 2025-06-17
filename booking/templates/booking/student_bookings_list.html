@@ -1,10 +1,15 @@
 {# booking/templates/booking/student_bookings_list.html #}
 {% extends "core/base.html" %}
-{% block title %}My Upcoming Bookings{% endblock %}
+{% block title %}Student Upcoming Bookings{% endblock %}
 
 {% block content %}
-  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6">Your Upcoming Bookings</h1>
+  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6">
+    Your Upcoming Bookings
+  </h1>
   <hr class="my-4 border-1 border-primary-dark-teal">
+
+  {% include "booking/partials/bookings_toggle.html" %}
+
 
   {% if bookings %}
     <ul class="space-y-4">
