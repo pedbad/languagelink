@@ -26,6 +26,13 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.btn-primary': {
+          '@apply inline-flex items-center justify-center whitespace-nowrap px-4 py-2 font-medium rounded-md shadow-md transition-colors duration-150 bg-deep-teal text-white hover:bg-teal-600 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-dark-teal focus:ring-opacity-60': {}
+        }
+      })
+    }
+  ]
 }
-
