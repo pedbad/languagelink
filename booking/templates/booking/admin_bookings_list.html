@@ -8,10 +8,13 @@
   </h1>
   <hr class="my-4 border-primary-dark-teal">
 
+  {% include "booking/partials/bookings_toggle.html" %}
+
+
   <!-- Search Form -->
   <form id="search-form" 
         method="GET" 
-        action="{% url 'admin_bookings_list' %}" 
+        action="{% if show_past %}{% url past_url %}{% else %}{% url list_url %}{% endif %}"
         class="relative flex-auto mb-4">
     <!-- Search Input -->
     <input
@@ -19,7 +22,7 @@
       type="search"
       name="search"
       aria-label="Search students"
-      placeholder="Search users by name, email, or date..."
+      placeholder="Search users by name or email."
       class="block w-full appearance-none rounded-lg bg-white border border-gray-300 py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:ring-primary-dark-teal focus:border-primary-dark-teal"
       value="{{ request.GET.search }}"
     >

@@ -752,16 +752,16 @@ def admin_bookings_list(request):
       return redirect("student_profile")
     return redirect("login")
 
-  # 1) Sorting params
+  # Sorting params
   sort_key = request.GET.get("sort", "date")   # "date", "adv_name", or "stu_name"
   order    = request.GET.get("order", "asc")   # "asc" or "desc"
 
   today  = date.today()
   q_text = request.GET.get("search", "").strip()
 
-  # 2) Base queryset
+  # Base queryset
   qs = Booking.objects.filter(
-      teacher_availability__date__gte=today
+      teacher_availability__date__gte = today
     ).select_related(
       "teacher_availability",
       "teacher_availability__teacher",
@@ -773,19 +773,19 @@ def admin_bookings_list(request):
   # 3) “Smart” search
   if q_text:
     q = (
-      Q(student__first_name__icontains=q_text) |
-      Q(student__last_name__icontains=q_text)  |
-      Q(student__email__icontains=q_text)     |
-      Q(teacher_availability__teacher__first_name__icontains=q_text) |
-      Q(teacher_availability__teacher__last_name__icontains=q_text)  |
-      Q(teacher_availability__teacher__email__icontains=q_text)
+      Q(student__first_name__icontains = q_text) |
+      Q(student__last_name__icontains = q_text)  |
+      Q(student__email__icontains = q_text)     |
+      Q(teacher_availability__teacher__first_name__icontains = q_text) |
+      Q(teacher_availability__teacher__last_name__icontains = q_text)  |
+      Q(teacher_availability__teacher__email__icontains = q_text)
     )
 
     # time “HH:MM”
     if re.fullmatch(r"\d{1,2}:\d{2}", q_text):
       q |= (
-        Q(teacher_availability__start_time__startswith=q_text) |
-        Q(teacher_availability__end_time__startswith=q_text)
+        Q(teacher_availability__start_time__startswith = q_text) |
+        Q(teacher_availability__end_time__startswith = q_text)
       )
 
     # month name “June” / “Jun”
@@ -805,15 +805,15 @@ def admin_bookings_list(request):
 
     # year only “2024”
     if re.fullmatch(r"\d{4}", q_text):
-      q |= Q(teacher_availability__date__year=int(q_text))
+      q |= Q(teacher_availability__date__year = int(q_text))
 
     # full “Month Day” “June 16”
     for fmt in ("%B %d","%b %d"):
       try:
         dt = datetime.strptime(q_text, fmt)
         q |= (
-          Q(teacher_availability__date__month=dt.month) &
-          Q(teacher_availability__date__day=dt.day)
+          Q(teacher_availability__date__month = dt.month) &
+          Q(teacher_availability__date__day = dt.day)
         )
         break
       except ValueError:
@@ -821,7 +821,7 @@ def admin_bookings_list(request):
 
     qs = qs.filter(q)
 
-  # 4) Apply sorting
+  # Apply sorting
   if sort_key == "date":
     if order == "asc":
       qs = qs.order_by("teacher_availability__date",
@@ -849,7 +849,7 @@ def admin_bookings_list(request):
     qs = qs.order_by("teacher_availability__date",
                      "teacher_availability__start_time")
 
-  # 5) Build flat list for template
+  # Build flat list for template
   items = []
   for b in qs:
     s = b.student
@@ -874,26 +874,39 @@ def admin_bookings_list(request):
       adv_avatar = request.build_absolute_uri(adv_avatar)
 
     items.append({
-      "date":       b.teacher_availability.date,
-      "start":      b.teacher_availability.start_time,
-      "end":        b.teacher_availability.end_time,
-      "stu_name":   f"{s.first_name} {s.last_name}".strip(),
-      "stu_email":  s.email,
+      "date": b.teacher_availability.date,
+      "start": b.teacher_availability.start_time,
+      "end": b.teacher_availability.end_time,
+      "stu_name": f"{s.first_name} {s.last_name}".strip(),
+      "stu_email": s.email,
       "stu_avatar": stu_avatar,
-      "adv_name":   f"{t.first_name} {t.last_name}".strip(),
-      "adv_email":  t.email,
+      "adv_name": f"{t.first_name} {t.last_name}".strip(),
+      "adv_email": t.email,
       "adv_avatar": adv_avatar,
-      "adv_id":     t.id,
-      "stu_id":     s.id,
-      "message":    b.message or "",
+      "adv_id": t.id,
+      "stu_id": s.id,
+      "message": b.message or "",
     })
+    
+  # Counts for badges
+  upcoming_count = Booking.objects.filter(
+      teacher_availability__date__gte=today
+  ).count()
+  past_count = Booking.objects.filter(
+      teacher_availability__date__lt=today
+  ).count()
 
-  # 6) Render with current_sort/order for the header arrows
+  # Render with current_sort/order for the header arrows
   return render(request, "booking/admin_bookings_list.html", {
-    "bookings":      items,
-    "search_query":  q_text,
-    "current_sort":  sort_key,
+    "bookings": items,
+    "search_query": q_text,
+    "current_sort": sort_key,
     "current_order": order,
+    "show_past": False,
+    "list_url": "admin_bookings_list",
+    "past_url": "admin_bookings_past",
+    "upcoming_count": upcoming_count,
+    "past_count": past_count,
   })
   
   
@@ -1020,7 +1033,127 @@ def teacher_bookings_past(request):
     "past_url":       "teacher_bookings_past",
     "search_query":   "",   # optional: keep same context shape
   })
+  
 
+@login_required
+def admin_bookings_past(request):
+  # restrict view to admins
+  if request.user.role != "admin":
+    if request.user.role == "teacher":
+      return redirect("teacher_profile")
+    if request.user.role == "student":
+      return redirect("student_profile")
+    return redirect("login")
 
- 
+  # parse query parameters
+  today = date.today()
+  sort_key = request.GET.get("sort", "date")
+  order = request.GET.get("order", "asc")
+  search_query = request.GET.get("search", "").strip()
+
+  # base queryset: past bookings only
+  qs = Booking.objects.filter(
+    teacher_availability__date__lt=today
+  ).select_related(
+    "teacher_availability",
+    "teacher_availability__teacher",
+    "teacher_availability__teacher__teacherprofile",
+    "student",
+    "student__studentprofile"
+  )
+
+  # apply search filters
+  if search_query:
+    q = (
+      Q(student__first_name__icontains=search_query) |
+      Q(student__last_name__icontains=search_query) |
+      Q(student__email__icontains=search_query) |
+      Q(teacher_availability__teacher__first_name__icontains=search_query) |
+      Q(teacher_availability__teacher__last_name__icontains=search_query) |
+      Q(teacher_availability__teacher__email__icontains=search_query)
+    )
+    # TODO: add time/month/day/year parsing here
+    qs = qs.filter(q)
+
+  # apply sorting
+  prefix = "" if order == "asc" else "-"
+  if sort_key == "date":
+    qs = qs.order_by(
+      f"{prefix}teacher_availability__date",
+      f"{prefix}teacher_availability__start_time"
+    )
+  elif sort_key == "adv_name":
+    qs = qs.order_by(
+      f"{prefix}teacher_availability__teacher__first_name",
+      f"{prefix}teacher_availability__teacher__last_name"
+    )
+  elif sort_key == "stu_name":
+    qs = qs.order_by(
+      f"{prefix}student__first_name",
+      f"{prefix}student__last_name"
+    )
+  else:
+    qs = qs.order_by(
+      "teacher_availability__date",
+      "teacher_availability__start_time"
+    )
+
+  # build list of bookings for template
+  items = []
+  for booking in qs:
+    student = booking.student
+    teacher = booking.teacher_availability.teacher
+
+    # student avatar URL
+    try:
+      pic = student.studentprofile.profile_picture
+      student_avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except:
+      student_avatar = "/static/core/img/default-profile.png"
+    if student_avatar.startswith("/"):
+      student_avatar = request.build_absolute_uri(student_avatar)
+
+    # teacher avatar URL
+    try:
+      pic = teacher.teacherprofile.profile_picture
+      teacher_avatar = pic.url if pic else "/static/core/img/default-profile.png"
+    except:
+      teacher_avatar = "/static/core/img/default-profile.png"
+    if teacher_avatar.startswith("/"):
+      teacher_avatar = request.build_absolute_uri(teacher_avatar)
+
+    items.append({
+      "date": booking.teacher_availability.date,
+      "start": booking.teacher_availability.start_time,
+      "end": booking.teacher_availability.end_time,
+      "stu_name": f"{student.first_name} {student.last_name}".strip(),
+      "stu_email": student.email,
+      "stu_avatar": student_avatar,
+      "adv_name": f"{teacher.first_name} {teacher.last_name}".strip(),
+      "adv_email": teacher.email,
+      "adv_avatar": teacher_avatar,
+      "adv_id": teacher.id,
+      "stu_id": student.id,
+      "message": booking.message or ""
+    })
+
+  # counts for toggle badges
+  upcoming_count = Booking.objects.filter(
+    teacher_availability__date__gte=today
+  ).count()
+  past_count = qs.count()
+
+  # render with toggle context
+  return render(request, "booking/admin_bookings_list.html", {
+    "bookings": items,
+    "search_query": search_query,
+    "current_sort": sort_key,
+    "current_order": order,
+    "show_past": True,
+    "list_url": "admin_bookings_list",
+    "past_url": "admin_bookings_past",
+    "upcoming_count": upcoming_count,
+    "past_count": past_count,
+  })
+
 
