@@ -29,9 +29,7 @@
           <div class="mt-2 flex space-x-4">
             <!-- Left button -->
             <a href="{% url 'student_booking_view' %}"
-              class="flex-1 inline-flex items-center justify-center bg-vibrant-orange text-white 
-                      text-lg px-6 py-3 rounded-lg hover:bg-dark-orange focus:outline-none 
-                      focus:ring-2 focus:ring-vibrant-orange focus:ring-opacity-50">
+              class="btn-primary-alt-lg flex-1">
               <!-- calendar icon -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
                 <!-- (Calendar icon path) -->
@@ -43,9 +41,7 @@
 
             <!-- Right button -->
             <a href="{% url 'student_bookings_list' %}"
-              class="flex-1 inline-flex items-center justify-center bg-deep-teal text-white 
-                      text-lg px-6 py-3 rounded-lg hover:bg-primary-dark-teal focus:outline-none 
-                      focus:ring-2 focus:ring-deep-teal focus:ring-opacity-50">
+              class="btn-primary-lg flex-1">
               <!-- calendar-list icon -->
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
                 <!-- (Calendar icon path) -->
@@ -103,7 +99,7 @@
         <!-- Edit Profile Button Student only -->
         {% if request.user.role == 'student' and request.user.id == student_profile.user.id %}
           <a href="?edit=true" 
-            class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 mb-20 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4 w-full">
+            class="btn-primary w-full mt-4 mb-20">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
             </svg>
@@ -115,7 +111,7 @@
             <!-- Toggle Active Status Button -->
             <form method="POST" action="{% url 'toggle_student_active' student_profile.user.id %}">
               {% csrf_token %}
-              <button type="submit" class="inline-flex items-center bg-warm-brown text-white px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+              <button type="submit" class="btn-secondary">
                 <!-- Conditional Text -->
                 {% if student_profile.user.is_active %}
                   <!-- Deactivate Icon -->
@@ -137,7 +133,7 @@
             <button 
               id="open-delete-modal" 
               type="button"
-              class="inline-flex items-center bg-red-600 text-white px-4 py-2 text-sm font-medium rounded-lg shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+              class="btn-danger">
               Delete Student
             </button>
 
@@ -176,13 +172,11 @@
                 <div class="mt-6 flex justify-end space-x-3">
                   <form method="POST" action="{% url 'delete_student' student_profile.user.id %}">
                     {% csrf_token %}
-                    <button type="submit" 
-                            class="inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <button type="submit" class="btn-danger">
                       Delete
                     </button>
                   </form>
-                  <button id="cancel-delete-modal" type="button" 
-                          class="inline-flex items-center justify-center rounded-md bg-gray-200 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                  <button id="cancel-delete-modal" type="button" class="btn-cancel">
                     Cancel
                   </button>
                 </div>
@@ -196,7 +190,7 @@
         {% if request.user.role != 'student' %}
           <div class="mt-6 mb-20">
             <a href="{% url 'teacher_student_list' %}"
-              class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 w-full">
+              class="btn-primary w-full">
               <!-- Chevron left icon-->
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
@@ -286,7 +280,7 @@
 
                 <!-- Custom Button -->
                 <label for="id_profile_picture"
-                  class="inline-flex items-center bg-deep-teal text-white px-4 pb-[5px] pt-[6px] text-xs font-medium leading-normal rounded shadow-lg transition duration-150 ease-in-out hover:bg-teal-600 hover:shadow-md focus:bg-teal-600 focus:shadow-md focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 active:bg-teal-700 active:shadow-md motion-reduce:transition-none">
+                  class="btn-primary-sm mt-4">
                   <!-- Upload Icon -->
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V20.25A2.25 2.25 0 005.25 22.5H18.75A2.25 2.25 0 0021 20.25V16.5M7.5 10.5L12 6M12 6L16.5 10.5M12 6V18" />
@@ -317,7 +311,7 @@
           <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
 
           <a href="{% url 'password_change' %}" 
-            class="flex items-center bg-deep-teal text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:ring-opacity-50 mt-4">
+            class="btn-primary w-full">
               <!-- Icon -->
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
@@ -330,7 +324,7 @@
           <div class="mt-4 mb-28 flex justify-end space-x-4">
             <!-- Save Profile Button -->
             <button type="submit"
-              class="inline-flex items-center bg-warm-brown text-white px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+              class="btn-secondary">
               <!-- Save Icon -->
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4 4L19 7M5 12.5H4v5.25A2.25 2.25 0 006.25 20.5h11.5A2.25 2.25 0 0020 18.25V13h-1" />
@@ -339,7 +333,7 @@
             </button>
           
             <a href="{% url 'student_profile' %}" 
-              class="inline-flex items-center bg-gray-200 text-gray-800 px-6 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+              class="btn-danger">
               Cancel
             </a>
           </div>

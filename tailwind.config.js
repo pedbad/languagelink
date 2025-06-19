@@ -27,12 +27,46 @@ module.exports = {
     },
   },
   plugins: [
-    function ({ addComponents }) {
-      addComponents({
-        '.btn-primary': {
-          '@apply inline-flex items-center justify-center whitespace-nowrap px-4 py-2 font-medium rounded-md shadow-md transition-colors duration-150 bg-deep-teal text-white hover:bg-teal-600 hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-primary-dark-teal focus:ring-opacity-60': {}
-        }
-      })
-    }
-  ]
+  function ({ addComponents }) {
+    const base = '@apply inline-flex items-center justify-center whitespace-nowrap font-medium rounded-md transition-colors duration-150 shadow-md focus:outline-none focus:ring-4 focus:ring-opacity-60';
+    addComponents({
+      /* Base shape */
+      '.btn': {
+        [base]: {}
+      },
+      /* Primary (default) */
+      '.btn-primary': {
+        [base + ' px-4 py-2 bg-deep-teal text-white hover:bg-teal-600 focus:ring-primary-dark-teal']: {}
+      },
+      /* Primary, large */
+      '.btn-primary-lg': {
+        [base + ' text-lg px-6 py-3 rounded-lg bg-deep-teal text-white hover:bg-teal-600 focus:ring-primary-dark-teal']: {}
+      },
+      /* Mini (for tiny text-xs buttons) */
+      '.btn-primary-sm': {
+        [base + ' text-xs px-4 py-2 bg-deep-teal text-white hover:bg-teal-600 focus:ring-primary-dark-teal']: {}
+      },
+      /* Alt-primary (orange) */
+      '.btn-primary-alt': {
+        [base + ' px-4 py-2 bg-vibrant-orange text-white hover:bg-dark-orange focus:ring-vibrant-orange']: {}
+      },
+      /* Alt-primary, large */
+      '.btn-primary-alt-lg': {
+        [base + ' text-lg px-6 py-3 rounded-lg bg-vibrant-orange text-white hover:bg-dark-orange focus:ring-vibrant-orange']: {}
+      },
+      /* Secondary (warm-brown) */
+      '.btn-secondary': {
+        [base + ' px-6 py-2 text-sm bg-warm-brown text-white hover:bg-dark-orange focus:ring-warm-brown']: {}
+      },
+      /* Cancel (gray) */
+      '.btn-cancel': {
+        [base + ' px-6 py-2 text-sm bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400']: {}
+      },
+      /* Danger (red) */
+      '.btn-danger': {
+        [base + ' px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 focus:ring-red-500']: {}
+      }
+    })
+  }
+]
 }
