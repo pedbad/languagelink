@@ -20,24 +20,21 @@
 
     if (studentBtn && teacherBtn && roleInput) {
       function selectRole(role) {
-        if (role === 'student') {
-          studentBtn.classList.add('bg-deep-teal', 'text-white', 'ring-deep-teal');
-          studentBtn.classList.remove('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
-          teacherBtn.classList.add('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
-          teacherBtn.classList.remove('bg-deep-teal', 'text-white', 'ring-deep-teal');
-        } else if (role === 'teacher') {
-          teacherBtn.classList.add('bg-deep-teal', 'text-white', 'ring-deep-teal');
-          teacherBtn.classList.remove('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
-          studentBtn.classList.add('bg-white', 'text-gray-900', 'ring-gray-300', 'hover:bg-teal-600');
-          studentBtn.classList.remove('bg-deep-teal', 'text-white', 'ring-deep-teal');
-        }
+        const isStudent = role === 'student';
+
+        studentBtn.classList.toggle('btn-role-toggle-selected',   isStudent);
+        studentBtn.classList.toggle('btn-role-toggle-unselected', !isStudent);
+
+        teacherBtn.classList.toggle('btn-role-toggle-selected',   !isStudent);
+        teacherBtn.classList.toggle('btn-role-toggle-unselected',  isStudent);
+
         roleInput.value = role;
       }
 
-      // Auto-select role based on URL parameter
-      const urlParams = new URLSearchParams(window.location.search);
-      const selectedRole = urlParams.get("role") || "student"; // Default to student
-      selectRole(selectedRole);
+      // auto‐read ?role=… or default
+      const params = new URLSearchParams(window.location.search);
+      const initialRole = params.get('role') || 'student';
+      selectRole(initialRole);
 
       // Add click event listeners for manual selection
       studentBtn.addEventListener('click', () => selectRole('student'));

@@ -107,6 +107,30 @@ module.exports = {
         /* when currently OFF, clicking ENABLES → teal “primary” */
         '.btn-toggle-on': {
           ['@apply btn-toggle bg-[#10454F] hover:bg-[#0d3a45] focus:ring-[#10454F] text-white']: {}
+        },
+        /* wrapper around the student / teacher buttons on register page */
+        '.btn-toggle-group': {
+          '@apply inline-flex rounded-md shadow-sm': {}
+        },
+        /* each toggle button */
+        '.btn-role-toggle': {
+          '@apply relative inline-flex items-center px-3 py-2 text-sm font-semibold transition-colors duration-150 focus:z-10 focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-none': {}
+        },
+        /* left edge (Student) */
+        '.btn-role-toggle-left': {
+          '@apply btn-role-toggle rounded-l-md': {}
+        },
+        /* right edge (Teacher) */
+        '.btn-role-toggle-right': {
+          '@apply btn-role-toggle rounded-r-md -ml-px': {}
+        },
+        /* when selected */
+        '.btn-role-toggle-selected': {
+          '@apply bg-deep-teal text-white ring-1 ring-inset ring-deep-teal hover:bg-teal-600': {}
+        },
+        /* when unselected */
+        '.btn-role-toggle-unselected': {
+          '@apply bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50': {}
         }
       })
     }
