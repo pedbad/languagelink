@@ -13,7 +13,7 @@
     {% if request.user.role == 'admin' %}
       <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
         <a href="{% url 'register' %}?role=teacher"
-          class="rounded-md bg-deep-teal px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-teal-600 flex items-center justify-center">
+          class="btn-primary">
           <!-- Academic Cap Icon -->
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
@@ -25,7 +25,7 @@
   
   </div>
 
-  <hr class="my-4 border-1 border-primary-dark-teal">
+  <hr class="page-divider">
 
   <!-- Table Container Alignment (Missing Div Added) -->
   <div class="-mx-4 mt-8 sm:-mx-6 lg:-mx-8">
@@ -187,7 +187,7 @@
             <td class="px-3 py-4 text-sm text-gray-500">{{ teacher.user.date_joined|date:"M d, Y" }}</td>
             <td class="py-4 px-4 text-center">
               <a href="{% url 'teacher_profile_admin' teacher.user.id %}"
-                class="inline-flex items-center bg-warm-brown text-white px-3 py-1.5 text-sm font-medium leading-normal rounded-lg shadow-lg transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+                class="btn-secondary">
                 <!-- Eye Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-2">
                   <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
@@ -204,11 +204,11 @@
   </div>
 </div>
 
-<hr class="my-4 border-1 border-primary-dark-teal">
+<hr class="page-divider">
 
 <div class="mt-6 mb-20 text-center">
   {% if request.user.role == 'admin' %}
-    <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+    <a href="{% url 'admin_dashboard' %}" class="btn-primary w-full">
       <!-- Chevron left icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
         <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
@@ -216,7 +216,7 @@
       Back to Dashboard
     </a>
   {% elif request.user.role == 'student' %}
-    <a href="{% url 'student_profile' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+    <a href="{% url 'student_profile' %}" class="btn-primary w-full">
       <!-- Chevron left icon-->
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
         <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />

@@ -5,8 +5,8 @@
 
 {% block content %}
 <div class="container mx-auto mt-10">
-  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6">Student Profile</h1>
-  <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Welcome Message -->
+  <h1 class="page-title">Student Profile</h1>
+  <hr class="page-divider">
 
   <!-- Flex Container for Profile Image and Info -->
   <div class="flex items-start space-x-6">
@@ -51,7 +51,7 @@
               Your Upcoming Bookings
             </a>
           </div><!-- eof mt-6 flex space-x-4 -->
-          <hr class="my-4 border-1 border-primary-dark-teal">
+          <hr class="page-divider">
           
         {% endif %}
         <!-- Name Section -->
@@ -63,7 +63,7 @@
         <!-- Date Registered Section -->
         <p class="text-lg"><strong>Date Registered:</strong> {{ request.user.date_joined|date:"F j, Y" }}</p>
         
-        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after email -->
+        <hr class="page-divider"> <!-- Divider after email -->
 
         <!-- Language Biography Section -->
         <p class="text-lg"><strong>Language Biography:</strong></p>
@@ -82,7 +82,7 @@
             </ul>
           </p>
         {% endif %}
-        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after language biography -->
+        <hr class="page-divider"> <!-- Divider after language biography -->
 
         <!-- Languages of Interest Section -->
         <p class="text-lg"><strong>Languages of Interest:</strong></p>
@@ -93,7 +93,7 @@
             Not provided yet. Tell us what languages you're interested in learning! You can edit your profile to add this information.
           </p>
         {% endif %}
-        <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->                
+        <hr class="page-divider"> <!-- Divider after Languages of Interest -->           
 
 
         <!-- Edit Profile Button Student only -->
@@ -183,7 +183,7 @@
               </div>
             </div>
           </div>
-          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Dividerdelete button -->
+          <hr class="page-divider"> <!-- Dividerdelete button -->
         {% endif %}
 
         <!-- Back to Student List button for admins and teachers -->
@@ -254,7 +254,7 @@
               placeholder="What languages are you interested in learning?">{{ form.languages_of_interest.value|default:'' }}</textarea>
           </div>
 
-          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Languages of Interest -->
+          <hr class="page-divider"> <!-- Divider after Languages of Interest -->
 
           <!-- Profile Picture Field -->
           <div class="mb-6">
@@ -308,7 +308,7 @@
             {% endif %}
           </div>
           
-          <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Profile picture -->
+          <hr class="page-divider"> <!-- Divider after Profile picture -->
 
           <a href="{% url 'password_change' %}" 
             class="btn-primary w-full">

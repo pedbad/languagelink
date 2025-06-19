@@ -3,14 +3,13 @@
 
 {% block content %}
 <div class="container mx-auto py-8">
-  <h1 class="text-3xl font-extralight text-gray-900 sm:text-4xl text-center">Admin Dashboard</h1>
+  <h1 class="page-title">Admin Dashboard</h1>
+  <hr class="page-divider"> <!-- Divider after Welcome Message -->
 
   <!-- Welcome Message -->
   <p class="text-lg text-gray-700 mt-4 text-center">
       Welcome, {{ request.user.first_name }} {{ request.user.last_name }}
-  </p>
-
-  <hr class="my-4 border-1 border-primary-dark-teal"> <!-- Divider after Welcome Message -->
+  </p>  
 
   <!-- Cards Section -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
@@ -87,7 +86,7 @@
   </div>
   <!-- end of Cards Section -->
 
-  <hr class="mt-6 mb-12 border-1 border-primary-dark-teal"> <!-- Divider after Cards -->
+  <hr class="page-divider"> <!-- Divider after Cards -->
 </div>
 {% endblock %}
 
