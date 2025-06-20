@@ -132,3 +132,26 @@ class Questionnaire(models.Model):
 
   def __str__(self):
     return f"Questionnaire for {self.student_profile.user.email} (Created: {self.created_at})"
+  
+  
+class ResourceNote(models.Model):
+  student_profile = models.ForeignKey(
+    'StudentProfile',
+    on_delete=models.CASCADE,
+    related_name='resource_notes'
+  )
+  author = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    limit_choices_to=models.Q(role__in=['teacher','admin'])
+  )
+  content = models.TextField()
+  created_at = models.DateTimeField(auto_now_add=True)
+
+  class Meta:
+    ordering = ['-created_at']
+
+  def __str__(self):
+    return f"Note for {self.student_profile.user.get_full_name()} on {self.created_at:%Y-%m-%d %H:%M}"
+

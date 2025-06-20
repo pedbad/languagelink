@@ -57,7 +57,7 @@ module.exports = {
         },
         /* Mini (for tiny text-xs buttons) */
         '.btn-primary-sm': {
-          [base + ' text-xs px-4 py-2 bg-deep-teal text-white hover:bg-teal-600 focus:ring-primary-dark-teal']: {}
+          [base + ' text-xs px-2 py-1 bg-deep-teal text-white hover:bg-teal-600 focus:ring-primary-dark-teal']: {}
         },
         /* Alt-primary (orange) */
         '.btn-primary-alt': {
@@ -74,7 +74,7 @@ module.exports = {
         /* Mini secondary (warm-brown) */
         '.btn-secondary-sm': {
           [ base + 
-            ' text-xs px-4 py-2 bg-warm-brown text-white' +
+            ' text-xs px-2 py-1 bg-warm-brown text-white' +
             ' hover:bg-dark-orange focus:ring-warm-brown'
           ]: {}
         },

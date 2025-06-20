@@ -6,7 +6,9 @@
 <div class="container mx-auto mt-10">
     <h1 class="page-title">Student Resources</h1>
     <hr class="page-divider">
-    <p>Welcome, {{ request.user.email }}!</p>
+    <p>User is , {{ request.user.email }}!</p>
+    <p>Viewing resources for: <strong>{{ student_profile.user.get_full_name }} ({{ student_profile.user.email }})</strong></p>
+
 
 </div>
 {% endblock %}

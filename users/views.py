@@ -10,7 +10,7 @@ from django.db.models import BooleanField, Value as V, Case, When, Exists, Outer
 from django.shortcuts import render, redirect, get_object_or_404
 
 # App Imports
-from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile
+from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile, ResourceNote
 from .forms import (
   CustomUserCreationForm,
   TeacherProfileForm,
@@ -40,6 +40,7 @@ def register(request):
     form = CustomUserCreationForm()
   
   return render(request, 'users/register.html', {'form': form})
+
 
 # Login View
 def login_view(request):
@@ -74,6 +75,7 @@ def login_view(request):
       return render(request, 'users/login.html', {'error': 'Invalid email or password.'})
 
   return render(request, 'users/login.html')
+
 
 # Student Profile View
 @login_required
@@ -204,7 +206,6 @@ def toggle_can_host_in_person(request):
   return redirect('teacher_profile')  # Redirect back to the profile page
 
   
-
 @login_required
 def toggle_can_host_online(request):
   """
@@ -218,7 +219,6 @@ def toggle_can_host_online(request):
   teacher_profile.save()
 
   return redirect('teacher_profile')  # Redirect back to the profile page
-
 
 
 # Toggle Advising Status Availability  
@@ -235,7 +235,6 @@ def toggle_advising_status(request):
   teacher_profile.save()
 
   return redirect('teacher_profile')  # Redirect back to the profile page
-
 
 
 # Questionnaire View
@@ -308,6 +307,46 @@ def student_resource_view(request):
   Displays resources for students.
   """
   return render(request, 'users/student_resources.html')
+
+
+@login_required
+def student_resource_view(request):
+  """
+  Displays resources (notes) for a given student.
+  - Students see their own notes.
+  - Teachers/Admins can pass ?student_id=<id> to view/add notes for that student.
+  """
+  user = request.user
+
+  # If teacher or admin, allow viewing someone else's resources...
+  if user.role in ('teacher', 'admin'):
+    sid = request.GET.get('student_id')
+    if sid:
+      from django.shortcuts import get_object_or_404
+      student_user = get_object_or_404(CustomUser, id=sid, role='student')
+    else:
+      # no student_id? redirect back or 404
+      return redirect('teacher_student_list') if user.role == 'teacher' else redirect('admin_dashboard')
+  else:
+    # students only see their own
+    student_user = user
+
+  # Now load or create the StudentProfile and ResourceNotes
+  student_profile = student_user.studentprofile
+
+  # fetch notes for this student, newest first
+  notes = ResourceNote.objects.filter(student_profile=student_profile) \
+                              .order_by('-created_at')
+
+  # show form only if teacher or admin
+  can_add = user.role in ('teacher', 'admin')
+
+  return render(request, 'users/student_resources.html', {
+    'student_profile': student_profile,
+    'notes': notes,
+    'can_add': can_add,
+  })
+
 
 
 
