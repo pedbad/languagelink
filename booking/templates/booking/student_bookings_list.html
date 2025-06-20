@@ -3,9 +3,7 @@
 {% block title %}Student Upcoming Bookings{% endblock %}
 
 {% block content %}
-  <h1 class="page-title">
-    Your Upcoming Bookings
-  </h1>
+  <h1 class="page-title">Your Upcoming Bookings</h1>
   <hr class="page-divider">
 
   {% include "booking/partials/bookings_toggle.html" %}
@@ -63,8 +61,7 @@
 
           {% if b.teacher_id %}
             <a href="{% url 'teacher_profile_admin' b.teacher_id %}"
-                class="inline-flex items-center bg-warm-brown text-white px-3 py-1.5 text-sm font-medium leading-normal rounded-lg shadow-lg
-                          transition duration-150 ease-in-out hover:bg-dark-orange focus:outline-none focus:ring-2 focus:ring-warm-brown focus:ring-opacity-50">
+                class="btn-secondary-sm">
               <!-- Eye Icon -->
               <svg xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor" viewBox="0 0 24 24"
@@ -91,7 +88,7 @@
   <hr class="my-6 border-1 border-primary-dark-teal">
   <div class="mt-6 mb-20 text-center">
     {% if request.user.role == 'admin' %}
-      <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+      <a href="{% url 'admin_dashboard' %}" class="btn-primary w-full">
         <!-- Chevron left icon-->
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
           <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
@@ -99,7 +96,7 @@
         Back to Dashboard
       </a>
     {% elif request.user.role == 'student' %}
-      <a href="{% url 'student_profile' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+      <a href="{% url 'student_profile' %}" class="btn-primary w-full">
         <!-- Chevron left icon-->
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
           <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />

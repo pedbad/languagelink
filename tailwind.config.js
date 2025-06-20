@@ -27,7 +27,6 @@ module.exports = {
     },
   },
   plugins: [
-    //Define your page‐heading & divider styles
     function ({ addBase }) {
       addBase({
         'h1.page-title': {
@@ -72,28 +71,49 @@ module.exports = {
         '.btn-secondary': {
           [base + ' px-6 py-2 text-sm bg-warm-brown text-white hover:bg-dark-orange focus:ring-warm-brown']: {}
         },
+        /* Mini secondary (warm-brown) */
+        '.btn-secondary-sm': {
+          [ base + 
+            ' text-xs px-4 py-2 bg-warm-brown text-white' +
+            ' hover:bg-dark-orange focus:ring-warm-brown'
+          ]: {}
+        },
         /* Cancel (gray) */
         '.btn-cancel': {
           [base + ' px-6 py-2 text-sm bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400']: {}
+        },
+        /** Mini cancel (gray) */
+        '.btn-cancel-sm': {
+          [base +
+            ' text-xs px-4 py-2 bg-gray-200 text-gray-800' +
+            ' hover:bg-gray-300 focus:ring-gray-400'
+          ]: {}
         },
         /* Danger (red) */
         '.btn-danger': {
           [base + ' px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 focus:ring-red-500']: {}
         },
+        /** Mini danger (red) */
+        '.btn-danger-sm': {
+          [base +
+            ' text-xs px-4 py-2 bg-red-700 text-white' +
+            ' hover:bg-red-600 focus:ring-red-500'
+          ]: {}
+        },
         /* Status: completed */
         '.btn-completed': {
           [base +
-           ' px-3 py-1.5 bg-accent-olive-green text-white' +
-           ' hover:bg-accent-bright-lime' +
-           ' focus:ring-2 focus:ring-accent-olive-green focus:ring-opacity-50'
+           ' px-3 py-1.5 bg-accent-olive-green text-white'
+           + ' hover:bg-accent-bright-lime'
+           + ' focus:ring-2 focus:ring-accent-olive-green focus:ring-opacity-50'
           ]: {}
         },
         /* Status: not-completed */
         '.btn-not-completed': {
           [base +
-           ' px-3 py-1.5 bg-red-100 text-red-800' +
-           ' hover:bg-red-200' +
-           ' focus:ring-2 focus:ring-red-500 focus:ring-opacity-50'
+           ' px-3 py-1.5 bg-red-100 text-red-800'
+           + ' hover:bg-red-200'
+           + ' focus:ring-2 focus:ring-red-500 focus:ring-opacity-50'
           ]: {}
         },
         /* generic toggle button */
@@ -131,6 +151,23 @@ module.exports = {
         /* when unselected */
         '.btn-role-toggle-unselected': {
           '@apply bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50': {}
+        },
+        /* Outline style for toggles */
+        '.btn-outline': {
+          '@apply inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 focus:ring-gray-400': {}
+        },
+        /* Badge base */
+        '.badge': {
+          '@apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium': {}
+        },
+        '.badge-primary-alt': {
+          '@apply bg-white text-vibrant-orange': {}
+        },
+        '.badge-primary': {
+          '@apply bg-white text-deep-teal': {}
+        },
+        '.badge-outline': {
+          '@apply bg-gray-100 text-gray-500': {}
         }
       })
     }

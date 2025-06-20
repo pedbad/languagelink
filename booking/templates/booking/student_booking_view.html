@@ -5,19 +5,19 @@
 {% block content %}
   <div id="student-booking-page">
     <div class="container mx-auto mt-10">
-      <h1 class="text-3xl font-light text-gray-900 text-center mb-6">Book a Meeting</h1>
-      <hr class="my-4 border-1 border-gray-300 mb-6">
+      <h1 class="page-title">Book a Meeting</h1>
+      <hr class="page-divider">
       <h2 class="text-xl font-semibold text-gray-800 text-center flex-1 mb-4">{{ month_display }}</h2>
 
       <!-- Week Navigation -->
       <div class="flex items-center justify-center gap-4 mb-6">
         {% if disable_prev_week %}
-          <span class="inline-flex items-center bg-gray-300 text-gray-500 px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg cursor-not-allowed">
+          <span class="btn-secondary-sm opacity-50 cursor-not-allowed">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Previous Week
           </span>
         {% else %}
-          <a href="?date={{ prev_week }}" class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg hover:bg-dark-orange">
+          <a href="?date={{ prev_week }}" class="btn-secondary-sm">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Previous Week
           </a>
@@ -46,7 +46,7 @@
           {% endfor %}
         </div>
 
-        <a href="?date={{ next_week }}" class="inline-flex items-center bg-warm-brown text-white px-4 py-2 text-sm font-medium leading-normal rounded-lg shadow-lg hover:bg-dark-orange">
+        <a href="?date={{ next_week }}" class="btn-secondary-sm">
           Next Week
           <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
@@ -184,7 +184,7 @@
 
       <div class="mt-6 mb-20 text-center">
         {% if request.user.role == 'admin' %}
-          <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+          <a href="{% url 'admin_dashboard' %}" class="btn-primary w-full">
             <!-- Chevron left icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
@@ -192,7 +192,7 @@
             Back to Dashboard
           </a>
         {% elif request.user.role == 'student' %}
-          <a href="{% url 'student_profile' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+          <a href="{% url 'student_profile' %}" class="btn-primary w-full">
             <!-- Chevron left icon-->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
@@ -251,11 +251,11 @@
         <!-- Modal Actions -->
         <div class="mt-6 flex justify-end space-x-3">
           <button id="submit-booking-modal" type="button"
-                  class="inline-flex items-center justify-center rounded-md bg-deep-teal px-4 py-2 text-sm font-medium text-white shadow hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-deep-teal">
+                  class="btn-primary">
             Book This Slot
           </button>
           <button id="cancel-booking-modal" type="button"
-                  class="inline-flex items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500">
+                  class="btn-danger">
             Cancel
           </button>
         </div>

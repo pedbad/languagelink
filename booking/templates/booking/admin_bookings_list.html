@@ -2,11 +2,9 @@
 {% extends "core/base.html" %}
 {% block title %}All Booked Slots{% endblock %}
 {% block content %}
-  <h1
-    class="text-3xl font-extralight text-gray-900 text-center mb-6">
-    All Booked Slots
-  </h1>
-  <hr class="my-4 border-primary-dark-teal">
+  <h1 class="page-title">All Booked Slots</h1>
+  <hr class="page-divider">
+
 
   {% include "booking/partials/bookings_toggle.html" %}
 
@@ -229,7 +227,7 @@
               <div class="flex flex-col items-center space-y-2">
                 <!-- View Advisor (on top) -->
                 <a href="{% url 'teacher_profile_admin' b.adv_id %}"
-                  class="inline-flex items-center bg-deep-teal text-white px-2 py-1 text-xs font-medium rounded-md shadow hover:bg-teal-600">
+                  class="btn-primary-sm">
                   <!-- advisor icon -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
@@ -246,7 +244,7 @@
 
                 <!-- View Student (below) -->
                 <a href="{% url 'student_profile_admin' b.stu_id %}"
-                  class="inline-flex items-center bg-warm-brown text-white px-2 py-1 text-xs font-medium rounded-md shadow hover:bg-dark-orange">
+                  class="btn-secondary-sm">
                   <!-- student icon -->
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
@@ -276,7 +274,7 @@
 
   <div class="mt-6 mb-24 text-center">
     {% if request.user.role == 'admin' %}
-      <a href="{% url 'admin_dashboard' %}" class="flex items-center justify-center bg-deep-teal text-white px-4 py-2 rounded-lg hover:bg-teal-600">
+      <a href="{% url 'admin_dashboard' %}" class="btn-primary w-full">
         <!-- Chevron left icon-->
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
           <path stroke-linecap="round" stroke-linejoin="round" d="m18.75 4.5-7.5 7.5 7.5 7.5m-6-15L5.25 12l7.5 7.5" />
