@@ -32,6 +32,8 @@ INSTALLED_APPS = [
   'django.contrib.sessions',
   'django.contrib.messages',
   'django.contrib.staticfiles',
+  #Third party apps
+  "django_ckeditor_5",
   # Custom Apps
   'core',
   'users',
@@ -115,6 +117,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Specify custom user model
 AUTH_USER_MODEL = 'users.CustomUser'
+
+#Configure which toolbar items you want in CKEDITOR_5
+CKEDITOR_5_CONFIGS = {
+  "default": {
+    "toolbar": [
+      "bold","italic","link","bulletedList","numberedList",
+    ],
+    # later we can add 'imageUpload','mediaEmbed', etc.
+    "heading": False,
+    "removePlugins": ["CKBox","CKFinder","EasyImage","RealTimeCollaborativeComments","RealTimeCollaborativeTrackChanges","RealTimeCollaborativeRevisionHistory","Comments","TrackChanges","TrackChangesData","RevisionHistory","Pagination","WProofreader","MathType"]
+  }
+}
+
 
 # Add Trusted Origins for CSRF protection
 CSRF_TRUSTED_ORIGINS = [

@@ -135,23 +135,95 @@ class Questionnaire(models.Model):
   
   
 class ResourceNote(models.Model):
+  """
+  A rich-text note or resource link left by a teacher/admin for a student.
+
+  Fields:
+    student_profile: which student this note belongs to
+    author:       who left it (teacher or admin)
+    booking:      optional link to the specific meeting (future use)
+    title:        short summary or category (future use)
+    content:      HTML from CKEditor
+    created_at:   when first saved
+    updated_at:   when last edited
+  """
   student_profile = models.ForeignKey(
     'StudentProfile',
     on_delete=models.CASCADE,
-    related_name='resource_notes'
+    related_name='resource_notes',
+    help_text="The student who will see this note."
   )
   author = models.ForeignKey(
     settings.AUTH_USER_MODEL,
     on_delete=models.SET_NULL,
-    null=True,
-    limit_choices_to=models.Q(role__in=['teacher','admin'])
+    null=True, blank=True,
+    limit_choices_to=models.Q(role__in=['teacher','admin']),
+    help_text="Which teacher/admin wrote this note; null if user deleted."
   )
-  content = models.TextField()
-  created_at = models.DateTimeField(auto_now_add=True)
+  # FUTURE: tie note to a specific booking if desired
+  booking = models.ForeignKey(
+    'booking.Booking',
+    on_delete=models.SET_NULL,
+    null=True, blank=True,
+    help_text="Optional: associate with a particular meeting."
+  )
+  # FUTURE: a short headline for easier listing
+  title = models.CharField(
+    max_length=200, blank=True,
+    help_text="Optional summary (e.g. 'Pronunciation tips')."
+  )
+  content = models.TextField(
+    help_text="Rich-text HTML (from CKEditor)."
+  )
+  created_at = models.DateTimeField(
+    auto_now_add=True,
+    help_text="When this note was first created."
+  )
+  updated_at = models.DateTimeField(
+    auto_now=True,
+    help_text="When this note was last modified."
+  )
 
   class Meta:
     ordering = ['-created_at']
+    indexes = [
+      models.Index(fields=['student_profile', 'created_at']),
+    ]
 
   def __str__(self):
+    """
+    Display in the admin as:
+      "Note for {Student Name} on YYYY-MM-DD HH:MM"
+    """
     return f"Note for {self.student_profile.user.get_full_name()} on {self.created_at:%Y-%m-%d %H:%M}"
 
+
+class ResourceAttachment(models.Model):
+  """
+  A file (image, PDF, etc.) attached to a ResourceNote.
+
+  Fields:
+    note:        which ResourceNote this belongs to
+    file:        the uploaded file
+    uploaded_at: when it was added
+  """
+  note = models.ForeignKey(
+    ResourceNote,
+    on_delete=models.CASCADE,
+    related_name='attachments',
+    help_text="The note this file augments."
+  )
+  file = models.FileField(
+    upload_to='resource_notes/',
+    help_text="Attachment to share with the student."
+  )
+  uploaded_at = models.DateTimeField(
+    auto_now_add=True,
+    help_text="When this file was uploaded."
+  )
+
+  def __str__(self):
+    """
+    Display the filename in the admin list.
+    """
+    return self.file.name

@@ -1,22 +1,45 @@
-# Python stdlib
+# -----------------------------------------------------------------------------
+# 1) Standard library
+# -----------------------------------------------------------------------------
 import re
+from datetime import datetime
 
-# Django Imports
+# -----------------------------------------------------------------------------
+# 2) Django imports
+# -----------------------------------------------------------------------------
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
-from datetime import datetime
-from django.db.models import BooleanField, Value as V, Case, When, Exists, OuterRef, Q
-from django.shortcuts import render, redirect, get_object_or_404
-
-# App Imports
-from .models import CustomUser, Questionnaire, TeacherProfile, StudentProfile, ResourceNote
-from .forms import (
-  CustomUserCreationForm,
-  TeacherProfileForm,
-  StudentProfileForm,
-  QuestionnaireForm
+from django.db.models import (
+    BooleanField,
+    Case,
+    Exists,
+    OuterRef,
+    Q,
+    Value as V,
+    When,
 )
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+# -----------------------------------------------------------------------------
+# 3) Local application imports
+# -----------------------------------------------------------------------------
+from .forms import (
+    CustomUserCreationForm,
+    QuestionnaireForm,
+    ResourceNoteForm,
+    StudentProfileForm,
+    TeacherProfileForm,
+)
+from .models import (
+    CustomUser,
+    Questionnaire,
+    ResourceNote,
+    StudentProfile,
+    TeacherProfile,
+)
+
 
 # Registration View
 def register(request):
@@ -304,48 +327,52 @@ def admin_dashboard_view(request):
 @login_required
 def student_resource_view(request):
   """
-  Displays resources for students.
-  """
-  return render(request, 'users/student_resources.html')
-
-
-@login_required
-def student_resource_view(request):
-  """
   Displays resources (notes) for a given student.
   - Students see their own notes.
-  - Teachers/Admins can pass ?student_id=<id> to view/add notes for that student.
+  - Teachers/Admins may view any student by passing ?student_id=<id>.
+  - Only *teachers* get an Add-Note form.
   """
   user = request.user
 
-  # If teacher or admin, allow viewing someone else's resources...
+  # 1) Determine which student’s page we’re on
   if user.role in ('teacher', 'admin'):
     sid = request.GET.get('student_id')
-    if sid:
-      from django.shortcuts import get_object_or_404
-      student_user = get_object_or_404(CustomUser, id=sid, role='student')
-    else:
-      # no student_id? redirect back or 404
+    if not sid:
+      # No student_id → bounce back
       return redirect('teacher_student_list') if user.role == 'teacher' else redirect('admin_dashboard')
+    student_user = get_object_or_404(CustomUser, id=sid, role='student')
   else:
-    # students only see their own
+    # A student viewing their own page
     student_user = user
 
-  # Now load or create the StudentProfile and ResourceNotes
   student_profile = student_user.studentprofile
 
-  # fetch notes for this student, newest first
-  notes = ResourceNote.objects.filter(student_profile=student_profile) \
-                              .order_by('-created_at')
+  # 2) Grab all notes (Model.Meta.ordering handles newest-first)
+  notes = student_profile.resource_notes.select_related('author').all()
 
-  # show form only if teacher or admin
-  can_add = user.role in ('teacher', 'admin')
+  # 3) Only teachers get to POST a new note
+  note_form = None
+  if user.role == 'teacher':
+    if request.method == 'POST':
+      form = ResourceNoteForm(request.POST)
+      if form.is_valid():
+        note = form.save(commit=False)
+        note.student_profile = student_profile
+        note.author = user
+        note.save()
+        # avoid double-POST: build URL + query and redirect
+        base_url = reverse('student_resource')
+        return redirect(f"{base_url}?student_id={student_profile.user.id}")
+    else:
+      form = ResourceNoteForm()
+    note_form = form
 
   return render(request, 'users/student_resources.html', {
     'student_profile': student_profile,
-    'notes': notes,
-    'can_add': can_add,
+    'notes':           notes,
+    'note_form':       note_form,
   })
+
 
 
 

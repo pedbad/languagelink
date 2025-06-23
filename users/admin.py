@@ -1,15 +1,15 @@
 # users/admin.py
-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
-# Import your models, including the new ResourceNote
+# Import your models
 from .models import (
   CustomUser,
   StudentProfile,
   TeacherProfile,
   Questionnaire,
   ResourceNote,
+  ResourceAttachment,
 )
 
 
@@ -17,16 +17,17 @@ from .models import (
 # CustomUser Admin
 # -----------------------------------------------------------------------------
 class CustomUserAdmin(UserAdmin):
-  # Fields to display in the list view
+  """
+  Admin display & forms for CustomUser.
+  Excludes the 'usable_password' field from forms.
+  """
   list_display = [
     'email', 'first_name', 'last_name',
     'role', 'is_staff', 'is_active'
   ]
-  # Filters in the sidebar
   list_filter = [
     'role', 'is_staff', 'is_active'
   ]
-  # Field grouping in the detail/edit view
   fieldsets = (
     (None, {
       'fields': ('email', 'password')
@@ -41,7 +42,6 @@ class CustomUserAdmin(UserAdmin):
       'fields': ('role',)
     }),
   )
-  # Fields shown on the “add user” form
   add_fieldsets = (
     (None, {
       'classes': ('wide',),
@@ -55,8 +55,10 @@ class CustomUserAdmin(UserAdmin):
   search_fields = ('email', 'first_name', 'last_name')
   ordering = ('email',)
 
-  # Remove unusable fields from the form
   def get_form(self, request, obj=None, **kwargs):
+    """
+    Remove 'usable_password' from the form if present.
+    """
     form = super().get_form(request, obj, **kwargs)
     if 'usable_password' in form.base_fields:
       form.base_fields.pop('usable_password')
@@ -66,19 +68,13 @@ class CustomUserAdmin(UserAdmin):
 # -----------------------------------------------------------------------------
 # Register models with the admin site
 # -----------------------------------------------------------------------------
+admin.site.register(CustomUser, CustomUserAdmin)  # Register CustomUser
+admin.site.register(StudentProfile)               # Student profiles
+admin.site.register(TeacherProfile)               # Teacher profiles
+admin.site.register(Questionnaire)                # Questionnaires
 
-# Register CustomUser using the custom admin class
-admin.site.register(CustomUser, CustomUserAdmin)
-
-# Register StudentProfile with the default ModelAdmin
-admin.site.register(StudentProfile)
-
-# Register TeacherProfile with the default ModelAdmin
-admin.site.register(TeacherProfile)
-
-# Register Questionnaire with the default ModelAdmin
-admin.site.register(Questionnaire)
-
-# Register the new ResourceNote model so it appears in the admin
+# ResourceNotes: rich-text notes / links for students
 admin.site.register(ResourceNote)
 
+# ResourceAttachments: optional file uploads for each note
+admin.site.register(ResourceAttachment)

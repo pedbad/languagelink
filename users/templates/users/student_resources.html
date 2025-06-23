@@ -1,14 +1,71 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
+{% load static %}
 
-{% block title %}Student Profile{% endblock %}
+{% block title %}Resources for {{ student_profile.user.get_full_name }}{% endblock %}
 
 {% block content %}
 <div class="container mx-auto mt-10">
-    <h1 class="page-title">Student Resources</h1>
-    <hr class="page-divider">
-    <p>User is , {{ request.user.email }}!</p>
-    <p>Viewing resources for: <strong>{{ student_profile.user.get_full_name }} ({{ student_profile.user.email }})</strong></p>
+  <h1 class="page-title">
+    Resources for {{ student_profile.user.get_full_name }}
+  </h1>
+  <hr class="page-divider">
 
+  {# 1) If teacher, show the add-note form #}
+  {% if note_form %}
+    <div class="bg-white shadow p-6 rounded mb-8">
+      <form method="POST"
+            action="?student_id={{ student_profile.user.id }}">
+        {% csrf_token %}
+        {{ note_form.non_field_errors }}
+        <div class="mb-4">
+          {{ note_form.title.label_tag }}
+          {{ note_form.title }}
+          {{ note_form.title.errors }}
+        </div>
+        <div class="mb-4">
+          {{ note_form.content.label_tag }}
+          {{ note_form.content }}
+          {{ note_form.content.errors }}
+        </div>
+        <button type="submit" class="btn-primary">
+          Add Note
+        </button>
+      </form>
+    </div>
+  {% endif %}
 
+  {# 2) List existing notes #}
+  {% if notes %}
+    <div class="space-y-6">
+      {% for note in notes %}
+        <div class="bg-white shadow rounded p-4">
+          {% if note.title %}
+            <h2 class="text-lg font-semibold">{{ note.title }}</h2>
+          {% endif %}
+          <p class="text-sm text-gray-500 mb-2">
+            by {{ note.author.get_full_name }} on {{ note.created_at|date:"F j, Y, H:i" }}
+          </p>
+          <div class="prose max-w-none">
+            {{ note.content|safe }}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-600">No notes yet.</p>
+  {% endif %}
 </div>
+
+{# 3) Include CKEditor JS #}
+<script src="{% static 'django_ckeditor_5/ckeditor.js' %}"></script>
+<script>
+  // Initialize all CKEditor 5 widgets on this page
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.django_ckeditor_5-widget').forEach(textarea => {
+      CKEditor5
+        .create(textarea, {{ CKEDITOR_5_CONFIGS.default|safe }})
+        .catch(error => console.error(error));
+    });
+  });
+</script>
 {% endblock %}
