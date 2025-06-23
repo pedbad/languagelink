@@ -43,7 +43,7 @@ urlpatterns = [
   path('student/<int:student_id>/profile/', student_profile_view, name='student_profile_admin'),  # View specific student's profile
   path('student/<int:student_id>/toggle-active/', toggle_student_active, name='toggle_student_active'),
   path('student/<int:student_id>/delete/', delete_student, name='delete_student'),
-
+  
   # Admin Dashboard
   path('admin/dashboard/', admin_dashboard_view, name='admin_dashboard'),
 

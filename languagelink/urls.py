@@ -26,7 +26,10 @@ urlpatterns = [
   path('users/', include('users.urls')),
 
   # Booking App URLs (Teacher Availability & Student Bookings)
-  path('booking/', include('booking.urls')),
+  path('booking/', include('booking.urls')),  
+    
+  # ckeditor5 
+  path('ckeditor5/', include('django_ckeditor_5.urls')),
 ]
 
 # Serve media files during development only

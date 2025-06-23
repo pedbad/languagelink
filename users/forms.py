@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, LanguageCompetency, StudentProfile, TeacherProfile, Questionnaire, ResourceNote
 from django.forms import modelformset_factory
 from django.forms.widgets import ClearableFileInput
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 
 # User Registration Form
@@ -136,23 +137,24 @@ class QuestionnaireForm(forms.ModelForm):
 # This form is used to handle the questionnaire that students fill out.       
 class ResourceNoteForm(forms.ModelForm):
   """
-  Form for teachers to leave rich‐text notes/resources for a student.
-  Uses CKEditor on the `content` field so you can format bold, links, lists, etc.
+  Form for teachers to leave rich-text notes/resources for a student.
+  Uses CKEditor5Widget on `content` so you can format bold, links, lists, etc.
   """
   class Meta:
     model = ResourceNote
     fields = [
-      'title',    # short headline (optional)
-      'content',  # rich‐text HTML
+      'title',    # optional short headline
+      'content',  # rich-text HTML
     ]
     widgets = {
-      # wire this up to CKEditor via the 'ckeditor' CSS class
-      'content': forms.Textarea(attrs={
-        'class': 'ckeditor',
-        'placeholder': 'Write your notes or share links here…'
-      }),
+      # This widget will include/initialize the CKEditor 5 toolbar for you
+      'content': CKEditor5Widget(config_name='default'),
     }
     labels = {
-      'title': 'Headline (optional)',
+      'title':   'Title',
       'content': 'Notes & Resource Links',
+    }
+    help_texts = {
+      'title':   'A brief headline (optional).',
+      'content': 'Your formatted notes, links, lists, etc.',
     }
