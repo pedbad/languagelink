@@ -60,3 +60,35 @@ footer {
   transform: translateX(100%);
   opacity: 0;
 }
+
+
+/* Give the entire editor a light-gray border + rounded corners */
+.ck.ck-editor {
+  border: 1px solid #D1D5DB; /* gray-300 */
+  border-radius: 0.5rem;      /* rounded-lg */
+  background: white;
+  overflow: hidden;           /* clip child borders nicely */
+}
+
+/* Separate styling for toolbar */
+.ck-toolbar {
+  border-bottom: 1px solid #D1D5DB; /* same gray-300 */
+  background: white;
+  padding: 0.25rem;                 /* small vertical padding */
+}
+
+/* And style the editable area */
+.ck-editor__editable_inline {
+  min-height: 8rem;                 /* whatever you like */
+  padding: 0.75rem;                 /* match your forms */
+  border-radius: 0 0 0.5rem 0.5rem; /* only bottom corners */
+  padding: 0.75rem 0.75rem 0.75rem 1.5rem;
+}
+
+
+/* 2) Ensure native lists get a little extra indent too */
+.ck-content ul,
+.ck-content ol {
+  /* default 1.5em works well for most fonts */
+  padding-left: 1.5em;
+}

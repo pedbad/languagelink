@@ -4,7 +4,10 @@
   <!-- Load Tailwind Elements script -->
   <script src="{% static 'js/tw-elements.umd.min.js' %}"></script>
 
-  <!-- Load main JavaScript file -->
+  <!-- 1) HTMX first so main.js can bind its htmx:configRequest listener -->
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+
+  <!-- Load main JavaScript file (which checks window.htmx and sets X-CSRFToken) -->
   <script src="{% static 'js/main.js' %}"></script>
 
   <!-- Additional scripts can be added in child templates using block extension -->

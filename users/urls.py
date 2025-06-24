@@ -17,6 +17,7 @@ from .views import (
   delete_student,              # Placeholder for the delete functionality
   toggle_can_host_online,      # Teacher availability for online meetings
   toggle_advising_status,      # Teacher availability toggle view
+  delete_resource_note,        # HTMX endpoint: delete a ResourceNote
   
 )
 
@@ -50,4 +51,7 @@ urlpatterns = [
   # Password Management URLs
   path('password-change/', PasswordChangeView.as_view(template_name='users/password_change.html'), name='password_change'),
   path('password-change/done/', PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'), name='password_change_done'),
+  
+  # HTMX-friendly delete endpoint for a ResourceNote
+  path('notes/<int:pk>/delete/', delete_resource_note, name='delete_resource_note'),
 ]

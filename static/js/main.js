@@ -2,6 +2,14 @@
   document.addEventListener("DOMContentLoaded", function () {
     console.log('==== DOM loaded - JS called ====');
 
+    // === HTMX: automatically include CSRF token on every request ===
+    if (window.htmx) {
+      document.body.addEventListener('htmx:configRequest', (evt) => {
+        evt.detail.headers['X-CSRFToken'] = getCSRFToken();
+      });
+    }
+
+
     // === Hamburger menu toggle ===
     const hamburger = document.getElementById('hamburger');
     if (hamburger) {
@@ -344,18 +352,38 @@
     }
 
     
-    // Function to get CSRF token from cookies
+    // ————————————————————————————————————————————————
+    // Function to read CSRF token from the browser’s cookies
+    // ————————————————————————————————————————————————
     function getCSRFToken() {
+      // The cookie name we’re looking for
       const name = 'csrftoken=';
+      // Split document.cookie into individual “key=value” strings
       const cookies = document.cookie.split(';');
+      
       for (let i = 0; i < cookies.length; i++) {
         let cookie = cookies[i].trim();
+        // If it starts with “csrftoken=”, return everything after the “=”
         if (cookie.startsWith(name)) {
           return cookie.substring(name.length, cookie.length);
         }
       }
       return '';
     }
+
+    // ————————————————————————————————————————————————
+    // HTMX global config: inject CSRF token into every HTMX request
+    // ————————————————————————————————————————————————
+    // Listens for HTMX’s configRequest event and adds the X-CSRFToken header
+    document.body.addEventListener('htmx:configRequest', function(event) {
+      const token = getCSRFToken(); // grab the token from cookies
+      if (token) {
+        // event.detail.headers is the object HTMX will send as HTTP headers
+        event.detail.headers['X-CSRFToken'] = token;
+      }
+    });
+
+
 
 
     // === Booking Modal Functionality ===

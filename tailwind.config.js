@@ -96,7 +96,7 @@ module.exports = {
         /** Mini danger (red) */
         '.btn-danger-sm': {
           [base +
-            ' text-xs px-4 py-2 bg-red-700 text-white' +
+            ' text-xs px-2 py-1 bg-red-700 text-white' +
             ' hover:bg-red-600 focus:ring-red-500'
           ]: {}
         },

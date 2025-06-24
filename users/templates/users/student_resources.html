@@ -13,45 +13,55 @@
   {# render CKEditor’s JS/CSS #}
   {{ note_form.media }}
 
-  {# 1) If teacher, show the add-note form #}
+  {# If teacher, show the add-note form #}
   {% if note_form %}
     <div class="bg-white shadow p-6 rounded mb-8">
       <form method="POST"
             action="?student_id={{ student_profile.user.id }}">
         {% csrf_token %}
         {{ note_form.non_field_errors }}
-        <div class="mb-4">
-          {{ note_form.title.label_tag }}
-          {{ note_form.title }}
+        {# Floating-label Title field #}
+        <div class="relative mb-6">
+          <input
+            type="text"
+            name="{{ note_form.title.html_name }}"
+            id="{{ note_form.title.id_for_label }}"
+            value="{{ note_form.title.value|default_if_none:'' }}"
+            placeholder="Add your title"
+            class="peer block w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
+                  leading-[2.15] outline-none transition-all duration-200 ease-linear
+                  placeholder-transparent
+                  peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal
+                  peer-valid:border-primary-dark-teal"
+          />
+          <label
+            for="{{ note_form.title.id_for_label }}"
+            class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
+                  pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+                  peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
+                  peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]">
+            Title
+          </label>
           {{ note_form.title.errors }}
         </div>
+
         <div class="mb-4">
           {{ note_form.content.label_tag }}
           {{ note_form.content }}
           {{ note_form.content.errors }}
         </div>
-        <button type="submit" class="btn-primary">
+        <button type="submit" class="btn-primary w-full">
           Add Note
         </button>
       </form>
     </div>
   {% endif %}
 
-  {# 2) List existing notes #}
+  {# List existing notes #}
   {% if notes %}
     <div class="space-y-6">
       {% for note in notes %}
-        <div class="bg-white shadow rounded p-4">
-          {% if note.title %}
-            <h2 class="text-lg font-semibold">{{ note.title }}</h2>
-          {% endif %}
-          <p class="text-sm text-gray-500 mb-2">
-            by {{ note.author.get_full_name }} on {{ note.created_at|date:"F j, Y, H:i" }}
-          </p>
-          <div class="prose max-w-none">
-            {{ note.content|safe }}
-          </div>
-        </div>
+        {% include "users/partials/note_item.html" with note=note %}
       {% endfor %}
     </div>
   {% else %}

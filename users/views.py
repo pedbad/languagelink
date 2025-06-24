@@ -10,34 +10,28 @@ from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
-from django.db.models import (
-    BooleanField,
-    Case,
-    Exists,
-    OuterRef,
-    Q,
-    Value as V,
-    When,
-)
+from django.db.models import BooleanField, Case, Exists, OuterRef, Q, Value as V, When
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.http import require_http_methods
 
 # -----------------------------------------------------------------------------
 # 3) Local application imports
 # -----------------------------------------------------------------------------
 from .forms import (
-    CustomUserCreationForm,
-    QuestionnaireForm,
-    ResourceNoteForm,
-    StudentProfileForm,
-    TeacherProfileForm,
+  CustomUserCreationForm,
+  QuestionnaireForm,
+  ResourceNoteForm,
+  StudentProfileForm,
+  TeacherProfileForm,
 )
 from .models import (
-    CustomUser,
-    Questionnaire,
-    ResourceNote,
-    StudentProfile,
-    TeacherProfile,
+  CustomUser,
+  Questionnaire,
+  ResourceNote,
+  StudentProfile,
+  TeacherProfile,
 )
 
 
@@ -373,6 +367,29 @@ def student_resource_view(request):
     'note_form':       note_form,
   })
 
+
+@login_required
+@require_http_methods(["DELETE", "POST"])
+def delete_resource_note(request, pk):
+  """
+  HTMX endpoint to delete a ResourceNote.
+  Only the authoring teacher (or an admin) may delete.
+  Returns an empty response so HTMX can remove the <div> wrapper.
+  """
+  note = get_object_or_404(ResourceNote, pk=pk)
+
+  # Ensure only the note’s author or an admin can delete
+  if not (
+      request.user == note.author
+      or request.user.role == 'admin'
+      or request.user.role == 'teacher'
+    ):
+    return HttpResponseForbidden()
+
+  note.delete()
+  # HTMX will swap out the element automatically if you
+  # set hx-swap="delete" on your delete button.
+  return HttpResponse(status=204)
 
 
 
