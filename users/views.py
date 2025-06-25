@@ -389,7 +389,7 @@ def delete_resource_note(request, pk):
   note.delete()
   # HTMX will swap out the element automatically if you
   # set hx-swap="delete" on your delete button.
-  return HttpResponse(status=204)
+  return HttpResponse("")
 
 
 

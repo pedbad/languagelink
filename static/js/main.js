@@ -694,6 +694,27 @@
     });
 
 
+    // ————————————————————————————————————————————  
+    // NOTE-DELETE MODAL OPEN/CLOSE LOGIC  
+    // ————————————————————————————————————————————  
+    document.querySelectorAll('[id^="open-delete-"]').forEach(btn => {
+      const id = btn.id.replace('open-delete-', '');
+      const modal = document.getElementById(`delete-modal-${id}`);
+
+      btn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+      });
+
+      modal.querySelectorAll('[data-action="close"]').forEach(closeBtn => {
+        closeBtn.addEventListener('click', () => {
+          modal.classList.add('hidden');
+        });
+      });
+    });
+
+
+
+
     
 
 
