@@ -711,7 +711,30 @@
         });
       });
     });
+    
 
+    // ────────────────────────────────────────────────────────────────────────────
+    // NEW: AUTO-OPEN external links in notes in a new tab, and only those links
+    // ────────────────────────────────────────────────────────────────────────────
+    function fixNoteLinks(container) {
+      container.querySelectorAll("a[href^='http']").forEach(a => {
+        a.setAttribute("target", "_blank");
+        a.setAttribute("rel", "noopener noreferrer");
+      });
+    }
+
+    // 1) Run once on initial page load:
+    document.querySelectorAll(".note-content").forEach(fixNoteLinks);
+
+    // 2) Re-run after any HTMX swap (so newly inserted notes get the same treatment):
+    document.body.addEventListener("htmx:afterSwap", (evt) => {
+      let t = evt.detail.target;
+      if (t.matches?.(".note-content")) {
+        fixNoteLinks(t);
+      } else {
+        t.querySelectorAll?.(".note-content").forEach(fixNoteLinks);
+      }
+    });
 
 
 

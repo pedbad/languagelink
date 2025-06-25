@@ -124,11 +124,19 @@ CKEDITOR_5_CONFIGS = {
     "toolbar": [
       "bold","italic","link","bulletedList","numberedList",
     ],
-    # later we can add 'imageUpload','mediaEmbed', etc.
     "heading": False,
-    "removePlugins": ["CKBox","CKFinder","EasyImage","RealTimeCollaborativeComments","RealTimeCollaborativeTrackChanges","RealTimeCollaborativeRevisionHistory","Comments","TrackChanges","TrackChangesData","RevisionHistory","Pagination","WProofreader","MathType"]
+    "removePlugins": [
+      "CKBox","CKFinder","EasyImage",
+      "RealTimeCollaborativeComments",
+      "RealTimeCollaborativeTrackChanges",
+      "RealTimeCollaborativeRevisionHistory",
+      "Comments","TrackChanges","TrackChangesData",
+      "RevisionHistory","Pagination","WProofreader",
+      "MathType",
+    ],
   }
 }
+
 
 
 # Add Trusted Origins for CSRF protection
