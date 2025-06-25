@@ -4,77 +4,108 @@
   data-note-id="{{ note.id }}" 
   class="bg-white shadow rounded p-4 relative"
 >
-  {# --- Title (if any) --- #}
+  {# === Title (if any) === #}
   {% if note.title %}
     <h2 class="text-lg font-semibold mb-2">{{ note.title }}</h2>
   {% endif %}
 
-  {# --- Author + timestamp --- #}
+  {# === Author + timestamp === #}
   <p class="text-sm text-gray-500 mb-4">
     by {{ note.author.get_full_name }} on {{ note.created_at|date:"F j, Y, H:i" }}
   </p>
 
-  {# --- Rich-text content --- #}
+  {# === Content === #}
   <div class="prose max-w-none mb-4">
     {{ note.content|safe }}
   </div>
 
-  {# --- “Delete” trigger button (opens modal) --- #}
-  <div class="absolute top-2 right-2">
-    <button
-      id="open-delete-{{ note.id }}"
-      type="button"
-      class="btn-danger-sm flex items-center"
-    >
-      <!-- trash icon -->
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           stroke-width="1.5" stroke="currentColor"
-           class="w-5 h-5 mr-1">
-        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z" clip-rule="evenodd" />
-      </svg>
-      Delete
-    </button>
-  </div>
-
-  {# ————————————————————————————————————————————————————————————— #}
-  {# Confirmation modal, hidden by default ————————————————————————————— #}
-  <div
-    id="delete-modal-{{ note.id }}"
-    class="fixed inset-0 z-50 hidden bg-gray-900/50 flex items-center justify-center"
-  >
-    <div class="bg-white rounded-lg p-6 max-w-sm w-full relative">
-      {# Close “X” #}
+  {# === Delete trigger (only the teacher who wrote it) === #}
+  {% if request.user.role == 'teacher' and request.user == note.author %}
+    <div class="absolute top-2 right-2">
       <button
+        id="open-delete-{{ note.id }}"
         type="button"
-        class="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-        data-action="close"
-      >&times;</button>
+        class="btn-danger-sm flex items-center"
+      >
+        <!-- trash icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor"
+             class="w-5 h-5 mr-1">
+          <path stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd"
+                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107
+                   1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084
+                   a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0
+                   -3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1
+                   3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0
+                   -3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0
+                   -7.5 0" clip-rule="evenodd"/>
+        </svg>
+        Delete
+      </button>
+    </div>
 
-      <h3 class="text-lg font-semibold mb-2">Delete Note?</h3>
-      <p class="text-sm text-gray-600 mb-6">
-        Are you sure you want to delete this note? This can’t be undone.
-      </p>
+    {# === Confirmation modal (hidden by default) === #}
+    <div
+      id="delete-modal-{{ note.id }}"
+      class="fixed top-0 left-0 w-screen h-screen z-50 hidden flex items-center justify-center bg-gray-500/75"
+    >
+      <div class="relative w-full max-w-lg mx-4 rounded-lg bg-white p-6 shadow-xl sm:p-8">
 
-      <div class="flex justify-end space-x-3">
-        {# Cancel #}
+        <!-- Close “X” -->
         <button
           type="button"
-          class="btn-cancel-sm"
           data-action="close"
-        >Cancel</button>
-
-        {# Actual HTMX delete #}
-        <button
-          type="button"
-          class="btn-danger-sm"
-          hx-delete="{% url 'delete_resource_note' note.id %}"
-          hx-target="#note-{{ note.id }}"
-          hx-swap="delete"
-          hx-on="htmx:afterRequest: document.getElementById('delete-modal-{{ note.id }}').classList.add('hidden')"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
         >
-          Delete
+          <span class="sr-only">Close</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
+
+        <!-- Header -->
+        <div class="flex items-center">
+          <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71
+                       c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5
+                       -3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+            </svg>
+          </div>
+          <h3 class="ml-4 text-lg font-semibold text-gray-900">Delete Note</h3>
+        </div>
+
+        <!-- Body -->
+        <div class="mt-4">
+          <p class="text-sm text-gray-500">
+            Are you sure you want to delete this note? This action cannot be undone.
+          </p>
+        </div>
+
+        <!-- Actions: Cancel then Delete -->
+        <div class="mt-6 flex justify-end space-x-3">
+          <button
+            type="button"
+            data-action="close"
+            class="btn-cancel"
+          >Cancel</button>
+
+          <button
+            type="button"
+            class="btn-danger"
+            hx-delete="{% url 'delete_resource_note' note.id %}"
+            hx-target="#note-{{ note.id }}"
+            hx-swap="delete"
+            hx-on="htmx:afterRequest: document
+                     .getElementById('delete-modal-{{ note.id }}')
+                     .classList.add('hidden')"
+          >Delete</button>
+        </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 </div>
