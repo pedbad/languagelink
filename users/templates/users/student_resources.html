@@ -59,7 +59,7 @@
 
   {# List existing notes #}
   {% if notes %}
-    <div class="space-y-6">
+    <div class="space-y-6 pb-20">
       {% for note in notes %}
         {% include "users/partials/note_item.html" with note=note %}
       {% endfor %}
@@ -68,6 +68,7 @@
     <p class="text-gray-600">No notes yet.</p>
   {% endif %}
 </div>
+
 
 
 {% endblock %}

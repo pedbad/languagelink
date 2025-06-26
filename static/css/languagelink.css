@@ -1926,10 +1926,6 @@ hr.page-divider {
   right: 0px;
 }
 
-.right-16 {
-  right: 4rem;
-}
-
 .right-2 {
   right: 0.5rem;
 }
@@ -2779,6 +2775,10 @@ hr.page-divider {
   padding-bottom: 4rem;
 }
 
+.pb-20 {
+  padding-bottom: 5rem;
+}
+
 .pl-10 {
   padding-left: 2.5rem;
 }
@@ -3235,6 +3235,15 @@ footer {
   content: var(--tw-content);
   --tw-border-opacity: 1;
   border-color: rgb(212 212 212 / var(--tw-border-opacity));
+}
+
+.odd\:border-l-deep-teal:nth-child(odd) {
+  border-left-color: var(--color-deep-teal);
+}
+
+.odd\:bg-gray-50:nth-child(odd) {
+  --tw-bg-opacity: 1;
+  background-color: rgb(249 250 251 / var(--tw-bg-opacity));
 }
 
 .hover\:cursor-pointer:hover {

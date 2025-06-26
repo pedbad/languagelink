@@ -185,7 +185,7 @@ class ResourceNote(models.Model):
   )
 
   class Meta:
-    ordering = ['-created_at']
+    ordering = ['-updated_at', '-created_at']
     indexes = [
       models.Index(fields=['student_profile', 'created_at']),
     ]
