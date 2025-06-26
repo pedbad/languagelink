@@ -6,16 +6,35 @@
     hx-swap="outerHTML"
   >
     {% csrf_token %}
+
+    {# --- Title field --- #}
+    <div class="mb-4">
+      {{ form.title.label_tag }}
+      {{ form.title }}
+      {% if form.title.errors %}
+        <p class="text-red-600 text-sm">{{ form.title.errors.0 }}</p>
+      {% endif %}
+    </div>
+
+    {# --- Content field (CKEditor widget) --- #}
     <div class="prose max-w-none mb-4">
       {{ form.content }}
+      {% if form.content.errors %}
+        <p class="text-red-600 text-sm">{{ form.content.errors.0 }}</p>
+      {% endif %}
     </div>
+
+    {# --- Actions --- #}
     <div class="flex justify-end space-x-2">
-      <button type="button"
-              class="btn-cancel-sm"
-              hx-get="{% url 'view_resource_note' note.id %}"
-              hx-target="#note-{{ note.id }}"
-              hx-swap="outerHTML"
-      >Cancel</button>
+      <button
+        type="button"
+        class="btn-cancel-sm"
+        hx-get="{% url 'view_resource_note' note.id %}"
+        hx-target="#note-{{ note.id }}"
+        hx-swap="outerHTML"
+      >
+        Cancel
+      </button>
       <button type="submit" class="btn-primary-sm">Save</button>
     </div>
   </form>

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, LanguageCompetency, StudentProfile, TeacherProfile, Questionnaire, ResourceNote
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, TextInput
 from django.forms.widgets import ClearableFileInput
 from django_ckeditor_5.widgets import CKEditor5Widget
 
@@ -138,7 +138,7 @@ class QuestionnaireForm(forms.ModelForm):
 class ResourceNoteForm(forms.ModelForm):
   """
   Form for teachers to leave rich-text notes/resources for a student.
-  Uses CKEditor5Widget on `content` so you can format bold, links, lists, etc.
+  Title gets a Tailwind-styled TextInput; content gets the CKEditor5 widget.
   """
   class Meta:
     model = ResourceNote
@@ -147,7 +147,10 @@ class ResourceNoteForm(forms.ModelForm):
       'content',  # rich-text HTML
     ]
     widgets = {
-      # This widget will include/initialize the CKEditor 5 toolbar for you
+      'title': TextInput(attrs={
+        'class': 'w-full rounded border border-gray-300 p-2',
+        'placeholder': 'Optional headline…',
+      }),
       'content': CKEditor5Widget(config_name='default'),
     }
     labels = {
@@ -158,3 +161,4 @@ class ResourceNoteForm(forms.ModelForm):
       'title':   'A brief title (optional).',
       'content': 'Your formatted notes, links, lists, etc.',
     }
+
