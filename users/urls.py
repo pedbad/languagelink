@@ -18,7 +18,8 @@ from .views import (
   toggle_can_host_online,      # Teacher availability for online meetings
   toggle_advising_status,      # Teacher availability toggle view
   delete_resource_note,        # HTMX endpoint: delete a ResourceNote
-  
+  edit_resource_note,          # HTMX endpoint: edit a ResourceNote
+  view_resource_note,          # HTMX endpoint: view a ResourceNote
 )
 
 # URL patterns for the app
@@ -54,4 +55,6 @@ urlpatterns = [
   
   # HTMX-friendly delete endpoint for a ResourceNote
   path('notes/<int:pk>/delete/', delete_resource_note, name='delete_resource_note'),
+  path('notes/<int:pk>/edit/', edit_resource_note, name='edit_resource_note'),
+  path('notes/<int:pk>/view/', view_resource_note, name='view_resource_note'),
 ]

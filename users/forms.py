@@ -133,8 +133,8 @@ class QuestionnaireForm(forms.ModelForm):
     fields = ['question1', 'question2']  # Add all the fields you want to include in the form
         
 
-# Questionnaire Form
-# This form is used to handle the questionnaire that students fill out.       
+# ResourceNoteForm Form
+# This form is used to handle the Resource Notes that teachers fill out.       
 class ResourceNoteForm(forms.ModelForm):
   """
   Form for teachers to leave rich-text notes/resources for a student.
@@ -155,6 +155,6 @@ class ResourceNoteForm(forms.ModelForm):
       'content': 'Notes & Resource Links',
     }
     help_texts = {
-      'title':   'A brief headline (optional).',
+      'title':   'A brief title (optional).',
       'content': 'Your formatted notes, links, lists, etc.',
     }

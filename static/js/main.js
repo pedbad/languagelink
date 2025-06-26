@@ -693,28 +693,9 @@
       openBookedInfoModal(name, email, date, start, end, avatar, message);
     });
 
-
-    // ————————————————————————————————————————————  
-    // NOTE-DELETE MODAL OPEN/CLOSE LOGIC  
-    // ————————————————————————————————————————————  
-    document.querySelectorAll('[id^="open-delete-"]').forEach(btn => {
-      const id = btn.id.replace('open-delete-', '');
-      const modal = document.getElementById(`delete-modal-${id}`);
-
-      btn.addEventListener('click', () => {
-        modal.classList.remove('hidden');
-      });
-
-      modal.querySelectorAll('[data-action="close"]').forEach(closeBtn => {
-        closeBtn.addEventListener('click', () => {
-          modal.classList.add('hidden');
-        });
-      });
-    });
     
-
     // ────────────────────────────────────────────────────────────────────────────
-    // NEW: AUTO-OPEN external links in notes in a new tab, and only those links
+    // AUTO-OPEN external links in notes in a new tab, and only those links
     // ────────────────────────────────────────────────────────────────────────────
     function fixNoteLinks(container) {
       container.querySelectorAll("a[href^='http']").forEach(a => {
@@ -723,10 +704,34 @@
       });
     }
 
-    // 1) Run once on initial page load:
+
+    // ————————————————————————————————————————————————
+    // NOTE-DELETE MODAL OPEN/CLOSE (delegated)
+    // ————————————————————————————————————————————————
+    document.body.addEventListener('click', (e) => {
+      // 1) “Open” buttons (id="open-delete-<id>")
+      const open = e.target.closest('[id^="open-delete-"]');
+      if (open) {
+        const id = open.id.replace('open-delete-', '');
+        document
+          .getElementById(`delete-modal-${id}`)
+          .classList.remove('hidden');
+        return;
+      }
+
+      // 2) “Close” buttons inside any modal (data-action="close")
+      const close = e.target.closest('[data-action="close"]');
+      if (close) {
+        const modal = close.closest('[id^="delete-modal-"]');
+        if (modal) modal.classList.add('hidden');
+      }
+    });
+
+
+    // Run once on initial page load:
     document.querySelectorAll(".note-content").forEach(fixNoteLinks);
 
-    // 2) Re-run after any HTMX swap (so newly inserted notes get the same treatment):
+    // Re-run after any HTMX swap (so newly inserted notes get the same treatment):
     document.body.addEventListener("htmx:afterSwap", (evt) => {
       let t = evt.detail.target;
       if (t.matches?.(".note-content")) {
@@ -735,11 +740,6 @@
         t.querySelectorAll?.(".note-content").forEach(fixNoteLinks);
       }
     });
-
-
-
-    
-
 
   });
 })();

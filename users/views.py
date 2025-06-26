@@ -392,6 +392,48 @@ def delete_resource_note(request, pk):
   return HttpResponse("")
 
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def edit_resource_note(request, pk):
+  note = get_object_or_404(ResourceNote, pk=pk)
+
+  # only the authoring teacher may edit
+  if request.user != note.author or request.user.role != 'teacher':
+    return HttpResponseForbidden()
+
+  if request.method == "GET":
+    # render a tiny “edit‐in‐place” form fragment
+    form = ResourceNoteForm(instance=note)
+    return render(request, "users/partials/note_edit_form.html", {
+      "note": note,
+      "form": form,
+    })
+
+  # POST: HTMX sent the form-encoded data in request.POST
+  data = request.POST
+  
+  
+  form = ResourceNoteForm(data, instance=note)
+  if form.is_valid():
+    note = form.save()
+    # return the normal read‐only note fragment so HTMX replaces it
+    return render(request, "users/partials/note_item.html", {
+      "note": note,
+    })
+  # on validation failure you could re-render the form (with errors)
+  return HttpResponse(status=400)
+
+
+@login_required
+def view_resource_note(request, pk):
+  """
+  HTMX endpoint: re-render the read-only note fragment
+  so “Cancel” can swap it back in.
+  """
+  note = get_object_or_404(ResourceNote, pk=pk)
+  return render(request, "users/partials/note_item.html", {
+    "note": note,
+  })
 
 
 @login_required

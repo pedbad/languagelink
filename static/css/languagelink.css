@@ -1926,6 +1926,10 @@ hr.page-divider {
   right: 0px;
 }
 
+.right-16 {
+  right: 4rem;
+}
+
 .right-2 {
   right: 0.5rem;
 }

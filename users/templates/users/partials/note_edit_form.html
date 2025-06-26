@@ -1,0 +1,22 @@
+{# users/partials/note_edit_form.html #}
+<div id="note-{{ note.id }}" class="bg-white shadow rounded p-4 relative">
+  <form
+    hx-post="{% url 'edit_resource_note' note.id %}"
+    hx-target="#note-{{ note.id }}"
+    hx-swap="outerHTML"
+  >
+    {% csrf_token %}
+    <div class="prose max-w-none mb-4">
+      {{ form.content }}
+    </div>
+    <div class="flex justify-end space-x-2">
+      <button type="button"
+              class="btn-cancel-sm"
+              hx-get="{% url 'view_resource_note' note.id %}"
+              hx-target="#note-{{ note.id }}"
+              hx-swap="outerHTML"
+      >Cancel</button>
+      <button type="submit" class="btn-primary-sm">Save</button>
+    </div>
+  </form>
+</div>
