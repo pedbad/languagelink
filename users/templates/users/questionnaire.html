@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Student Questionnaire{% endblock %}
 
@@ -8,6 +9,51 @@
     Questionnaire Details for {{ student.first_name }} {{ student.last_name }}
   </h1>
   <hr class="page-divider"> <!-- Divider after Welcome Message -->
+  <!-- 🆕 Display User Info for Admins and Teachers -->
+  <div class="mb-6 flex items-start justify-between text-gray-800 text-base">
+    <!-- Left: Large Avatar with Styled Name Labels and Values -->
+    <div class="flex items-center space-x-4">
+      <!-- Avatar -->
+      <div class="flex-shrink-0">
+        {% if student.studentprofile.profile_picture %}
+          <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}" class="w-16 h-16 rounded-full object-cover">
+        {% else %}
+          <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="w-16 h-16 rounded-full object-cover">
+        {% endif %}
+      </div>
+
+      <!-- Name Info (Stacked with styled labels) -->
+      <div class="flex flex-col leading-tight text-base">
+        <div>
+          <span class="text-gray-500">First Name: </span>
+          <span class="font-semibold text-primary-dark-teal">{{ student.first_name }}</span>
+        </div>
+        <div>
+          <span class="text-gray-500">Last Name: </span>
+          <span class="font-semibold text-primary-dark-teal">{{ student.last_name }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Email aligned with same styling -->
+    <div class="flex items-center space-x-2 text-base text-gray-700">
+      <!-- Enlarged Email Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+          stroke-width="1.5" stroke="currentColor"
+          class="w-10 h-10 text-deep-teal flex-shrink-0">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M16.5 12a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0Zm0 0c0 1.657 1.007 3 
+                2.25 3S21 13.657 21 12a9 9 0 1 0-2.636 6.364M16.5 12V8.25" />
+      </svg>
+      <div>
+        <span class="text-gray-500">Email: </span>
+        <span class="font-semibold text-primary-dark-teal">{{ student.email }}</span>
+      </div>
+    </div>
+  </div>
+
+
+
 
   <div class="bg-white shadow-md rounded-lg p-6">
     {% if is_editing %}
@@ -56,6 +102,11 @@
       </form>
     {% else %}
       <!-- Read-Only Mode -->
+      
+
+
+
+
       {% if questionnaires %}
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Previous Submissions</h2>
         <ul class="divide-y divide-gray-300">
