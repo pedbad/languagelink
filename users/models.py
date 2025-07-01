@@ -119,11 +119,49 @@ Fields include timestamps for creation and updates, and a completion status.
 '''
 
 class Questionnaire(models.Model):
-  student_profile = models.ForeignKey(
+  student_profile = models.ForeignKey (
     StudentProfile,
     on_delete=models.CASCADE,
     related_name="questionnaires"  # Allows querying related questionnaires easily
   )
+  
+  faculty_department = models.CharField (
+    max_length=150,
+    blank=False,
+    null=False,
+    help_text="Enter your faculty or department. If none, type 'External'."
+  )
+  
+  mother_tongue = models.CharField (
+    max_length=100,
+    blank=False,
+    null=False,
+    help_text="Enter your first/native language. If multilingual, list them separated by commas."
+  ) 
+  
+  UNIVERSITY_STATUS_CHOICES = [
+    ('undergrad_first', 'Undergraduate student (1st Year)'),
+    ('undergrad_other', 'Undergraduate student (Other Years)'),
+    ('mphil', 'MPhil student'),
+    ('phd_first', 'PhD student (1st Year)'),
+    ('phd_other', 'PhD student (Other Years)'),
+    ('postdoc', 'Post-doctoral research'),
+    ('academic_staff', 'Academic staff / Lecturer'),
+    ('support_staff', 'Support staff'),
+    ('fee_paying', 'Fee-paying member'),
+    ('academic_visitor', 'Academic visitor'),
+    ('other', 'Other'),
+  ]
+
+  university_status = models.CharField (
+      max_length=50,
+      choices=UNIVERSITY_STATUS_CHOICES,
+      blank=False,
+      null=False,
+      default='other',
+      help_text="Select your current university status."
+  )
+  
   question1 = models.TextField()  # Required field
   question2 = models.TextField()  # Required field
   completed = models.BooleanField(default=False)  # To track if this version was completed
@@ -147,13 +185,13 @@ class ResourceNote(models.Model):
     created_at:   when first saved
     updated_at:   when last edited
   """
-  student_profile = models.ForeignKey(
+  student_profile = models.ForeignKey (
     'StudentProfile',
     on_delete=models.CASCADE,
     related_name='resource_notes',
     help_text="The student who will see this note."
   )
-  author = models.ForeignKey(
+  author = models.ForeignKey (
     settings.AUTH_USER_MODEL,
     on_delete=models.SET_NULL,
     null=True, blank=True,
@@ -161,25 +199,25 @@ class ResourceNote(models.Model):
     help_text="Which teacher/admin wrote this note; null if user deleted."
   )
   # FUTURE: tie note to a specific booking if desired
-  booking = models.ForeignKey(
+  booking = models.ForeignKey (
     'booking.Booking',
     on_delete=models.SET_NULL,
     null=True, blank=True,
     help_text="Optional: associate with a particular meeting."
   )
   # FUTURE: a short headline for easier listing
-  title = models.CharField(
+  title = models.CharField (
     max_length=200, blank=True,
     help_text="Optional summary (e.g. 'Pronunciation tips')."
   )
-  content = models.TextField(
+  content = models.TextField (
     help_text="Rich-text HTML (from CKEditor)."
   )
-  created_at = models.DateTimeField(
+  created_at = models.DateTimeField (
     auto_now_add=True,
     help_text="When this note was first created."
   )
-  updated_at = models.DateTimeField(
+  updated_at = models.DateTimeField (
     auto_now=True,
     help_text="When this note was last modified."
   )
@@ -207,17 +245,17 @@ class ResourceAttachment(models.Model):
     file:        the uploaded file
     uploaded_at: when it was added
   """
-  note = models.ForeignKey(
+  note = models.ForeignKey (
     ResourceNote,
     on_delete=models.CASCADE,
     related_name='attachments',
     help_text="The note this file augments."
   )
-  file = models.FileField(
+  file = models.FileField (
     upload_to='resource_notes/',
     help_text="Attachment to share with the student."
   )
-  uploaded_at = models.DateTimeField(
+  uploaded_at = models.DateTimeField (
     auto_now_add=True,
     help_text="When this file was uploaded."
   )

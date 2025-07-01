@@ -130,7 +130,16 @@ class TeacherProfileForm(forms.ModelForm):
 class QuestionnaireForm(forms.ModelForm):
   class Meta:
     model = Questionnaire
-    fields = ['question1', 'question2']  # Add all the fields you want to include in the form
+    fields = [
+      'faculty_department',
+      'mother_tongue',
+      'university_status',
+      'question1',
+      'question2',
+    ]  
+    widgets = {
+      'university_status': forms.RadioSelect()
+    }
         
 
 # ResourceNoteForm Form
