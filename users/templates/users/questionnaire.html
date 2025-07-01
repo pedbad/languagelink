@@ -5,9 +5,19 @@
 
 {% block content %}
 <div class="container mx-auto mt-10">
-  <h1 class="page-title">
-    Pre-appointment Questionnaire Response for {{ student.first_name }} {{ student.last_name }}
-  </h1>
+  {% if not has_completed_questionnaires %}
+    <h1 class="page-title">
+      Welcome {{ student.first_name }} {{ student.last_name }}.
+    </h1>
+    <p class="text-primary-dark-teal text-lg font-light text-center">
+      Please complete your Pre-appointment Questionnaire.
+    </p>
+  {% else %}
+    <h1 class="page-title">
+      Pre-appointment Questionnaire Response for {{ student.first_name }} {{ student.last_name }}
+    </h1>
+  {% endif %}
+
   <hr class="page-divider"> <!-- Divider after Welcome Message -->
   <!-- 🆕 Display User Info for Admins and Teachers -->
   <div class="bg-white shadow-md rounded-lg p-4 mb-6">
@@ -74,7 +84,6 @@
         <h3 class="text-primary-dark-teal text-lg font-light">
           Faculty / Department
         </h3>
-
         <div class="mb-2">
           <div class="relative">
             <input
@@ -168,12 +177,176 @@
           {% endfor %}
         </fieldset>
 
+        <hr class="page-divider">
 
+        <!-- Mandatory Language Name -->
+        <h3 class="text-primary-dark-teal text-lg font-light">
+          Main Language to Learn or Improve
+        </h3>
+        <div class="mb-2">
+          <div class="relative">
+            <input
+              type="text"
+              name="language_mandatory_name"
+              id="id_language_mandatory_name"
+              value="{{ form.language_mandatory_name.value|default:'' }}"
+              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
+                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
+                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              placeholder="e.g., Spanish"
+              required
+            />
+            <label
+              for="id_language_mandatory_name"
+              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
+                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
+                    peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
+            >
+              Main Language
+            </label>
+          </div>
+          {% if form.language_mandatory_name.help_text %}
+            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+              {{ form.language_mandatory_name.help_text }}
+            </p>
+          {% endif %}
+        </div>
 
+        <hr class="page-divider">
 
+        <!-- Mandatory Language Proficiency -->
+        <fieldset class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white mb-6 rounded-md">
+          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+            Proficiency Level
+          </legend>
+          {% for radio in form.language_mandatory_proficiency %}
+            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+              <input
+                type="radio"
+                name="{{ radio.data.name }}"
+                value="{{ radio.data.value }}"
+                id="{{ radio.id_for_label }}"
+                {% if radio.data.attrs.checked %}checked{% endif %}
+                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+              />
+              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                {{ radio.choice_label }}
+              </span>
+            </label>
+          {% endfor %}
+        </fieldset>
 
+        <hr class="page-divider">
 
+        <!-- Mandatory Language Learning Goals -->
+        <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
+          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+            Learning / Development Goals
+            <br>
+            <span class="text-sm font-medium text-warm-brown">
+              Please select at least one goal.
+            </span>
+          </legend>
+          {% for checkbox in form.language_mandatory_goals %}
+            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+              <input
+                type="checkbox"
+                name="{{ checkbox.data.name }}"
+                value="{{ checkbox.data.value }}"
+                id="{{ checkbox.id_for_label }}"
+                {% if checkbox.data.attrs.checked %}checked{% endif %}
+                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+              />
+              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                {{ checkbox.choice_label }}
+              </span>
+            </label>
+          {% endfor %}
+        </fieldset>
 
+        <hr class="page-divider">
+
+        <!-- Optional Language Name -->
+        <h3 class="text-primary-dark-teal text-lg font-light">
+          Additional Language to Learn or Improve (Optional)
+        </h3>
+        <div class="mb-2">
+          <div class="relative">
+            <input
+              type="text"
+              name="language_optional_name"
+              id="id_language_optional_name"
+              value="{{ form.language_optional_name.value|default:'' }}"
+              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
+                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
+                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              placeholder="e.g., French"
+            />
+            <label
+              for="id_language_optional_name"
+              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
+                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
+                    peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
+            >
+              Additional Language (Optional)
+            </label>
+          </div>
+          {% if form.language_optional_name.help_text %}
+            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+              {{ form.language_optional_name.help_text }}
+            </p>
+          {% endif %}
+        </div>
+
+        <hr class="page-divider">
+
+        <!-- Optional Language Proficiency -->
+        <fieldset class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white mb-6 rounded-md">
+          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+            Proficiency Level (Optional)
+          </legend>
+          {% for radio in form.language_optional_proficiency %}
+            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+              <input
+                type="radio"
+                name="{{ radio.data.name }}"
+                value="{{ radio.data.value }}"
+                id="{{ radio.id_for_label }}"
+                {% if radio.data.attrs.checked %}checked{% endif %}
+                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+              />
+              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                {{ radio.choice_label }}
+              </span>
+            </label>
+          {% endfor %}
+        </fieldset>
+
+        <hr class="page-divider">
+
+        <!-- Optional Language Learning Goals -->
+        <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
+          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+            Learning / Development Goals (Optional)
+          </legend>
+          {% for checkbox in form.language_optional_goals %}
+            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+              <input
+                type="checkbox"
+                name="{{ checkbox.data.name }}"
+                value="{{ checkbox.data.value }}"
+                id="{{ checkbox.id_for_label }}"
+                {% if checkbox.data.attrs.checked %}checked{% endif %}
+                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+              />
+              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                {{ checkbox.choice_label }}
+              </span>
+            </label>
+          {% endfor %}
+        </fieldset>
 
 
 
@@ -218,7 +391,6 @@
       </form>
     {% else %}
       <!-- Read-Only Mode -->
-
       {% if questionnaires %}
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Previous Submissions</h2>
         <ul class="divide-y divide-gray-300">
@@ -240,6 +412,77 @@
                 <strong>University Status:</strong>
                 {{ questionnaire.get_university_status_display|default:"Not provided" }}
               </p>
+
+              <p class="text-gray-800">
+                <strong>Main Language:</strong>
+                {% if questionnaire.language_mandatory_name and questionnaire.language_mandatory_name != "Not specified" %}
+                  {{ questionnaire.language_mandatory_name }}
+                {% else %}
+                  Not provided
+                {% endif %}
+              </p>
+
+              <p class="text-gray-800">
+                <strong>Proficiency Level:</strong>
+                {% if questionnaire.language_mandatory_proficiency %}
+                  {{ questionnaire.get_language_mandatory_proficiency_display }}
+                {% else %}
+                  Not provided
+                {% endif %}
+              </p>
+
+              <p class="text-gray-800">
+                <strong>Learning Goals:</strong>
+                {% if questionnaire.language_mandatory_goals %}
+                  <ul class="list-disc ml-5">
+                    {% for goal in questionnaire.language_mandatory_goals %}
+                      <li>
+                        {% if goal == "personal_interest" %}Personal or general interest{% endif %}
+                        {% if goal == "fieldwork" %}Fieldwork (oral communicative purposes){% endif %}
+                        {% if goal == "academic_reading" %}Academic reading or other scholarship{% endif %}
+                        {% if goal == "study_abroad" %}Preparation for work or study abroad{% endif %}
+                        {% if goal == "other" %}Other{% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  Not provided
+                {% endif %}
+              </p>
+
+              <!-- Optional Language (if provided) -->
+              {% if questionnaire.language_optional_name %}
+                <p class="text-gray-800 mt-4">
+                  <strong>Additional Language:</strong>
+                  {{ questionnaire.language_optional_name }}
+                </p>
+              {% endif %}
+
+              {% if questionnaire.language_optional_proficiency %}
+                <p class="text-gray-800">
+                  <strong>Additional Language Proficiency:</strong>
+                  {{ questionnaire.get_language_optional_proficiency_display }}
+                </p>
+              {% endif %}
+
+              {% if questionnaire.language_optional_goals %}
+                <p class="text-gray-800">
+                  <strong>Additional Language Goals:</strong>
+                  <ul class="list-disc ml-5">
+                    {% for goal in questionnaire.language_optional_goals %}
+                      <li>
+                        {% if goal == "personal_interest" %}Personal or general interest{% endif %}
+                        {% if goal == "fieldwork" %}Fieldwork (oral communicative purposes){% endif %}
+                        {% if goal == "academic_reading" %}Academic reading or other scholarship{% endif %}
+                        {% if goal == "study_abroad" %}Preparation for work or study abroad{% endif %}
+                        {% if goal == "other" %}Other{% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </p>
+              {% endif %}
+
+
 
 
 

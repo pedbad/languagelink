@@ -128,19 +128,65 @@ class TeacherProfileForm(forms.ModelForm):
 # Questionnaire Form
 # This form is used to handle the questionnaire that students fill out.
 class QuestionnaireForm(forms.ModelForm):
+  # Choices for goals
+  LANGUAGE_GOALS_CHOICES = [
+    ('personal_interest', 'Personal or general interest'),
+    ('fieldwork', 'Fieldwork (oral communicative purposes)'),
+    ('academic_reading', 'Academic reading or other scholarship'),
+    ('study_abroad', 'Preparation for work or study abroad'),
+    ('other', 'Other'),
+  ]
+
+  language_mandatory_goals = forms.MultipleChoiceField(
+    choices=LANGUAGE_GOALS_CHOICES,
+    widget=forms.CheckboxSelectMultiple,
+    required=True,
+    initial=['other'],  # pre-select "Other"
+  )
+  
+  language_optional_goals = forms.MultipleChoiceField(
+    choices=LANGUAGE_GOALS_CHOICES,
+    widget=forms.CheckboxSelectMultiple,
+    required=False,
+  )
+
   class Meta:
     model = Questionnaire
     fields = [
       'faculty_department',
       'mother_tongue',
       'university_status',
+      'language_mandatory_name',
+      'language_mandatory_proficiency',
+      'language_mandatory_goals',
+      'language_optional_name',
+      'language_optional_proficiency',
+      'language_optional_goals',
       'question1',
       'question2',
-    ]  
+    ]
     widgets = {
-      'university_status': forms.RadioSelect()
+      'university_status': forms.RadioSelect(),
+      'language_mandatory_proficiency': forms.RadioSelect(),
+      'language_optional_proficiency': forms.RadioSelect(),
     }
-        
+    
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    # Remove the blank choice for proficiency
+    self.fields['language_mandatory_proficiency'].choices = [
+      choice for choice in self.fields['language_mandatory_proficiency'].choices if choice[0] != ''
+    ]
+    self.fields['language_optional_proficiency'].choices = [
+      choice for choice in self.fields['language_optional_proficiency'].choices if choice[0] != ''
+    ]
+
+  def clean_language_mandatory_goals(self):
+    data = self.cleaned_data.get("language_mandatory_goals")
+    if not data:
+      raise forms.ValidationError("Please select at least one learning goal.")
+    return data
+ 
 
 # ResourceNoteForm Form
 # This form is used to handle the Resource Notes that teachers fill out.       

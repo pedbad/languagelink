@@ -162,6 +162,55 @@ class Questionnaire(models.Model):
       help_text="Select your current university status."
   )
   
+  # Choices for proficiency
+  LANGUAGE_PROFICIENCY_CHOICES = [
+    ('beginner', 'Beginner'),
+    ('intermediate', 'Intermediate'),
+    ('advanced', 'Advanced'),
+  ]
+
+  language_mandatory_name = models.CharField (
+    max_length=100,
+    blank=False,
+    null=False,
+    help_text="Specify the main language you wish to learn or improve."
+  )
+
+  language_mandatory_proficiency = models.CharField (
+    max_length=20,
+    choices=LANGUAGE_PROFICIENCY_CHOICES,
+    blank=False,
+    null=False,
+  )
+
+  language_mandatory_goals = models.JSONField (
+    blank=False,
+    null=False,
+    help_text="List of learning/development goals selected for this language."
+  )
+  
+  language_optional_name = models.CharField (
+    max_length=100,
+    blank=True,
+    null=True,
+    help_text="Specify an additional language you wish to learn or improve (optional)."
+  )
+
+  language_optional_proficiency = models.CharField (
+    max_length=20,
+    choices=LANGUAGE_PROFICIENCY_CHOICES,
+    blank=True,
+    null=True,
+  )
+
+  language_optional_goals = models.JSONField (
+    blank=True,
+    null=True,
+    help_text="List of learning/development goals selected for this additional language."
+  )
+
+
+  
   question1 = models.TextField()  # Required field
   question2 = models.TextField()  # Required field
   completed = models.BooleanField(default=False)  # To track if this version was completed
