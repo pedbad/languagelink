@@ -224,19 +224,26 @@ class Questionnaire(models.Model):
   )
 
   hours_per_week = models.CharField(
-    max_length=100,
+    max_length=300,
     blank=False,
     null=False,
     help_text="Roughly how many hours per week will you devote to language learning?"
   )
 
+  other_languages_studied = models.TextField(
+    max_length=1000,
+    blank=True,
+    null=True,
+    help_text="List any other languages you have previously studied (optional)."
+  )
 
+  additional_comments = models.TextField(
+    max_length=2000,
+    blank=True,
+    null=True,
+    help_text="Any final comments you’d like to share with us (optional)."
+  )
 
-
-
-  
-  question1 = models.TextField()  # Required field
-  question2 = models.TextField()  # Required field
   completed = models.BooleanField(default=False)  # To track if this version was completed
   created_at = models.DateTimeField(auto_now_add=True)  # Timestamp for when the questionnaire was created
   last_updated = models.DateTimeField(auto_now=True)  # Timestamp for when the questionnaire was last updated

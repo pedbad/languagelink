@@ -165,8 +165,8 @@ class QuestionnaireForm(forms.ModelForm):
       'aspects_to_improve',
       'activities_you_can_manage',
       'hours_per_week',
-      'question1',
-      'question2',
+      'other_languages_studied',
+      'additional_comments',
     ]
     widgets = {
       'university_status': forms.RadioSelect(),
@@ -190,6 +190,13 @@ class QuestionnaireForm(forms.ModelForm):
     if not data:
       raise forms.ValidationError("Please select at least one learning goal.")
     return data
+  
+  def clean_other_languages_studied(self):
+    data = self.cleaned_data.get('other_languages_studied')
+    if not data or data.strip() == '':
+      return "Not specified"
+    return data
+
  
 
 # ResourceNoteForm Form

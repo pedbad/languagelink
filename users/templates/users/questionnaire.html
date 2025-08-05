@@ -156,9 +156,10 @@
           <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
             University Status
             <br>
-            <span class="text-sm font-medium text-warm-brown">Please select the option that best drscribes your university status</span>
+            <span class="text-sm font-medium text-warm-brown">
+              Please select the option that best drscribes your university status
+            </span>
           </legend>
-
 
           {% for radio in form.university_status %}
             <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
@@ -390,8 +391,7 @@
           {% endif %}
         </div>
 
-
-        <!-- Activities You Can Manage -->        
+        <!-- Mandatory Activities You Can Manage -->        
         <div class="mb-6">
           <h3 class="text-primary-dark-teal text-lg font-light">
             Activities You Can Manage
@@ -431,8 +431,7 @@
           {% endif %}
         </div>
 
-
-        <!-- Hours Per Week -->
+        <!-- Mandatory Hours Per Week -->
         <div class="mb-6">
           <h3 class="text-primary-dark-teal text-lg font-light">
             Time Available Per Week
@@ -471,35 +470,86 @@
           {% endif %}
         </div>
 
-
-
-
-
-
-
-
-        
-        <!-- Question 1 -->
-        <div class="relative mb-6">
-          <input type="text" name="question1" id="id_question1" value="{{ form.question1.value|default:'' }}"
-            class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-            placeholder="Question 1" required />
-          <label for="id_question1"
-            class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
-            Question 1
-          </label>
+        <!-- Optional Other Languages You Have Studied -->
+        <div class="form-field">
+          <h3 class="text-primary-dark-teal text-lg font-light mb-2">
+            Other Languages You Have Studied
+          </h3>
+          <div class="relative">
+            <textarea
+              name="other_languages_studied"
+              id="id_other_languages_studied"
+              rows="1"
+              placeholder="E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…"
+              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
+                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
+                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              required
+            >{{ form.other_languages_studied.value|default_if_none:'' }}</textarea>
+            <label
+              for="id_other_languages_studied"
+              class="form-label
+                    peer-focus:-translate-y-[1.15rem]
+                    peer-focus:scale-[0.8]
+                    peer-valid:-translate-y-[1.15rem]
+                    peer-valid:scale-[0.8]"
+            >
+              E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…
+            </label>
+          </div>
+          {% if form.other_languages_studied.help_text %}
+            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+              {{ form.other_languages_studied.help_text }}
+            </p>
+          {% endif %}
+          {% if form.other_languages_studied.errors %}
+            <p class="text-sm text-red-600">
+              {{ form.other_languages_studied.errors }}
+            </p>
+          {% endif %}
         </div>
 
-        <!-- Question 2 -->
-        <div class="relative mb-6">
-          <input type="text" name="question2" id="id_question2" value="{{ form.question2.value|default:'' }}"
-            class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-            placeholder="Question 2" required />
-          <label for="id_question2"
-            class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8] peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8] dark:text-neutral-400 dark:peer-focus:text-primary">
-            Question 2
-          </label>
+        <!-- Additional Comments -->
+        <div class="form-field">
+          <h3 class="text-primary-dark-teal text-lg font-light mb-2">
+            Additional Comments
+          </h3>
+          <div class="relative">
+            <textarea
+              name="additional_comments"
+              id="id_additional_comments"
+              rows="3"
+              placeholder="E.g. anything else you’d like us to know about your learning needs or preferences…"
+              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
+                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
+                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              required
+            >{{ form.additional_comments.value|default_if_none:'' }}</textarea>
+            <label
+              for="id_additional_comments"
+              class="form-label
+                    peer-focus:-translate-y-[1.15rem]
+                    peer-focus:scale-[0.8]
+                    peer-valid:-translate-y-[1.15rem]
+                    peer-valid:scale-[0.8]"
+            >
+              E.g. anything else you’d like us to know about your learning needs or preferences
+            </label>
+          </div>
+          {% if form.additional_comments.help_text %}
+            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+              {{ form.additional_comments.help_text }}
+            </p>
+          {% endif %}
+          {% if form.additional_comments.errors %}
+            <p class="text-sm text-red-600">
+              {{ form.additional_comments.errors }}
+            </p>
+          {% endif %}
         </div>
+
+        <hr class="page-divider">
+
 
         <!-- Save Changes Button -->
         <div class="flex justify-end space-x-4">
@@ -610,8 +660,35 @@
                 </p>
               {% endif %}
 
-              <p class="text-gray-800"><strong>Question 1:</strong> {{ questionnaire.question1|default:"Not provided" }}</p>
-              <p class="text-gray-800"><strong>Question 2:</strong> {{ questionnaire.question2|default:"Not provided" }}</p>
+              <!-- Aspects to Improve -->
+              <p class="text-gray-800">
+                <strong>Aspects to Improve:</strong>
+                {{ questionnaire.aspects_to_improve|default:"Not provided" }}
+              </p>
+
+              <!-- Activities You Can Manage -->
+              <p class="text-gray-800">
+                <strong>Activities You Can Manage:</strong>
+                {{ questionnaire.activities_you_can_manage|default:"Not provided" }}
+              </p>
+
+              <!-- Time Available Per Week -->
+              <p class="text-gray-800">
+                <strong>Time Available Per Week:</strong>
+                {{ questionnaire.hours_per_week|default:"Not provided" }}
+              </p>
+
+              <!-- Other Languages You Have Studied -->
+              <p class="text-gray-800">
+                <strong>Other Languages You Have Studied:</strong>
+                {{ questionnaire.other_languages_studied|default:"Not provided" }}
+              </p>
+
+              <!-- Additional Comments -->
+              <p class="text-gray-800">
+                <strong>Additional Comments:</strong>
+                {{ questionnaire.additional_comments|default:"Not provided" }}
+              </p>
             </li>
           {% endfor %}
         </ul>
