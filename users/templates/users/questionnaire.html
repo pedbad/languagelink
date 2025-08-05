@@ -348,6 +348,52 @@
           {% endfor %}
         </fieldset>
 
+        <hr class="page-divider">
+        
+        <!-- Mandatory Aspects to Improve -->
+        
+        <div class="mb-6">
+          <h3 class="text-primary-dark-teal text-lg font-light">
+          Aspects to Improve
+        </h3>
+          <div class="relative">
+            <textarea
+              name="aspects_to_improve"
+              id="id_aspects_to_improve"
+              maxlength="2000"
+              rows="3"
+              placeholder="E.g. speaking, pronunciation, listening, grammar…"
+              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
+                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
+                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              required
+            >{{ form.aspects_to_improve.value|default_if_none:'' }}</textarea>
+
+            <label
+              for="id_aspects_to_improve"
+              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
+                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
+                    peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
+            >
+              E.g. conversation skills, pronunciation, listening comprehension, grammar, writing
+            </label>
+          </div>
+
+          {% if form.aspects_to_improve.help_text %}
+            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+              {{ form.aspects_to_improve.help_text }}
+            </p>
+          {% endif %}
+
+          {% if form.aspects_to_improve.errors %}
+            <p class="text-sm text-red-600">{{ form.aspects_to_improve.errors }}</p>
+          {% endif %}
+        </div>
+
+
+
+
 
 
         
@@ -481,13 +527,6 @@
                   </ul>
                 </p>
               {% endif %}
-
-
-
-
-
-
-
 
               <p class="text-gray-800"><strong>Question 1:</strong> {{ questionnaire.question1|default:"Not provided" }}</p>
               <p class="text-gray-800"><strong>Question 2:</strong> {{ questionnaire.question2|default:"Not provided" }}</p>

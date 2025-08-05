@@ -162,6 +162,7 @@ class QuestionnaireForm(forms.ModelForm):
       'language_optional_name',
       'language_optional_proficiency',
       'language_optional_goals',
+      'aspects_to_improve',
       'question1',
       'question2',
     ]
@@ -170,6 +171,7 @@ class QuestionnaireForm(forms.ModelForm):
       'language_mandatory_proficiency': forms.RadioSelect(),
       'language_optional_proficiency': forms.RadioSelect(),
     }
+
     
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)

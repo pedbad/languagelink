@@ -209,6 +209,14 @@ class Questionnaire(models.Model):
     help_text="List of learning/development goals selected for this additional language."
   )
 
+  aspects_to_improve = models.TextField (
+    max_length=2000,
+    blank=False,
+    null=False,
+    help_text="What specific aspects of the language(s) would you like to learn or improve?"
+  )
+
+
 
   
   question1 = models.TextField()  # Required field
