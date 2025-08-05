@@ -164,6 +164,7 @@ class QuestionnaireForm(forms.ModelForm):
       'language_optional_goals',
       'aspects_to_improve',
       'activities_you_can_manage',
+      'hours_per_week',
       'question1',
       'question2',
     ]

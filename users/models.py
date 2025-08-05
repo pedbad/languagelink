@@ -223,6 +223,14 @@ class Questionnaire(models.Model):
     help_text="List the activities you can manage in the language(s) (if applicable)"
   )
 
+  hours_per_week = models.CharField(
+    max_length=100,
+    blank=False,
+    null=False,
+    help_text="Roughly how many hours per week will you devote to language learning?"
+  )
+
+
 
 
 
