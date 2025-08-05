@@ -163,6 +163,7 @@ class QuestionnaireForm(forms.ModelForm):
       'language_optional_proficiency',
       'language_optional_goals',
       'aspects_to_improve',
+      'activities_you_can_manage',
       'question1',
       'question2',
     ]
