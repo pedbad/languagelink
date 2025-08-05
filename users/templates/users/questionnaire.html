@@ -81,132 +81,133 @@
       <form method="POST" class="space-y-6">
         {% csrf_token %}
         <!-- Faculty / Department -->
-        <h3 class="text-primary-dark-teal text-lg font-light">
-          Faculty / Department
-        </h3>
-        <div class="mb-2">
+        <div class="form-field">
+          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+            Faculty / Department
+          </h3>
+
           <div class="relative">
             <input
               type="text"
               name="faculty_department"
               id="id_faculty_department"
               value="{{ form.faculty_department.value|default:'' }}"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               placeholder="Faculty or Department"
               required
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
             />
+
             <label
               for="id_faculty_department"
-              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
-                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
-                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
+              class="form-label left-3 top-3 peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
                     peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
             >
               Faculty / Department
             </label>
           </div>
+
           {% if form.faculty_department.help_text %}
             <p class="mt-0.5 text-sm font-medium text-warm-brown">
               {{ form.faculty_department.help_text }}
             </p>
           {% endif %}
-        </div>
+        </div><!-- eof form-field -->
+        
         <hr class="page-divider">
 
         <!-- Mother Tongue -->
-        <h3 class="text-primary-dark-teal text-lg font-light">
-          Mother Tongue
-        </h3>
-        <div class="mb-2">
+        <div class="form-field">
+          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+            Mother Tongue
+          </h3>
+
           <div class="relative">
             <input
               type="text"
               name="mother_tongue"
               id="id_mother_tongue"
               value="{{ form.mother_tongue.value|default:'' }}"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-              placeholder="e.g., English, Spanish, Mandarin"
+              placeholder="Mother Tongue"
               required
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
             />
+
             <label
               for="id_mother_tongue"
-              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
-                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+              class="form-label left-3 top-3
                     peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
                     peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
             >
               Mother Tongue
             </label>
           </div>
+
           {% if form.mother_tongue.help_text %}
             <p class="mt-0.5 text-sm font-medium text-warm-brown">
               {{ form.mother_tongue.help_text }}
             </p>
           {% endif %}
-        </div>
+        </div><!-- eof form-field -->
 
         <hr class="page-divider">
 
         <!-- University Status -->
-        <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
-          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
-            University Status
-            <br>
-            <span class="text-sm font-medium text-warm-brown">
-              Please select the option that best drscribes your university status
-            </span>
-          </legend>
-
-          {% for radio in form.university_status %}
-            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <input
-                type="radio"
-                name="{{ radio.data.name }}"
-                value="{{ radio.data.value }}"
-                id="{{ radio.id_for_label }}"
-                {% if radio.data.attrs.checked %}checked{% endif %}
-                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
-              />
-              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
-                {{ radio.choice_label }}
+        <div class="form-field">
+          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
+            <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+              University Status
+              <span class="block mt-1 text-sm font-medium text-warm-brown">
+                Please select the option that best describes your university status
               </span>
-            </label>
-          {% endfor %}
-        </fieldset>
+            </legend>
+
+            {% for radio in form.university_status %}
+              <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                <input
+                  type="radio"
+                  name="{{ radio.data.name }}"
+                  value="{{ radio.data.value }}"
+                  id="{{ radio.id_for_label }}"
+                  {% if radio.data.attrs.checked %}checked{% endif %}
+                  class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+                />
+                <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                  {{ radio.choice_label }}
+                </span>
+              </label>
+            {% endfor %}
+          </fieldset>
+        </div><!-- eof form-field -->
 
         <hr class="page-divider">
 
-        <!-- Mandatory Language Name -->
-        <h3 class="text-primary-dark-teal text-lg font-light">
-          Main Language to Learn or Improve
-        </h3>
-        <div class="mb-2">
+        <!-- Mandatory Main Language to Learn or Improve -->
+        <div class="form-field">
+          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+            Main Language to Learn or Improve
+          </h3>
+
           <div class="relative">
             <input
               type="text"
               name="language_mandatory_name"
               id="id_language_mandatory_name"
               value="{{ form.language_mandatory_name.value|default:'' }}"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               placeholder="e.g., Spanish"
               required
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
             />
+
             <label
               for="id_language_mandatory_name"
-              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
-                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+              class="form-label left-3 top-3
                     peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
                     peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
             >
-              Main Language
+              Main Language to Learn or Improve
             </label>
           </div>
+
           {% if form.language_mandatory_name.help_text %}
             <p class="mt-0.5 text-sm font-medium text-warm-brown">
               {{ form.language_mandatory_name.help_text }}
@@ -240,60 +241,64 @@
 
         <hr class="page-divider">
 
-        <!-- Mandatory Language Learning Goals -->
-        <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
-          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
-            Learning / Development Goals
-            <br>
-            <span class="text-sm font-medium text-warm-brown">
-              Please select at least one goal.
-            </span>
-          </legend>
-          {% for checkbox in form.language_mandatory_goals %}
-            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <input
-                type="checkbox"
-                name="{{ checkbox.data.name }}"
-                value="{{ checkbox.data.value }}"
-                id="{{ checkbox.id_for_label }}"
-                {% if checkbox.data.attrs.checked %}checked{% endif %}
-                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
-              />
-              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
-                {{ checkbox.choice_label }}
+        <!-- Mandatory Language Learning / Development Goals -->
+        <div class="form-field">
+          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white rounded-md">
+            <legend class="text-primary-dark-teal text-lg font-light mb-4">
+              Learning / Development Goals
+              <span class="block mt-1 text-sm font-medium text-warm-brown">
+                Please select at least one goal.
               </span>
-            </label>
-          {% endfor %}
-        </fieldset>
+            </legend>
+
+            {% for checkbox in form.language_mandatory_goals %}
+              <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  name="{{ checkbox.data.name }}"
+                  value="{{ checkbox.data.value }}"
+                  id="{{ checkbox.id_for_label }}"
+                  {% if checkbox.data.attrs.checked %}checked{% endif %}
+                  class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+                />
+                <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                  {{ checkbox.choice_label }}
+                </span>
+              </label>
+            {% endfor %}
+
+          </fieldset>
+        </div>
 
         <hr class="page-divider">
 
-        <!-- Optional Language Name -->
-        <h3 class="text-primary-dark-teal text-lg font-light">
-          Additional Language to Learn or Improve (Optional)
-        </h3>
-        <div class="mb-2">
+        <!-- Optional Additional Language to Learn or Improve -->
+        <div class="form-field">
+          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+            Additional Language to Learn or Improve (Optional)
+          </h3>
+
           <div class="relative">
             <input
               type="text"
               name="language_optional_name"
               id="id_language_optional_name"
               value="{{ form.language_optional_name.value|default:'' }}"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-              placeholder="e.g., French"
+              placeholder="Additional Language (Optional)"
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              required
             />
+
             <label
               for="id_language_optional_name"
-              class="pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
-                    pt-[0.37rem] leading-[2.15] text-neutral-500 transition-all duration-200 ease-out
+              class="form-label
                     peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
                     peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
             >
               Additional Language (Optional)
             </label>
           </div>
+
           {% if form.language_optional_name.help_text %}
             <p class="mt-0.5 text-sm font-medium text-warm-brown">
               {{ form.language_optional_name.help_text }}
@@ -331,6 +336,9 @@
         <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
           <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
             Learning / Development Goals (Optional)
+            <span class="block mt-1 text-sm font-medium text-warm-brown">
+              You may select one or more goals.
+            </span>
           </legend>
           {% for checkbox in form.language_optional_goals %}
             <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
@@ -363,9 +371,7 @@
               maxlength="2000"
               rows="3"
               placeholder="E.g. speaking, pronunciation, listening, grammar…"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               required
             >{{ form.aspects_to_improve.value|default_if_none:'' }}</textarea>
 
@@ -403,9 +409,7 @@
               maxlength="2000"
               rows="3"
               placeholder="E.g. reading newspapers, watching films without subtitles, giving presentations…"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               required
             >{{ form.activities_you_can_manage.value|default_if_none:'' }}</textarea>
 
@@ -443,9 +447,7 @@
               id="id_hours_per_week"
               value="{{ form.hours_per_week.value|default_if_none:'' }}"
               placeholder="E.g. 2–3 hours, evenings only, varies weekly…"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               required
             />
             <label
@@ -481,9 +483,7 @@
               id="id_other_languages_studied"
               rows="1"
               placeholder="E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               required
             >{{ form.other_languages_studied.value|default_if_none:'' }}</textarea>
             <label
@@ -520,9 +520,7 @@
               id="id_additional_comments"
               rows="3"
               placeholder="E.g. anything else you’d like us to know about your learning needs or preferences…"
-              class="peer block min-h-[auto] w-full rounded border border-gray-300 bg-white px-3 py-[0.32rem]
-                    leading-[2.15] outline-none transition-all duration-200 ease-linear placeholder-transparent
-                    peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
+              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
               required
             >{{ form.additional_comments.value|default_if_none:'' }}</textarea>
             <label
