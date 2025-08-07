@@ -99,13 +99,6 @@ module.exports = {
               peer-valid:border-primary-dark-teal`
           ]: {},
         },
-        // shared floating-label styles (no peer-variants here!)
-        '.form-label': {
-          [
-            `@apply pointer-events-none absolute left-3 top-0 mb-0 origin-[0_0] truncate
-             pt-[0.37rem] leading-[2.15] text-neutral-500`
-          ]: {},
-        },
       })
     },
 
