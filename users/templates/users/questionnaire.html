@@ -272,6 +272,7 @@
 
         <hr class="page-divider">
 
+
         <!-- Optional Additional Language to Learn or Improve -->
         <div class="form-field">
           <h3 class="text-primary-dark-teal text-lg font-light mb-1">
@@ -279,21 +280,24 @@
           </h3>
 
           <div class="relative">
+            <!-- the only placeholder is a single space, hidden by `placeholder-transparent` -->
             <input
               type="text"
               name="language_optional_name"
               id="id_language_optional_name"
               value="{{ form.language_optional_name.value|default:'' }}"
-              placeholder="Additional Language (Optional)"
-              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-              required
+              placeholder=" "
+              class="form-control peer
+                    placeholder-transparent
+                    peer-placeholder-shown:top-3 peer-placeholder-shown:left-3 peer-placeholder-shown:scale-100
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]"
             />
 
             <label
               for="id_language_optional_name"
               class="form-label
-                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]
-                    peer-valid:-translate-y-[1.15rem] peer-valid:scale-[0.8]"
+                    peer-placeholder-shown:top-3 peer-placeholder-shown:left-3 peer-placeholder-shown:scale-100
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]"
             >
               Additional Language (Optional)
             </label>
@@ -307,6 +311,7 @@
         </div>
 
         <hr class="page-divider">
+
 
         <!-- Optional Language Proficiency -->
         <fieldset class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white mb-6 rounded-md">
@@ -482,17 +487,17 @@
               name="other_languages_studied"
               id="id_other_languages_studied"
               rows="1"
-              placeholder="E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…"
-              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-              required
+              placeholder=" "
+              class="form-control peer
+                    placeholder-transparent
+                    peer-placeholder-shown:top-3 peer-placeholder-shown:left-3 peer-placeholder-shown:scale-100
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]"
             >{{ form.other_languages_studied.value|default_if_none:'' }}</textarea>
             <label
               for="id_other_languages_studied"
               class="form-label
-                    peer-focus:-translate-y-[1.15rem]
-                    peer-focus:scale-[0.8]
-                    peer-valid:-translate-y-[1.15rem]
-                    peer-valid:scale-[0.8]"
+                    peer-placeholder-shown:top-3 peer-placeholder-shown:left-3 peer-placeholder-shown:scale-100
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]"
             >
               E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…
             </label>
@@ -502,14 +507,9 @@
               {{ form.other_languages_studied.help_text }}
             </p>
           {% endif %}
-          {% if form.other_languages_studied.errors %}
-            <p class="text-sm text-red-600">
-              {{ form.other_languages_studied.errors }}
-            </p>
-          {% endif %}
         </div>
 
-        <!-- Additional Comments -->
+        <!-- Optional Additional Comments -->
         <div class="form-field">
           <h3 class="text-primary-dark-teal text-lg font-light mb-2">
             Additional Comments
@@ -519,19 +519,19 @@
               name="additional_comments"
               id="id_additional_comments"
               rows="3"
-              placeholder="E.g. anything else you’d like us to know about your learning needs or preferences…"
-              class="form-control peer peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal peer-valid:border-primary-dark-teal"
-              required
+              placeholder=" "
+              class="form-control peer
+                    placeholder-transparent
+                    peer-placeholder-shown:top-3 peer-placeholder-shown:left-3 peer-placeholder-shown:scale-100
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]"
             >{{ form.additional_comments.value|default_if_none:'' }}</textarea>
             <label
               for="id_additional_comments"
               class="form-label
-                    peer-focus:-translate-y-[1.15rem]
-                    peer-focus:scale-[0.8]
-                    peer-valid:-translate-y-[1.15rem]
-                    peer-valid:scale-[0.8]"
+                    peer-placeholder-shown:top-3 peer-placeholder-shown:left-3 peer-placeholder-shown:scale-100
+                    peer-focus:-translate-y-[1.15rem] peer-focus:scale-[0.8]"
             >
-              E.g. anything else you’d like us to know about your learning needs or preferences
+              E.g. anything else you’d like us to know about your learning needs or preferences…
             </label>
           </div>
           {% if form.additional_comments.help_text %}
@@ -539,15 +539,9 @@
               {{ form.additional_comments.help_text }}
             </p>
           {% endif %}
-          {% if form.additional_comments.errors %}
-            <p class="text-sm text-red-600">
-              {{ form.additional_comments.errors }}
-            </p>
-          {% endif %}
         </div>
 
         <hr class="page-divider">
-
 
         <!-- Save Changes Button -->
         <div class="flex justify-end space-x-4">
