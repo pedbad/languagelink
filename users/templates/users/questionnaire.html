@@ -80,13 +80,13 @@
 
       <form method="POST" class="space-y-6">
         {% csrf_token %}
-        <!-- Faculty / Department -->
+        <!-- Mandatory Faculty / Department -->
         <div class="form-field">
-          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+          <h3 class="form-heading">
             Faculty / Department
           </h3>
 
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_faculty_department" class="sr-only">
               Faculty / Department
@@ -100,24 +100,35 @@
               placeholder="Faculty or Department"
               required
               class="form-control"
+              aria-describedby="id_faculty_department_help{% if form.faculty_department.errors %} id_faculty_department_error{% endif %}"
             />
           </div>
 
           {% if form.faculty_department.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_faculty_department_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.faculty_department.help_text }}
             </p>
           {% endif %}
-        </div><!-- eof form-field -->
-        
-        <hr class="page-divider">
 
-        <!-- Mother Tongue -->
+          {% if form.faculty_department.errors %}
+            <p
+              id="id_faculty_department_error"
+              class="text-sm text-red-600"
+            >
+              {{ form.faculty_department.errors }}
+            </p>
+          {% endif %}
+        </div><!-- eof form-field -->
+
+        <!-- Mandatory Mother Tongue -->
         <div class="form-field">
-          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+          <h3 class="form-heading">
             Mother Tongue
           </h3>
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_mother_tongue" class="sr-only">
               Mother Tongue
@@ -130,17 +141,28 @@
               placeholder="Mother Tongue"
               required
               class="form-control"
+              aria-describedby="id_mother_tongue_help{% if form.mother_tongue.errors %} id_mother_tongue_error{% endif %}"
             />
           </div>
 
           {% if form.mother_tongue.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_mother_tongue_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.mother_tongue.help_text }}
             </p>
           {% endif %}
-        </div><!-- eof form-field -->
 
-        <hr class="page-divider">
+          {% if form.mother_tongue.errors %}
+            <p
+              id="id_mother_tongue_error"
+              class="text-sm text-red-600"
+            >
+              {{ form.mother_tongue.errors }}
+            </p>
+          {% endif %}
+        </div><!-- eof form-field -->
 
         <!-- University Status -->
         <div class="form-field">
@@ -170,15 +192,13 @@
           </fieldset>
         </div><!-- eof form-field -->
 
-        <hr class="page-divider">
-
         <!-- Mandatory Main Language to Learn or Improve -->
         <div class="form-field">
-          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+          <h3 class="form-heading">
             Main Language to Learn or Improve
           </h3>
 
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_language_mandatory_name" class="sr-only">
               Main Language to Learn or Improve
@@ -191,17 +211,28 @@
               placeholder="e.g., Spanish"
               required
               class="form-control"
+              aria-describedby="id_language_mandatory_name_help{% if form.language_mandatory_name.errors %} id_language_mandatory_name_error{% endif %}"
             />
           </div>
 
           {% if form.language_mandatory_name.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_language_mandatory_name_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.language_mandatory_name.help_text }}
             </p>
           {% endif %}
-        </div>
 
-        <hr class="page-divider">
+          {% if form.language_mandatory_name.errors %}
+            <p
+              id="id_language_mandatory_name_error"
+              class="text-sm text-red-600"
+            >
+              {{ form.language_mandatory_name.errors }}
+            </p>
+          {% endif %}
+        </div><!-- eof form-field -->
 
         <!-- Mandatory Language Proficiency -->
         <fieldset class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white mb-6 rounded-md">
@@ -225,14 +256,18 @@
           {% endfor %}
         </fieldset>
 
-        <hr class="page-divider">
-
         <!-- Mandatory Language Learning / Development Goals -->
         <div class="form-field">
-          <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white rounded-md">
+          <fieldset
+            aria-describedby="id_language_mandatory_goals_help{% if form.language_mandatory_goals.errors %} id_language_mandatory_goals_error{% endif %}"
+            class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white rounded-md"
+          >
             <legend class="text-primary-dark-teal text-lg font-light mb-4">
               Learning / Development Goals
-              <span class="block mt-1 text-sm font-medium text-warm-brown">
+              <span
+                id="id_language_mandatory_goals_help"
+                class="block mt-1 text-sm font-medium text-warm-brown"
+              >
                 Please select at least one goal.
               </span>
             </legend>
@@ -252,20 +287,25 @@
                 </span>
               </label>
             {% endfor %}
-
           </fieldset>
-        </div>
 
-        <hr class="page-divider">
-
+          {% if form.language_mandatory_goals.errors %}
+            <p
+              id="id_language_mandatory_goals_error"
+              class="mt-0.5 text-sm text-red-600"
+            >
+              {{ form.language_mandatory_goals.errors }}
+            </p>
+          {% endif %}
+        </div><!-- eof form-field -->
 
         <!-- Optional Additional Language to Learn or Improve -->
         <div class="form-field">
-          <h3 class="text-primary-dark-teal text-lg font-light mb-1">
+          <h3 class="form-heading">
             Additional Language to Learn or Improve (Optional)
           </h3>
 
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_language_optional_name" class="sr-only">
               Additional Language to Learn or Improve (Optional)
@@ -277,18 +317,28 @@
               value="{{ form.language_optional_name.value|default:'' }}"
               placeholder="Additional Language (Optional)"
               class="form-control"
+              aria-describedby="{% if form.language_optional_name.help_text %}id_language_optional_name_help{% endif %}{% if form.language_optional_name.errors %} id_language_optional_name_error{% endif %}"
             />
           </div>
 
           {% if form.language_optional_name.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_language_optional_name_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.language_optional_name.help_text }}
             </p>
           {% endif %}
-        </div>
 
-        <hr class="page-divider">
-
+          {% if form.language_optional_name.errors %}
+            <p
+              id="id_language_optional_name_error"
+              class="mt-0.5 text-sm text-red-600"
+            >
+              {{ form.language_optional_name.errors }}
+            </p>
+          {% endif %}
+        </div><!-- eof form-field -->
 
         <!-- Optional Language Proficiency -->
         <fieldset class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white mb-6 rounded-md">
@@ -312,41 +362,67 @@
           {% endfor %}
         </fieldset>
 
-        <hr class="page-divider">
-
         <!-- Optional Language Learning Goals -->
-        <fieldset class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md">
-          <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
-            Learning / Development Goals (Optional)
-            <span class="block mt-1 text-sm font-medium text-warm-brown">
-              You may select one or more goals.
-            </span>
-          </legend>
-          {% for checkbox in form.language_optional_goals %}
-            <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
-              <input
-                type="checkbox"
-                name="{{ checkbox.data.name }}"
-                value="{{ checkbox.data.value }}"
-                id="{{ checkbox.id_for_label }}"
-                {% if checkbox.data.attrs.checked %}checked{% endif %}
-                class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
-              />
-              <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
-                {{ checkbox.choice_label }}
+        <div class="form-field">
+          <fieldset
+            id="id_language_optional_goals"
+            class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md"
+            {% if form.language_optional_goals.help_text or form.language_optional_goals.errors %}
+              aria-describedby="
+                {% if form.language_optional_goals.help_text %}id_language_optional_goals_help{% endif %}
+                {% if form.language_optional_goals.errors %} id_language_optional_goals_error{% endif %}
+              "
+            {% endif %}
+          >
+            <legend class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+              Learning / Development Goals (Optional)
+              <span class="block mt-1 text-sm font-medium text-warm-brown">
+                You may select one or more goals.
               </span>
-            </label>
-          {% endfor %}
-        </fieldset>
+            </legend>
 
-        <hr class="page-divider">
-        
-        <!-- Mandatory Aspects to Improve -->        
-        <div class="mb-6">
-          <h3 class="text-primary-dark-teal text-lg font-light">
+            {% for checkbox in form.language_optional_goals %}
+              <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+                <input
+                  type="checkbox"
+                  name="{{ checkbox.data.name }}"
+                  value="{{ checkbox.data.value }}"
+                  id="{{ checkbox.id_for_label }}"
+                  {% if checkbox.data.attrs.checked %}checked{% endif %}
+                  class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
+                />
+                <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
+                  {{ checkbox.choice_label }}
+                </span>
+              </label>
+            {% endfor %}
+          </fieldset>
+
+          {% if form.language_optional_goals.help_text %}
+            <p
+              id="id_language_optional_goals_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
+              {{ form.language_optional_goals.help_text }}
+            </p>
+          {% endif %}
+
+          {% if form.language_optional_goals.errors %}
+            <p
+              id="id_language_optional_goals_error"
+              class="mt-0.5 text-sm text-red-600"
+            >
+              {{ form.language_optional_goals.errors }}
+            </p>
+          {% endif %}
+        </div>
+            
+        <!-- Mandatory Aspects to Improve -->
+        <div class="form-field">
+          <h3 class="form-heading">
             Aspects to Improve
           </h3>
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_aspects_to_improve" class="sr-only">
               Aspects to Improve
@@ -359,26 +435,40 @@
               placeholder="E.g. conversation skills, pronunciation, listening comprehension, grammar, writing"
               class="form-control"
               required
+              {% if form.aspects_to_improve.help_text or form.aspects_to_improve.errors %}
+                aria-describedby="
+                  {% if form.aspects_to_improve.help_text %}id_aspects_to_improve_help{% endif %}
+                  {% if form.aspects_to_improve.errors %} id_aspects_to_improve_error{% endif %}
+                "
+              {% endif %}
             >{{ form.aspects_to_improve.value|default_if_none:'' }}</textarea>
           </div>
 
           {% if form.aspects_to_improve.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_aspects_to_improve_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.aspects_to_improve.help_text }}
             </p>
           {% endif %}
 
           {% if form.aspects_to_improve.errors %}
-            <p class="text-sm text-red-600">{{ form.aspects_to_improve.errors }}</p>
+            <p
+              id="id_aspects_to_improve_error"
+              class="mt-0.5 text-sm text-red-600"
+            >
+              {{ form.aspects_to_improve.errors }}
+            </p>
           {% endif %}
-        </div>
-
-        <!-- Mandatory Activities You Can Manage -->        
-        <div class="mb-6">
-          <h3 class="text-primary-dark-teal text-lg font-light">
+        </div><!-- eof form-field -->
+     
+        <!-- Mandatory Activities You Can Manage -->
+        <div class="form-field">
+          <h3 class="form-heading">
             Activities You Can Manage
           </h3>
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_activities_you_can_manage" class="sr-only">
               Activities You Can Manage
@@ -391,26 +481,40 @@
               placeholder="E.g. reading newspapers, watching films without subtitles, writing emails, listening to podcasts"
               class="form-control"
               required
+              {% if form.activities_you_can_manage.help_text or form.activities_you_can_manage.errors %}
+                aria-describedby="
+                  {% if form.activities_you_can_manage.help_text %}id_activities_you_can_manage_help{% endif %}
+                  {% if form.activities_you_can_manage.errors %} id_activities_you_can_manage_error{% endif %}
+                "
+              {% endif %}
             >{{ form.activities_you_can_manage.value|default_if_none:'' }}</textarea>
           </div>
 
           {% if form.activities_you_can_manage.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_activities_you_can_manage_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.activities_you_can_manage.help_text }}
             </p>
           {% endif %}
 
           {% if form.activities_you_can_manage.errors %}
-            <p class="text-sm text-red-600">{{ form.activities_you_can_manage.errors }}</p>
+            <p
+              id="id_activities_you_can_manage_error"
+              class="mt-0.5 text-sm text-red-600"
+            >
+              {{ form.activities_you_can_manage.errors }}
+            </p>
           {% endif %}
-        </div>
+        </div><!-- eof form-field -->
 
         <!-- Mandatory Hours Per Week -->
-        <div class="mb-6">
-          <h3 class="text-primary-dark-teal text-lg font-light">
+        <div class="form-field">
+          <h3 class="form-heading">
             Time Available Per Week
           </h3>
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_hours_per_week" class="sr-only">
               Time Available Per Week
@@ -423,26 +527,41 @@
               placeholder="E.g. 2–3 hours, evenings only, varies weekly…"
               class="form-control"
               required
+              {% if form.hours_per_week.help_text or form.hours_per_week.errors %}
+                aria-describedby="
+                  {% if form.hours_per_week.help_text %}id_hours_per_week_help{% endif %}
+                  {% if form.hours_per_week.errors %} id_hours_per_week_error{% endif %}
+                "
+              {% endif %}
             />
           </div>
 
           {% if form.hours_per_week.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_hours_per_week_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.hours_per_week.help_text }}
             </p>
           {% endif %}
 
           {% if form.hours_per_week.errors %}
-            <p class="text-sm text-red-600">{{ form.hours_per_week.errors }}</p>
+            <p
+              id="id_hours_per_week_error"
+              class="mt-0.5 text-sm text-red-600"
+            >
+              {{ form.hours_per_week.errors }}
+            </p>
           {% endif %}
-        </div>
+        </div><!-- eof form-field -->
+
 
         <!-- Optional Other Languages You Have Studied -->
         <div class="form-field">
-          <h3 class="text-primary-dark-teal text-lg font-light mb-2">
+          <h3 class="form-heading">
             Other Languages You Have Studied
           </h3>
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_other_languages_studied" class="sr-only">
               Other Languages You Have Studied
@@ -453,21 +572,29 @@
               rows="1"
               placeholder="E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…"
               class="form-control"
+              {% if form.other_languages_studied.help_text %}
+                aria-describedby="id_other_languages_studied_help"
+              {% endif %}
             >{{ form.other_languages_studied.value|default_if_none:'' }}</textarea>
           </div>
+
           {% if form.other_languages_studied.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_other_languages_studied_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.other_languages_studied.help_text }}
             </p>
           {% endif %}
-        </div>
+        </div><!-- eof form-field -->
+
 
         <!-- Optional Additional Comments -->
         <div class="form-field">
-          <h3 class="text-primary-dark-teal text-lg font-light mb-2">
+          <h3 class="form-heading">
             Additional Comments
           </h3>
-          <div class="relative">
+          <div class="floating-input">
             <!-- Screen-reader–only label -->
             <label for="id_additional_comments" class="sr-only">
               Additional Comments
@@ -478,14 +605,20 @@
               rows="3"
               placeholder="E.g. anything else you’d like us to know about your learning needs or preferences…"
               class="form-control"
+              {% if form.additional_comments.help_text %}
+                aria-describedby="id_additional_comments_help"
+              {% endif %}
             >{{ form.additional_comments.value|default_if_none:'' }}</textarea>
           </div>
           {% if form.additional_comments.help_text %}
-            <p class="mt-0.5 text-sm font-medium text-warm-brown">
+            <p
+              id="id_additional_comments_help"
+              class="mt-0.5 text-sm font-medium text-warm-brown"
+            >
               {{ form.additional_comments.help_text }}
             </p>
           {% endif %}
-        </div>
+        </div><!-- eof form-field -->
 
         <hr class="page-divider">
 

@@ -76,6 +76,9 @@ module.exports = {
         'h1.page-title': {
           '@apply text-3xl font-extralight text-gray-900 sm:text-4xl text-center mb-6': {},
         },
+        'h3.form-heading': {
+          '@apply text-primary-dark-teal text-lg font-light mb-1': {}
+        },
         'hr.page-divider': {
           '@apply my-4 border-t border-primary-dark-teal border-opacity-30': {},
         },
@@ -88,6 +91,13 @@ module.exports = {
         // wrapper for each form field
         '.form-field': {
           '@apply mb-6 relative': {},
+        },
+        '.form-field + .form-field': {
+          '@apply border-t border-primary-dark-teal border-opacity-30 pt-6': {}
+        },
+        // a tiny semantic helper instead of repeating "relative"
+        '.floating-input': {
+          '@apply relative': {},
         },
         // shared input/textarea styles (no floating-label or peer variants)
         '.form-control': {

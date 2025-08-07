@@ -490,6 +490,14 @@ h1.page-title {
   }
 }
 
+h3.form-heading {
+  margin-bottom: 0.25rem;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
+  font-weight: 300;
+  color: var(--color-primary-dark-teal);
+}
+
 hr.page-divider {
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -1166,6 +1174,17 @@ hr.page-divider {
 .form-field {
   position: relative;
   margin-bottom: 1.5rem;
+}
+
+.form-field + .form-field {
+  border-top-width: 1px;
+  border-color: var(--color-primary-dark-teal);
+  --tw-border-opacity: 0.3;
+  padding-top: 1.5rem;
+}
+
+.floating-input {
+  position: relative;
 }
 
 .form-control {
