@@ -1203,15 +1203,6 @@ hr.page-divider {
   --tw-ring-color: var(--color-primary-dark-teal);
 }
 
-.peer:valid ~ .form-control {
-  border-color: var(--color-primary-dark-teal);
-}
-
-.peer:focus ~ .form-control {
-  border-color: var(--color-primary-dark-teal);
-  --tw-ring-color: var(--color-primary-dark-teal);
-}
-
 .btn-primary {
   display: inline-flex;
   cursor: pointer;

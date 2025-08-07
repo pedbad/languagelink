@@ -82,25 +82,24 @@ module.exports = {
       })
     },
 
-    // form-field, form-control and form-label *base* styles
+    // form-field and form-control *base* styles
     function ({ addComponents }) {
       addComponents({
         // wrapper for each form field
         '.form-field': {
           '@apply mb-6 relative': {},
         },
-        // shared input/textarea styles (no peer-variants here!)
+        // shared input/textarea styles (no floating-label or peer variants)
         '.form-control': {
           [
             `@apply block min-h-[auto] w-full rounded border border-gray-300 bg-white
               px-3 py-[0.32rem] leading-[2.15] outline-none
-              focus:placeholder-transparent focus:border-primary-dark-teal focus:ring-primary-dark-teal
-              peer-focus:border-primary-dark-teal peer-focus:ring-primary-dark-teal
-              peer-valid:border-primary-dark-teal`
+              focus:placeholder-transparent focus:border-primary-dark-teal focus:ring-primary-dark-teal`
           ]: {},
         },
       })
     },
+
 
     // all your existing btn / badge / toggle components…
     function ({ addComponents }) {
