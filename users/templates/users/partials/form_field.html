@@ -1,0 +1,21 @@
+{# users/partials/form_field.html #}
+<!-- Expects: field → a BoundField, legend_text → heading text -->
+<div class="form-field">
+  <h3 class="form-heading">{{ legend_text }}</h3>
+  <div class="floating-input">
+    <label for="{{ field.id_for_label }}" class="sr-only">{{ legend_text }}</label>
+    {{ widget_html|safe }}
+  </div>
+
+  {% if field.help_text %}
+    <p id="{{ help_id }}" class="mt-0.5 text-sm text-warm-brown">
+      {{ field.help_text }}
+    </p>
+  {% endif %}
+
+  {% if field.errors %}
+    <p id="{{ error_id }}" class="text-sm text-red-600">
+      {{ field.errors }}
+    </p>
+  {% endif %}
+</div>

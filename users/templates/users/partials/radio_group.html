@@ -1,0 +1,37 @@
+{# users/partials/radio_group.html #}
+<!--
+  Expects:
+    group        → a BoundField for a RadioSelect (e.g. form.university_status)
+    legend_text  → legend text
+    help_text    → optional help line (string)
+-->
+<fieldset 
+    class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md"
+    role="radiogroup"
+    aria-labelledby="{{ group.id_for_label }}_label"
+    aria-describedby="{{ group.id_for_label }}_help {{ group.id_for_label }}_error"
+>
+  <legend id="{{ group.id_for_label }}_label" class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
+    {{ legend_text }}
+    {% if help_text %}
+      <span id="{{ group.id_for_label }}_help" class="block mt-1 text-sm text-warm-brown">
+        {{ help_text }}
+      </span>
+    {% endif %}
+  </legend>
+
+  {% for widget in group %}
+    <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
+      {{ widget.tag }}
+      <span class="ml-4 text-base text-gray-800 peer-checked:text-primary-dark-teal">
+        {{ widget.choice_label }}
+      </span>
+    </label>
+  {% endfor %}
+
+  {% for err in group.errors %}
+    <p id="{{ group.id_for_label }}_error" class="mt-0.5 text-sm text-red-600">
+      {{ err }}
+    </p>
+  {% endfor %}
+</fieldset>

@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load form_utils %}
 
 {% block title %}Student Questionnaire{% endblock %}
 
@@ -81,92 +82,11 @@
       <form method="POST" class="space-y-6">
         {% csrf_token %}
         <!-- Mandatory Faculty / Department -->
-        <div class="form-field">
-          <h3 class="form-heading">
-            Faculty / Department
-          </h3>
+        {% form_field form.faculty_department "Faculty / Department" "Faculty or Department" %}
 
-          <div class="floating-input">
-            <!-- Screen-reader–only label -->
-            <label for="id_faculty_department" class="sr-only">
-              Faculty / Department
-            </label>
-
-            <input
-              type="text"
-              name="faculty_department"
-              id="id_faculty_department"
-              value="{{ form.faculty_department.value|default:'' }}"
-              placeholder="Faculty or Department"
-              required
-              class="form-control"
-              aria-required="true"
-              aria-invalid="{% if form.faculty_department.errors %}true{% else %}false{% endif %}"
-              aria-describedby="id_faculty_department_help id_faculty_department_error"
-            />
-          </div>
-
-          {% if form.faculty_department.help_text %}
-            <p
-              id="id_faculty_department_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.faculty_department.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.faculty_department.errors %}
-            <p
-              id="id_faculty_department_error"
-              class="text-sm text-red-600"
-            >
-              {{ form.faculty_department.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
 
         <!-- Mandatory Mother Tongue -->
-        <div class="form-field">
-          <h3 class="form-heading">
-            Mother Tongue
-          </h3>
-          <div class="floating-input">
-            <!-- Screen-reader–only label -->
-            <label for="id_mother_tongue" class="sr-only">
-              Mother Tongue
-            </label>
-            <input
-              type="text"
-              name="mother_tongue"
-              id="id_mother_tongue"
-              value="{{ form.mother_tongue.value|default:'' }}"
-              placeholder="Mother Tongue"
-              required
-              class="form-control"
-              aria-required="true"
-              aria-invalid="{% if form.mother_tongue.errors %}true{% else %}false{% endif %}"
-              aria-describedby="id_mother_tongue_help id_mother_tongue_error"
-            />
-          </div>
-
-          {% if form.mother_tongue.help_text %}
-            <p
-              id="id_mother_tongue_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.mother_tongue.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.mother_tongue.errors %}
-            <p
-              id="id_mother_tongue_error"
-              class="text-sm text-red-600"
-            >
-              {{ form.mother_tongue.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
+        {% form_field form.mother_tongue "Mother Tongue" "E.g., English, Spanish, Mandarin. If you speak multiple languages, please separate them with commas."%}
 
         <!-- University Status -->
         <div class="form-field">
