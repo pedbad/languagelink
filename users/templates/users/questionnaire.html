@@ -88,51 +88,9 @@
         <!-- Mandatory Mother Tongue -->
         {% form_field form.mother_tongue "Mother Tongue" "E.g., English, Spanish, Mandarin. If you speak multiple languages, please separate them with commas."%}
 
-        <!-- University Status -->
-        <div class="form-field">
-          <fieldset
-            role="radiogroup"
-            aria-labelledby="id_university_status_label"
-            class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md"
-            aria-describedby="id_university_status_help id_university_status_error"
-          >
-            <legend id="id_university_status_label" class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
-              University Status
-              <span
-                id="id_university_status_help"
-                class="block mt-1 text-sm font-medium text-warm-brown"
-              >
-                Please select the option that best describes your university status
-              </span>
-            </legend>
+        <!-- Mandatory University Status -->
+        {% radio_group form.university_status "University Status" "Please select the option that best describes your university status" %}
 
-            {% for radio in form.university_status %}
-              <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="{{ radio.data.name }}"
-                  value="{{ radio.data.value }}"
-                  id="{{ radio.id_for_label }}"
-                  {% if radio.data.attrs.checked %}checked{% endif %}
-                  class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
-                  aria-invalid="{% if form.university_status.errors %}true{% else %}false{% endif %}"
-                />
-                <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
-                  {{ radio.choice_label }}
-                </span>
-              </label>
-            {% endfor %}
-          </fieldset>
-
-          {% if form.university_status.errors %}
-            <p
-              id="id_university_status_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.university_status.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
 
         <!-- Mandatory Main Language to Learn or Improve -->
         {% form_field form.language_mandatory_name "Main Language to Learn or Improve" "e.g., Spanish" %}
@@ -355,8 +313,6 @@
 
         <!-- Optional Additional Comments -->
         {% form_field form.additional_comments "Additional Comments" "Anything else you’d like us to know about your learning needs or preferences… (optional)" rows="2" %}
-
-
 
 
         <hr class="page-divider">
