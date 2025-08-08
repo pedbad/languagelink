@@ -84,69 +84,19 @@
         <!-- Mandatory Faculty / Department -->
         {% form_field form.faculty_department "Faculty / Department" "Faculty or Department" %}
 
-
         <!-- Mandatory Mother Tongue -->
         {% form_field form.mother_tongue "Mother Tongue" "E.g., English, Spanish, Mandarin. If you speak multiple languages, please separate them with commas."%}
 
         <!-- Mandatory University Status -->
         {% radio_group form.university_status "University Status" "Please select the option that best describes your university status" %}
 
-
         <!-- Mandatory Main Language to Learn or Improve -->
         {% form_field form.language_mandatory_name "Main Language to Learn or Improve" "e.g., Spanish" %}
 
 
         <!-- Mandatory Language Proficiency -->
-        <div class="form-field">
-          <fieldset
-            role="radiogroup"
-            aria-required="true"
-            aria-labelledby="id_language_mandatory_proficiency_label"
-            aria-invalid="{% if form.language_mandatory_proficiency.errors %}true{% else %}false{% endif %}"
-            aria-describedby="id_language_mandatory_proficiency_help id_language_mandatory_proficiency_error"
-            class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white mb-6 rounded-md"
-          >
-            <legend id="id_language_mandatory_proficiency_label" class="text-primary-dark-teal text-lg font-light mb-4 col-span-full">
-              Proficiency Level
-            </legend>
+        {% radio_group form.language_mandatory_proficiency "Proficiency Level" form.language_mandatory_proficiency.help_text cols=3 %}
 
-            {% for radio in form.language_mandatory_proficiency %}
-              <label class="flex items-center border border-gray-200 rounded-md p-4 cursor-pointer hover:bg-gray-50">
-                <input
-                  type="radio"
-                  name="{{ radio.data.name }}"
-                  value="{{ radio.data.value }}"
-                  id="{{ radio.id_for_label }}"
-                  {% if radio.data.attrs.checked %}checked{% endif %}
-                  required
-                  class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"
-                  aria-checked="{% if radio.data.attrs.checked %}true{% else %}false{% endif %}"
-                />
-                <span class="text-base text-gray-800 peer-checked:text-primary-dark-teal">
-                  {{ radio.choice_label }}
-                </span>
-              </label>
-            {% endfor %}
-          </fieldset>
-
-          {% if form.language_mandatory_proficiency.help_text %}
-            <p
-              id="id_language_mandatory_proficiency_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.language_mandatory_proficiency.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.language_mandatory_proficiency.errors %}
-            <p
-              id="id_language_mandatory_proficiency_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.language_mandatory_proficiency.errors }}
-            </p>
-          {% endif %}
-        </div>
 
         <!-- Mandatory Language Learning / Development Goals -->
         <div class="form-field">

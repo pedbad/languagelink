@@ -6,7 +6,7 @@
     help_text    → optional help line (string)
 -->
 <fieldset
-  class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white mb-6 rounded-md"
+  class="grid grid-cols-1 sm:grid-cols-{{ cols }} gap-3 bg-white mb-6 rounded-md"
   role="radiogroup"
   aria-required="{{ is_required|yesno:'true,false' }}"
   aria-labelledby="{{ help_id }}_label"

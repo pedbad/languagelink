@@ -70,13 +70,13 @@ def add_input_classes(widget_html, css_classes):
 
 
 @register.inclusion_tag("users/partials/radio_group.html")
-@register.inclusion_tag("users/partials/radio_group.html")
-def radio_group(group, legend_text, help_text=None):
+def radio_group(group, legend_text, help_text=None, cols=2):
     """
     Renders a <fieldset> radio group for a BoundField of RadioSelect.
-    - group        → the BoundField (e.g. form.university_status)
-    - legend_text  → text for the <legend>
+    - group        → the BoundField
+    - legend_text  → text for the legend
     - help_text    → optional helper text
+    - cols         → number of columns on sm+ screens
     """
     help_id  = f"{group.id_for_label}_help"
     error_id = f"{group.id_for_label}_error"
@@ -89,71 +89,29 @@ def radio_group(group, legend_text, help_text=None):
         described.append(error_id)
     described = " ".join(described)
 
+    # pre-render each radio, injecting your Tailwind classes
     items = []
-    for widget in group:  # each is a BoundWidget
-        # CALL tag() to render the <input> HTML
-        raw = widget.tag()
-        # inject your Tailwind classes onto the first <input>
-        styled = raw.replace(
+    for widget in group:
+        raw_html = widget.tag()
+        styled = raw_html.replace(
             "<input",
-            '<input class="peer mr-4 h-5 w-5 text-primary-dark-teal '
-            'border-gray-300 focus:ring-primary-dark-teal"',
+            '<input class="peer mr-4 h-5 w-5 text-primary-dark-teal border-gray-300 focus:ring-primary-dark-teal"',
             1
         )
         items.append({
             "input": mark_safe(styled),
             "label": widget.choice_label,
-            "id":    widget.id_for_label,
+            "id": widget.id_for_label,
         })
 
     return {
-        "items":       items,
+        "items": items,
         "legend_text": legend_text,
-        "help_text":   help_text,
-        "help_id":     help_id,
-        "error_id":    error_id,
-        "described":   described,
+        "help_text": help_text,
+        "help_id": help_id,
+        "error_id": error_id,
+        "described": described,
         "is_required": group.field.required,
-        "has_error":   bool(group.errors),
-    }
-    """
-    Renders a <fieldset> radio group for a BoundField of RadioSelect.
-    - group        → the BoundField (e.g. form.university_status)
-    - legend_text  → text for the <legend>
-    - help_text    → optional helper text
-    """
-    help_id  = f"{group.id_for_label}_help"
-    error_id = f"{group.id_for_label}_error"
-
-    # build aria-describedby
-    described = []
-    if help_text:
-        described.append(help_id)
-    if group.errors:
-        described.append(error_id)
-    described = " ".join(described)
-
-    # render each radio input with your Tailwind classes via widget.tag()
-    items = []
-    for boundwidget in group:  # each is a BoundWidget
-        rendered_input = boundwidget.tag(attrs={
-            "class": "peer mr-4 h-5 w-5 text-primary-dark-teal "
-                     "border-gray-300 focus:ring-primary-dark-teal"
-        })
-        items.append({
-            "input": rendered_input,
-            "label": boundwidget.choice_label,
-            "id":    boundwidget.id_for_label,
-        })
-
-    return {
-        "items":        items,
-        "legend_text":  legend_text,
-        "help_text":    help_text,
-        "help_id":      help_id,
-        "error_id":     error_id,
-        "described":    described,
-        "is_required":  group.field.required,
-        "has_error":    bool(group.errors),
-        "group":        group,  # if you still want to inspect .errors in your partial
+        "has_error": bool(group.errors),
+        "cols": cols,
     }
