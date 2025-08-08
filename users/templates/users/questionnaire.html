@@ -135,47 +135,7 @@
         </div><!-- eof form-field -->
 
         <!-- Mandatory Main Language to Learn or Improve -->
-        <div class="form-field">
-          <h3 class="form-heading">
-            Main Language to Learn or Improve
-          </h3>
-
-          <div class="floating-input">
-            <label for="id_language_mandatory_name" class="sr-only">
-              Main Language to Learn or Improve
-            </label>
-            <input
-              type="text"
-              name="language_mandatory_name"
-              id="id_language_mandatory_name"
-              value="{{ form.language_mandatory_name.value|default:'' }}"
-              placeholder="e.g., Spanish"
-              required
-              class="form-control"
-              aria-required="true"
-              aria-invalid="{% if form.language_mandatory_name.errors %}true{% else %}false{% endif %}"
-              aria-describedby="id_language_mandatory_name_help id_language_mandatory_name_error"
-            />
-          </div>
-
-          {% if form.language_mandatory_name.help_text %}
-            <p
-              id="id_language_mandatory_name_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.language_mandatory_name.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.language_mandatory_name.errors %}
-            <p
-              id="id_language_mandatory_name_error"
-              class="text-sm text-red-600"
-            >
-              {{ form.language_mandatory_name.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
+        {% form_field form.language_mandatory_name "Main Language to Learn or Improve" "e.g., Spanish" %}
 
 
         <!-- Mandatory Language Proficiency -->
@@ -278,47 +238,9 @@
           {% endif %}
         </div>
 
-
         <!-- Optional Additional Language to Learn or Improve -->
-        <div class="form-field">
-          <h3 class="form-heading">
-            Additional Language to Learn or Improve (Optional)
-          </h3>
+        {% form_field form.language_optional_name "Additional Language to Learn or Improve" "E.g., French (optional)" %}
 
-          <div class="floating-input">
-            <label for="id_language_optional_name" class="sr-only">
-              Additional Language to Learn or Improve (Optional)
-            </label>
-            <input
-              type="text"
-              name="language_optional_name"
-              id="id_language_optional_name"
-              value="{{ form.language_optional_name.value|default:'' }}"
-              placeholder="Additional Language (Optional)"
-              class="form-control"
-              aria-invalid="{% if form.language_optional_name.errors %}true{% else %}false{% endif %}"
-              aria-describedby="id_language_optional_name_help id_language_optional_name_error"
-            />
-          </div>
-
-          {% if form.language_optional_name.help_text %}
-            <p
-              id="id_language_optional_name_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.language_optional_name.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.language_optional_name.errors %}
-            <p
-              id="id_language_optional_name_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.language_optional_name.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
 
         <!-- Optional Language Proficiency -->
         <div class="form-field">
@@ -415,236 +337,26 @@
             </p>
           {% endif %}
         </div>
-            
+
         <!-- Mandatory Aspects to Improve -->
-        <div class="form-field">
-          <h3
-            id="id_aspects_to_improve_label"
-            class="form-heading"
-          >
-            Aspects to Improve
-          </h3>
-          <div class="floating-input">
-            <label for="id_aspects_to_improve" class="sr-only">
-              Aspects to Improve
-            </label>
-            <textarea
-              name="aspects_to_improve"
-              id="id_aspects_to_improve"
-              rows="3"
-              maxlength="2000"
-              placeholder="E.g. conversation skills, pronunciation, listening comprehension, grammar, writing"
-              required
-              class="form-control"
-              aria-labelledby="id_aspects_to_improve_label"
-              aria-describedby="id_aspects_to_improve_help id_aspects_to_improve_error"
-              aria-required="true"
-              aria-invalid="{% if form.aspects_to_improve.errors %}true{% else %}false{% endif %}"
-            >{{ form.aspects_to_improve.value|default_if_none:'' }}</textarea>
-          </div>
+        {% form_field form.aspects_to_improve "Aspects to Improve" "E.g. conversation skills, pronunciation, listening comprehension, grammar, writing" rows="4" %}
+            
 
-          {% if form.aspects_to_improve.help_text %}
-            <p
-              id="id_aspects_to_improve_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.aspects_to_improve.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.aspects_to_improve.errors %}
-            <p
-              id="id_aspects_to_improve_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.aspects_to_improve.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
-
-     
         <!-- Mandatory Activities You Can Manage -->
-        <div class="form-field">
-          <h3
-            id="id_activities_you_can_manage_label"
-            class="form-heading"
-          >
-            Activities You Can Manage
-          </h3>
-          <div class="floating-input">
-            <label for="id_activities_you_can_manage" class="sr-only">
-              Activities You Can Manage
-            </label>
-            <textarea
-              name="activities_you_can_manage"
-              id="id_activities_you_can_manage"
-              rows="3"
-              maxlength="2000"
-              placeholder="E.g. reading newspapers, watching films without subtitles, writing emails, listening to podcasts"
-              required
-              class="form-control"
-              aria-labelledby="id_activities_you_can_manage_label"
-              aria-describedby="id_activities_you_can_manage_help id_activities_you_can_manage_error"
-              aria-required="true"
-              aria-invalid="{% if form.activities_you_can_manage.errors %}true{% else %}false{% endif %}"
-            >{{ form.activities_you_can_manage.value|default_if_none:'' }}</textarea>
-          </div>
-
-          {% if form.activities_you_can_manage.help_text %}
-            <p
-              id="id_activities_you_can_manage_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.activities_you_can_manage.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.activities_you_can_manage.errors %}
-            <p
-              id="id_activities_you_can_manage_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.activities_you_can_manage.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
+        {% form_field form.activities_you_can_manage "Activities You Can Manage" "E.g. reading newspapers, watching films without subtitles, writing emails, listening to podcasts" rows="2" %}
 
 
-        <!-- Mandatory Hours Per Week -->
-        <div class="form-field">
-          <h3
-            id="id_hours_per_week_label"
-            class="form-heading"
-          >
-            Time Available Per Week
-          </h3>
-          <div class="floating-input">
-            <label for="id_hours_per_week" class="sr-only">
-              Time Available Per Week
-            </label>
-            <input
-              type="text"
-              name="hours_per_week"
-              id="id_hours_per_week"
-              value="{{ form.hours_per_week.value|default_if_none:'' }}"
-              placeholder="E.g. 2–3 hours, evenings only, varies weekly…"
-              required
-              class="form-control"
-              aria-labelledby="id_hours_per_week_label"
-              aria-describedby="id_hours_per_week_help id_hours_per_week_error"
-              aria-required="true"
-              aria-invalid="{% if form.hours_per_week.errors %}true{% else %}false{% endif %}"
-            />
-          </div>
-
-          {% if form.hours_per_week.help_text %}
-            <p
-              id="id_hours_per_week_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.hours_per_week.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.hours_per_week.errors %}
-            <p
-              id="id_hours_per_week_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.hours_per_week.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
+        <!-- Mandatory Time Available Per Week -->
+        {% form_field form.hours_per_week "Time Available Per Week" "E.g. 2–3 hours, evenings only, varies weekly…" %}
 
 
         <!-- Optional Other Languages You Have Studied -->
-        <div class="form-field">
-          <h3
-            id="id_other_languages_studied_label"
-            class="form-heading"
-          >
-            Other Languages You Have Studied
-          </h3>
-          <div class="floating-input">
-            <label for="id_other_languages_studied" class="sr-only">
-              Other Languages You Have Studied
-            </label>
-            <textarea
-              name="other_languages_studied"
-              id="id_other_languages_studied"
-              rows="1"
-              placeholder="E.g. Latin at school, a term of Japanese evening classes, self-studied Italian…"
-              class="form-control"
-              aria-required="false"
-              aria-labelledby="id_other_languages_studied_label"
-              aria-describedby="id_other_languages_studied_help id_other_languages_studied_error"
-              aria-invalid="{% if form.other_languages_studied.errors %}true{% else %}false{% endif %}"
-            >{{ form.other_languages_studied.value|default_if_none:'' }}</textarea>
-          </div>
-
-          {% if form.other_languages_studied.help_text %}
-            <p
-              id="id_other_languages_studied_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.other_languages_studied.help_text }}
-            </p>
-          {% endif %}
-
-          {% if form.other_languages_studied.errors %}
-            <p
-              id="id_other_languages_studied_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.other_languages_studied.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
-
+        {% form_field form.other_languages_studied "Other Languages You Have Studied" "E.g. Latin at school, a term of Japanese evening classes, self-studied Italian… (optional)" rows="1" %}
 
         <!-- Optional Additional Comments -->
-        <div class="form-field">
-          <h3
-            id="id_additional_comments_label"
-            class="form-heading"
-          >
-            Additional Comments
-          </h3>
-          <div class="floating-input">
-            <label for="id_additional_comments" class="sr-only">
-              Additional Comments
-            </label>
-            <textarea
-              name="additional_comments"
-              id="id_additional_comments"
-              rows="3"
-              placeholder="E.g. anything else you’d like us to know about your learning needs or preferences…"
-              class="form-control"
-              aria-required="false"
-              aria-labelledby="id_additional_comments_label"
-              aria-describedby="id_additional_comments_help id_additional_comments_error"
-              aria-invalid="{% if form.additional_comments.errors %}true{% else %}false{% endif %}"
-            >{{ form.additional_comments.value|default_if_none:'' }}</textarea>
-          </div>
+        {% form_field form.additional_comments "Additional Comments" "Anything else you’d like us to know about your learning needs or preferences… (optional)" rows="2" %}
 
-          {% if form.additional_comments.help_text %}
-            <p
-              id="id_additional_comments_help"
-              class="mt-0.5 text-sm font-medium text-warm-brown"
-            >
-              {{ form.additional_comments.help_text }}
-            </p>
-          {% endif %}
 
-          {% if form.additional_comments.errors %}
-            <p
-              id="id_additional_comments_error"
-              class="mt-0.5 text-sm text-red-600"
-            >
-              {{ form.additional_comments.errors }}
-            </p>
-          {% endif %}
-        </div><!-- eof form-field -->
 
 
         <hr class="page-divider">

@@ -220,7 +220,7 @@ class Questionnaire(models.Model):
     max_length=2000,
     blank=False,
     null=False,
-    help_text="List the activities you can manage in the language(s) (if applicable)"
+    help_text="List the activities you can manage in the language(s)"
   )
 
   hours_per_week = models.CharField(
