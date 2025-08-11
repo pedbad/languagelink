@@ -117,6 +117,11 @@ module.exports = {
         '@apply inline-flex items-center justify-center whitespace-nowrap font-medium ' +
         'rounded-md transition-colors duration-150 shadow-md focus:outline-none ' +
         'focus:ring-4 focus:ring-opacity-60 cursor-pointer'
+      // add a "disabled base" (no pointer, no focus ring)
+      const baseDisabled =
+        '@apply inline-flex items-center justify-center whitespace-nowrap font-medium ' +
+        'rounded-md transition-colors duration-150 shadow-md focus:outline-none ' +
+        'cursor-not-allowed';
       const toggleBase =
         '@apply inline-flex items-center text-sm font-medium px-5 py-2 rounded-lg ' +
         'shadow-md transition-all duration-200 ease-linear focus:outline-none ' +
@@ -183,17 +188,35 @@ module.exports = {
         /* Status: completed */
         '.btn-completed': {
           [base +
-            ' px-3 py-1.5 bg-accent-olive-green text-white' +
-            ' hover:bg-accent-bright-lime' +
+            ' px-3 py-1.5 bg-accent-olive-green font-semibold text-white' +
+            ' hover:bg-accent-bright-lime hover:text-deep-teal' +
             ' focus:ring-2 focus:ring-accent-olive-green focus:ring-opacity-50'
           ]: {}
         },
         /* Status: not-completed */
         '.btn-not-completed': {
-          [base +
+          [baseDisabled +
             ' px-3 py-1.5 bg-red-100 text-red-800' +
             ' hover:bg-red-200' +
             ' focus:ring-2 focus:ring-red-500 focus:ring-opacity-50'
+          ]: {}
+        },
+        /* Status: completed — LARGE */
+        '.btn-completed-lg': {
+          [base +
+            ' text-lg px-6 py-3 rounded-lg' +
+            ' bg-accent-olive-green font-semibold text-white' +
+            ' hover:bg-accent-bright-lime hover:text-primary-dark-teal' +
+            ' focus:ring-2 focus:ring-accent-olive-green focus:ring-opacity-50'
+          ]: {}
+        },
+
+        /* Status: not-completed (disabled) — LARGE */
+        '.btn-not-completed-lg': {
+          [baseDisabled +
+            ' text-lg px-6 py-3 rounded-lg' +
+            ' bg-red-100 text-red-800' +
+            ' hover:bg-red-100 focus:ring-0'
           ]: {}
         },
         /* generic toggle button */

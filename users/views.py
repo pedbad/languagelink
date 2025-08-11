@@ -96,7 +96,7 @@ def login_view(request):
 
 # Student Profile View
 @login_required
-def student_profile_view(request, student_id=None):
+def student_profile_view(request, student_id = None):
   """
   Displays and allows editing of the student's profile.
   """
@@ -149,7 +149,7 @@ def student_profile_view(request, student_id=None):
 
 # Teacher Profile View
 @login_required
-def teacher_profile_view(request, teacher_id=None):
+def teacher_profile_view(request, teacher_id = None):
   """
   Displays and allows editing of the teacher's profile.
   - Teachers can edit their own profile.
@@ -256,7 +256,7 @@ def toggle_advising_status(request):
 
 # Questionnaire View
 @login_required
-def questionnaire_view(request, student_id=None):
+def questionnaire_view(request, student_id = None):
   """
   Handles the questionnaire view for both students and admins.
 
@@ -376,7 +376,7 @@ def delete_resource_note(request, pk):
   Only the authoring teacher (or an admin) may delete.
   Returns an empty response so HTMX can remove the <div> wrapper.
   """
-  note = get_object_or_404(ResourceNote, pk=pk)
+  note = get_object_or_404(ResourceNote, pk = pk)
 
   # Ensure only the note’s author or an admin can delete
   if not (
@@ -395,7 +395,7 @@ def delete_resource_note(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def edit_resource_note(request, pk):
-  note = get_object_or_404(ResourceNote, pk=pk)
+  note = get_object_or_404(ResourceNote, pk = pk)
 
   # only the authoring teacher may edit
   if request.user != note.author or request.user.role != 'teacher':
@@ -413,7 +413,7 @@ def edit_resource_note(request, pk):
   data = request.POST
   
   
-  form = ResourceNoteForm(data, instance=note)
+  form = ResourceNoteForm(data, instance = note)
   if form.is_valid():
     note = form.save()
     # return the normal read‐only note fragment so HTMX replaces it
@@ -430,7 +430,7 @@ def view_resource_note(request, pk):
   HTMX endpoint: re-render the read-only note fragment
   so “Cancel” can swap it back in.
   """
-  note = get_object_or_404(ResourceNote, pk=pk)
+  note = get_object_or_404(ResourceNote, pk = pk)
   return render(request, "users/partials/note_item.html", {
     "note": note,
   })

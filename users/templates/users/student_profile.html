@@ -26,50 +26,71 @@
     <div class="flex-1">
       {% if not is_editing %}
 
-  {# —————— Add/View Notes Button for Teachers/Admins —————— #}
-  {% if request.user.role == 'teacher' %}
-    <div class="mt-2 mb-4">
-      <a
-        href="{% url 'student_resource' %}?student_id={{ student_profile.user.id }}"
-        class="btn-primary-alt-lg w-full flex items-center justify-center"
-      >
-        <!-- pencil/sketch icon for adding -->
-        <svg xmlns="http://www.w3.org/2000/svg"
-            fill="none" viewBox="0 0 24 24"
-            stroke-width="1.5" stroke="currentColor"
-            class="h-5 w-5 mr-2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-        </svg>
-        Add notes and resource links
-      </a>
+{# ——— Teacher view: side-by-side buttons ——— #}
+{% if request.user.role == 'teacher' or request.user.role == 'admin' %}
+  <div class="mt-2 flex space-x-4">
+    <!-- Left: Questionnaire status -->
+    <div class="flex-1">
+      {% if has_completed_questionnaire %}
+        <a href="{% url 'student_questionnaire' student_profile.user.id %}"
+           class="btn-completed-lg w-full inline-flex items-center justify-center">
+          <!-- eye icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M2.036 12.322a1.012 1.012 0 000 .356C3.423 17.338 7.455 21 12 21s8.577-3.662 9.964-8.322a1.012 1.012 0 000-.356C20.577 6.662 16.545 3 12 3S3.423 6.662 2.036 12.322z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Questionnaire: Completed
+        </a>
+      {% else %}
+        <span class="btn-not-completed-lg w-full inline-flex items-center justify-center cursor-not-allowed hover:bg-red-100"
+              aria-disabled="true"
+              title="Student has not completed the questionnaire yet">
+          <!-- x icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+          </svg>
+          Questionnaire: Not Completed
+        </span>
+      {% endif %}
     </div>
-    <hr class="page-divider">
 
-  {% elif request.user.role == 'admin' %}
-    <div class="mt-2 mb-4">
-      <a
-        href="{% url 'student_resource' %}?student_id={{ student_profile.user.id }}"
-        class="btn-primary-alt-lg w-full flex items-center justify-center"
-      >
-        <!-- eye icon for viewing -->
-        <svg xmlns="http://www.w3.org/2000/svg"
-            fill="none" viewBox="0 0 24 24"
-            stroke-width="1.5" stroke="currentColor"
-            class="h-5 w-5 mr-2">
+    <!-- Right: Add notes & resources -->
+    <div class="flex-1">
+      <a href="{% url 'student_resource' %}?student_id={{ student_profile.user.id }}"
+         class="btn-primary-alt-lg w-full flex items-center justify-center">
+        <!-- pencil icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round"
-                d="M2.036 12.322a1.012 1.012 0 0 0 0 .356
-                  C3.423 17.338 7.455 21 12 21s8.577-3.662 
-                  9.964-8.322a1.012 1.012 0 0 0 0-.356
-                  C20.577 6.662 16.545 3 12 3
-                  S3.423 6.662 2.036 12.322Z" />
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125" />
         </svg>
-        View notes
+        Add notes & resources
       </a>
     </div>
-    <hr class="page-divider">
-  {% endif %}
+  </div>
+  <hr class="page-divider">
+
+{# ——— Admin view: no questionnaire, just notes button full width ——— #}
+{% elif request.user.role == 'admin' %}
+  <div class="mt-2">
+    <a href="{% url 'student_resource' %}?student_id={{ student_profile.user.id }}"
+       class="btn-primary-alt-lg w-full flex items-center justify-center">
+      <!-- eye icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.036 12.322a1.012 1.012 0 0 0 0 .356C3.423 17.338 7.455 21 12 21s8.577-3.662 9.964-8.322a1.012 1.012 0 0 0 0-.356C20.577 6.662 16.545 3 12 3S3.423 6.662 2.036 12.322Z" />
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
+      View notes
+    </a>
+  </div>
+  <hr class="page-divider">
+{% endif %}
+
+
 
 
         {% if is_student and has_completed_questionnaire %}
