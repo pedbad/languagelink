@@ -9,46 +9,54 @@ def form_field(field, legend_text, placeholder="", **extra_attrs):
   """
   Renders a full form-field block:
     <div class="form-field">…</div>
-  - Adds HTML5 `required` to required fields
-  - Appends “(Optional)” to the legend for non-required fields
-  - Manages aria-required, aria-invalid, aria-describedby
+  Automatically:
+   - Adds HTML5 `required` to required fields
+   - Appends “(Optional)” to the legend_text for non-required fields
+   - Manages aria-required, aria-invalid, aria-describedby
   """
-  help_id = f"{field.id_for_label}_help"
+  help_id  = f"{field.id_for_label}_help"
   error_id = f"{field.id_for_label}_error"
 
+  # base attrs without clobbering widget classes
   attrs = {
-    "class": "form-control",
     "aria-required": str(field.field.required).lower(),
     "aria-invalid": "true" if field.errors else "false",
   }
 
+  # merge classes: existing (from forms.py) + baseline + any passed-in
+  existing_cls = field.field.widget.attrs.get("class", "")
+  provided_cls = extra_attrs.pop("class", "")
+  baseline_cls = "form-control"  # remove if you don’t use this class
+  final_cls = " ".join(c for c in [existing_cls, baseline_cls, provided_cls] if c).strip()
+  if final_cls:
+    attrs["class"] = final_cls
+
   if field.field.required:
     attrs["required"] = "required"
   else:
-    legend_text = (
-      f"{legend_text} "
-      "<span class='text-sm text-gray-500'>(Optional)</span>"
-    )
+    legend_text = f"{legend_text} <span class='text-sm text-gray-500'>(Optional)</span>"
 
   if placeholder:
     attrs["placeholder"] = placeholder
 
-  desc_ids = []
+  desc = []
   if field.help_text:
-    desc_ids.append(help_id)
+    desc.append(help_id)
   if field.errors:
-    desc_ids.append(error_id)
-  if desc_ids:
-    attrs["aria-describedby"] = " ".join(desc_ids)
+    desc.append(error_id)
+  if desc:
+    attrs["aria-describedby"] = " ".join(desc)
 
+  # any extra attrs like rows=…
   attrs.update(extra_attrs)
+
   widget_html = field.as_widget(attrs=attrs)
 
   html = f"""
   <div class="form-field">
     <h3 class="form-heading">{legend_text}</h3>
     <div class="floating-input">
-      <label for="{field.id_for_label}" class="sr-only">{legend_text}</label>
+      <label for="{field.id_for_label}" class="sr-only">{field.label}</label>
       {widget_html}
     </div>
     {f'<p id="{help_id}" class="mt-0.5 text-sm text-warm-brown">{field.help_text}</p>' if field.help_text else ''}
@@ -56,6 +64,10 @@ def form_field(field, legend_text, placeholder="", **extra_attrs):
   </div>
   """
   return mark_safe(html)
+
+
+
+
 
 
 @register.filter

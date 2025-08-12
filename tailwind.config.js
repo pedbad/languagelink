@@ -7,6 +7,11 @@ module.exports = {
     './booking/templates/**/*.html',
     './node_modules/tw-elements/dist/js/**/*.js',
   ],
+  safelist: [
+    'form-control',
+    'form-field',
+    'floating-input',
+  ],
   theme: {
     extend: {
       // ────────────────────────────────────────────────
@@ -86,29 +91,21 @@ module.exports = {
     },
 
     // form-field and form-control *base* styles
-    function ({ addComponents }) {
-      addComponents({
-        // wrapper for each form field
-        '.form-field': {
-          '@apply mb-6 relative': {},
-        },
-        '.form-field + .form-field': {
-          '@apply border-t border-primary-dark-teal border-opacity-30 pt-6': {}
-        },
-        // a tiny semantic helper instead of repeating "relative"
-        '.floating-input': {
-          '@apply relative': {},
-        },
-        // shared input/textarea styles (no floating-label or peer variants)
-        '.form-control': {
-          [
-            `@apply block min-h-[auto] w-full rounded border border-gray-300 bg-white
-              px-3 py-[0.32rem] leading-[2.15] outline-none
-              focus:placeholder-transparent focus:border-primary-dark-teal focus:ring-primary-dark-teal`
-          ]: {},
-        },
-      })
-    },
+    function({ addComponents }) {
+        addComponents({
+          '.form-field': { '@apply mb-6 relative': {} },
+          '.form-field + .form-field': { '@apply border-t border-primary-dark-teal border-opacity-30 pt-6': {} },
+          '.floating-input': { '@apply relative': {} },
+
+          // 👇 THIS is the important fix
+          '.form-control': {
+            '@apply block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:border-primary-dark-teal': {}
+          },
+          'textarea.form-control': {
+            '@apply min-h-[120px]': {}
+          },
+        })
+      },
 
 
     // all your existing btn / badge / toggle components…

@@ -6,18 +6,34 @@
 
 {% block content %}
 <div class="container mx-auto mt-10">
-  {% if not has_completed_questionnaires %}
-    <h1 class="page-title">
-      Welcome {{ student.first_name }} {{ student.last_name }}.
-    </h1>
-    <p class="text-primary-dark-teal text-lg font-light text-center">
-      Please complete your Pre-appointment Questionnaire.
-    </p>
-  {% else %}
-    <h1 class="page-title">
-      Pre-appointment Questionnaire Response for {{ student.first_name }} {{ student.last_name }}
-    </h1>
-  {% endif %}
+  {% with completed=has_completed_questionnaire %}
+    {% if is_owner %}
+      {% if not completed %}
+        <h1 class="page-title">
+          Welcome {{ student.first_name }} {{ student.last_name }}.
+        </h1>
+        <p class="text-primary-dark-teal text-lg font-light text-center">
+          Please complete your Pre-appointment Questionnaire.
+        </p>
+      {% else %}
+        <h1 class="page-title">
+          Your Pre-appointment Questionnaire
+        </h1>
+      {% endif %}
+    {% else %}
+      {% if completed %}
+        <h1 class="page-title">
+          Pre-appointment Questionnaire Response for {{ student.first_name }} {{ student.last_name }}
+        </h1>
+      {% else %}
+        <h1 class="page-title">
+          Pre-appointment Questionnaire for {{ student.first_name }} {{ student.last_name }}
+        </h1>
+        <p class="text-gray-600 text-center">Not completed yet.</p>
+      {% endif %}
+    {% endif %}
+  {% endwith %}
+
 
   <hr class="page-divider"> <!-- Divider after Welcome Message -->
   <!-- 🆕 Display User Info for Admins and Teachers -->

@@ -256,55 +256,60 @@ def toggle_advising_status(request):
 
 # Questionnaire View
 @login_required
-def questionnaire_view(request, student_id = None):
+def questionnaire_view(request, student_id=None):
   """
-  Handles the questionnaire view for both students and admins.
+  Students: view/edit own questionnaire
+  Teachers/Admins: view a student's questionnaire (read-only)
+  """
+  # Determine whose questionnaire is being viewed
+  if student_id is not None:
+    # 🔒 only staff (teacher/admin) can view another student's page
+    if request.user.role not in ('teacher', 'admin'):
+      return HttpResponseForbidden("Not allowed")
 
-  - Students: Can view and edit their own questionnaire.
-  - Admins: Can view a student's completed questionnaire in read-only mode.
-  """
-  if student_id:
-    # Admin is viewing a specific student's questionnaire
-    student = CustomUser.objects.filter(id=student_id, role='student').first()
-    if not student or not hasattr(student, 'studentprofile'):
-      return render(request, '404.html', status=404)  # Render a 404 page if the student does not exist
-    student_profile = student.studentprofile
-    is_editing = False  # Admins cannot edit student questionnaires
+    student = get_object_or_404(CustomUser, id=student_id, role='student')
+    student_profile = getattr(student, 'studentprofile', None)
+    if not student_profile:
+      return render(request, '404.html', status=404)
+
+    is_owner = False
+    is_editing = False  # staff cannot edit
   else:
-    # Student is viewing their own questionnaire
+    # Student viewing their own
     student = request.user
-    student_profile = request.user.studentprofile
-
-    # Check if the student has any completed questionnaires
-    has_completed_questionnaires = student_profile.questionnaires.filter(completed=True).exists()
-
-    # Determine if the user is in edit mode
+    student_profile = student.studentprofile
+    is_owner = True
     is_editing = request.GET.get('edit', 'false').lower() == 'true'
-    if not has_completed_questionnaires:
-      is_editing = True  # Force edit mode if no completed questionnaires exist
 
-  # Get the latest questionnaire for display
+  # ✅ unified completed flag (singular)
+  has_completed = student_profile.questionnaires.filter(completed=True).exists()
+
+  # Force edit if owner has never completed
+  if is_owner and not has_completed:
+    is_editing = True
+
   latest_questionnaire = student_profile.questionnaires.order_by('-created_at').first()
 
-  if request.method == 'POST' and is_editing:
-    # Handle form submission for editing or creating a questionnaire
+  if request.method == 'POST' and is_owner and is_editing:
     form = QuestionnaireForm(request.POST)
     if form.is_valid():
-      new_questionnaire = form.save(commit=False)
-      new_questionnaire.student_profile = student_profile  # Associate the questionnaire with the student profile
-      new_questionnaire.completed = True  # Mark the questionnaire as completed
-      new_questionnaire.save()
-      return redirect('questionnaire')  # Redirect to prevent duplicate submissions
+      obj = form.save(commit=False)
+      obj.student_profile = student_profile
+      obj.completed = True
+      obj.save()
+      # Student just submitted their own form
+      return redirect('questionnaire')
   else:
-    # Pre-fill the form with the latest questionnaire data if available
     form = QuestionnaireForm(instance=latest_questionnaire)
 
   return render(request, 'users/questionnaire.html', {
-    'form': form,  # Form for editing or displaying the questionnaire
-    'is_editing': is_editing,  # Whether the user is in edit mode
-    'student': student,  # Student object for displaying name in the template
-    'latest_questionnaire': latest_questionnaire,  # Latest questionnaire for context
-    'questionnaires': student_profile.questionnaires.filter(completed=True).order_by('-created_at'),  # Completed questionnaires
+    'form': form,
+    'is_editing': is_editing,
+    'student': student,
+    'latest_questionnaire': latest_questionnaire,
+    'questionnaires': student_profile.questionnaires.filter(completed=True).order_by('-created_at'),
+    'has_completed_questionnaire': has_completed, 
+    'is_owner': is_owner,
   })
 
 
