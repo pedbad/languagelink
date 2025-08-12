@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 # Django core
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, Http404
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
@@ -17,6 +18,7 @@ from django.db.models import Q
 
 # Local app
 from .models import TeacherAvailability, Booking
+from .utils import slot_is_in_past_or_too_soon
 from users.models import TeacherProfile
 
 
@@ -76,7 +78,6 @@ def teacher_availability_view(request):
       slot_info["student_email"] = student.email
       slot_info["student_message"] = slot.booking.message or ""
 
-
       try:
         profile = student.studentprofile
         if profile.profile_picture:
@@ -107,7 +108,7 @@ def teacher_availability_view(request):
         }
 
   context = {
-    "today": date.today(),
+    "today": timezone.localdate(),
     "month_dates": month_dates,
     "time_slots": time_slots,
     "availability_dict": availability_dict,
@@ -119,22 +120,23 @@ def teacher_availability_view(request):
     "next_year": year if month < 12 else year + 1,
   }
 
+  now_local = timezone.localtime()
+  context["now_date"] = now_local.date()
+  context["cutoff_time"] = (now_local + timedelta(minutes=settings.BOOKING_LEAD_MINUTES)).time().replace(microsecond=0)
+
   return render(request, "booking/teacher_availability.html", context)
 
 
 @csrf_exempt  # Allows AJAX POST requests without CSRF issues
+@require_POST
 @login_required
 def toggle_availability(request):
   """
   Toggles a specific time slot's availability for the logged-in teacher.
   """
-
-  #print("DEBUG: Toggle Availability View Hit!")
-
   if request.method == "POST":
     try:
       data = json.loads(request.body)
-      #print(f"DEBUG: Received Data - {data}")
 
       date_str = data.get("date")
       start_time_str = data.get("start_time")
@@ -151,7 +153,7 @@ def toggle_availability(request):
       if request.user.role != "teacher":
         return JsonResponse({"error": "Unauthorized access"}, status=403)
 
-      # Fetch or create slot, then toggle availability
+      # Fetch or create slot
       slot, created = TeacherAvailability.objects.get_or_create(
         teacher=request.user,
         date=slot_date,
@@ -159,155 +161,48 @@ def toggle_availability(request):
         end_time=end_time
       )
 
-      #print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
+      # Determine the new state (True = opening the slot)
+      new_state = not slot.is_available
 
-      slot.is_available = not slot.is_available
-      slot.save(update_fields=['is_available'])  # Save only `is_available` field
+      # Block opening if the slot is in the past or within the lead window
+      if new_state:
+        if slot_is_in_past_or_too_soon(slot.date, slot.start_time):
+          return JsonResponse(
+            {"success": False, "error": "You can’t open past or too-soon slots."},
+            status=400
+          )
 
-      #print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
+      # Proceed with the toggle
+      slot.is_available = new_state
+      slot.save(update_fields=["is_available"])
 
-      # Convert availability_dict keys into **strings** (JSON-safe)
+      # Refresh availability dict for the month (string keys for JSON)
       teacher_availabilities = TeacherAvailability.objects.filter(
         teacher=request.user, date__year=slot_date.year, date__month=slot_date.month
       )
-
       updated_availability_dict = {
-        f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}": slot.is_available
-        for slot in teacher_availabilities
+        f"{s.date.strftime('%Y-%m-%d')},{s.start_time.strftime('%H:%M:%S')}": s.is_available
+        for s in teacher_availabilities
       }
 
       return JsonResponse({
-        "success": True, 
-        "is_available": slot.is_available, 
-        "availability_dict": updated_availability_dict  # Now has string keys
+        "success": True,
+        "is_available": slot.is_available,
+        "availability_dict": updated_availability_dict
       })
 
     except Exception as e:
-      print(f"ERROR: {e}")  # Log any errors
+      print(f"ERROR: {e}")
       return JsonResponse({"error": str(e)}, status=400)
 
-  #print("DEBUG: Invalid Request Method")
   return JsonResponse({"error": "Invalid request"}, status=400)
 
-  """
-  Toggles a specific time slot's availability for the logged-in teacher.
-  """
-
-  #print("DEBUG: Toggle Availability View Hit!")
-
-  if request.method == "POST":
-    try:
-      data = json.loads(request.body)
-      #print(f"DEBUG: Received Data - {data}")
-
-      date_str = data.get("date")
-      start_time_str = data.get("start_time")
-      end_time_str = data.get("end_time")
-
-      if not all([date_str, start_time_str, end_time_str]):
-        return JsonResponse({"error": "Missing required fields"}, status=400)
-
-      slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-      slot_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
-      end_time = datetime.strptime(end_time_str, "%H:%M:%S").time()
-
-      # Ensure the user is a teacher
-      if request.user.role != "teacher":
-        return JsonResponse({"error": "Unauthorized access"}, status=403)
-
-      # Fetch or create slot, then toggle availability
-      slot, created = TeacherAvailability.objects.get_or_create(
-        teacher=request.user,
-        date=slot_date,
-        start_time=slot_time,
-        end_time=end_time
-      )
-
-      #print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
-
-      slot.is_available = not slot.is_available
-      slot.save(update_fields=['is_available'])  # Save only `is_available` field
-
-      #print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
-
-      # Return the entire updated availability dictionary
-      teacher_availabilities = TeacherAvailability.objects.filter(
-        teacher=request.user, date__year=slot_date.year, date__month=slot_date.month
-      )
-
-      updated_availability_dict = {
-        (slot.date.strftime('%Y-%m-%d'), slot.start_time.strftime('%H:%M:%S')): slot.is_available
-        for slot in teacher_availabilities
-      }
-
-      return JsonResponse({
-        "success": True, 
-        "is_available": slot.is_available, 
-        "availability_dict": updated_availability_dict  # Send updated data
-      })
-
-    except Exception as e:
-      print(f"ERROR: {e}")  # Log any errors
-      return JsonResponse({"error": str(e)}, status=400)
-
-  #print("DEBUG: Invalid Request Method")
-  return JsonResponse({"error": "Invalid request"}, status=400)
-
-  """
-  Toggles a specific time slot's availability for the logged-in teacher.
-  """
-
-  #print("DEBUG: Toggle Availability View Hit!")
-
-  if request.method == "POST":
-    try:
-      data = json.loads(request.body)
-      #print(f"DEBUG: Received Data - {data}")
-
-      date_str = data.get("date")
-      start_time_str = data.get("start_time")
-      end_time_str = data.get("end_time")
-
-      if not all([date_str, start_time_str, end_time_str]):
-        return JsonResponse({"error": "Missing required fields"}, status=400)
-
-      slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-      slot_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
-      end_time = datetime.strptime(end_time_str, "%H:%M:%S").time()
-
-      # Ensure the user is a teacher
-      if request.user.role != "teacher":
-        return JsonResponse({"error": "Unauthorized access"}, status=403)
-
-      # Fetch or create slot, then toggle availability
-      slot, created = TeacherAvailability.objects.get_or_create(
-        teacher=request.user,
-        date=slot_date,
-        start_time=slot_time,
-        end_time=end_time
-      )
-
-      #print(f"DEBUG: Before Toggle - Exists: {not created}, Available: {slot.is_available}")
-
-      slot.is_available = not slot.is_available
-      slot.save(update_fields=['is_available'])  # Save only `is_available` field
-
-      #print(f"DEBUG: After Toggle - Updated Slot: {slot.date}, {slot.start_time}, Available: {slot.is_available}")
-
-      return JsonResponse({"success": True, "is_available": slot.is_available})
-
-    except Exception as e:
-      print(f"ERROR: {e}")  # Log any errors
-      return JsonResponse({"error": str(e)}, status=400)
-
-  #print("DEBUG: Invalid Request Method")
-  return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
 def student_booking_view(request):
   # Get today's date
-  today = date.today()
+  today = timezone.localdate()
 
   # Try to get selected date from query string, fallback to today
   selected_date_str = request.GET.get("date")
@@ -361,16 +256,17 @@ def student_booking_view(request):
     for minute in (0, 30)
   ]
 
-  # Fetch all availability slots in the selected week, along with related teacher and booking
-  all_slots = TeacherAvailability.objects.filter(
-    date__range=(week_start, week_end)
-  ).select_related("teacher", "booking")
+  # === Include teachers who have at least one available slot on the SELECTED DAY ===
+  day_slots = (
+  TeacherAvailability.objects
+    .filter(date=selected_date, is_available=True, booking__isnull=True)
+    .select_related("teacher")
+)
 
   teacher_availability_by_email = {}
   teacher_profiles = {}
 
-  # Organize slots by teacher email and day+time key
-  for slot in all_slots:
+  for slot in day_slots:
     try:
       profile = slot.teacher.teacherprofile
       if not profile.is_active_advisor:
@@ -378,25 +274,19 @@ def student_booking_view(request):
 
       teacher_email = slot.teacher.email
       key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
-
       teacher_availability_by_email.setdefault(teacher_email, {})[key] = slot
       teacher_profiles[teacher_email] = profile
 
     except TeacherProfile.DoesNotExist:
       continue  # Skip teachers without profiles
 
-  # Ensure every time slot exists (even if not in DB)
-  for email in teacher_availability_by_email.keys():
-    for day in week_dates:
-      date_str = day.strftime('%Y-%m-%d')
-      for start_time, _ in time_slots:
-        key = f"{date_str},{start_time.strftime('%H:%M:%S')}"
-        if key not in teacher_availability_by_email[email]:
-          teacher_availability_by_email[email][key] = None
-
-  # Debug print of final availability structure (optional)
-  # import pprint
-  # pprint.pprint(teacher_availability_by_email)
+  # Ensure every time slot exists (even if not in DB) for the teachers we kept — for SELECTED DAY ONLY
+  date_str = selected_date.strftime('%Y-%m-%d')
+  for email in list(teacher_availability_by_email.keys()):
+    for start_time, _ in time_slots:
+      key = f"{date_str},{start_time.strftime('%H:%M:%S')}"
+      if key not in teacher_availability_by_email[email]:
+        teacher_availability_by_email[email][key] = None
 
   # Pass all data to the template
   context = {
@@ -411,8 +301,13 @@ def student_booking_view(request):
     "time_slots": time_slots,
     "teacher_availability_by_email": teacher_availability_by_email,
     "teacher_profiles": teacher_profiles,
-    "student_email": request.user.email,  
+    "student_email": request.user.email,
   }
+
+  # Provide 'now' and 'cutoff' for visual disabling in the template
+  now_local = timezone.localtime()
+  context["now_date"] = now_local.date()
+  context["cutoff_time"] = (now_local + timedelta(minutes=settings.BOOKING_LEAD_MINUTES)).time().replace(microsecond=0)
 
   return render(request, "booking/student_booking_view.html", context)
 
@@ -477,6 +372,10 @@ def create_booking(request):
     if not all([teacher_email, date_str, start_time_str, end_time_str]):
       return JsonResponse({"error": "Missing required data"}, status=400)
 
+    # Optional: ensure only students can create bookings
+    if getattr(request.user, "role", None) != "student":
+      return JsonResponse({"error": "Unauthorized access"}, status=403)
+
     # Parse string inputs
     slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
     start_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
@@ -499,6 +398,10 @@ def create_booking(request):
       )
     except TeacherAvailability.DoesNotExist:
       return JsonResponse({"error": "This slot is not available"}, status=404)
+
+    # NEW: Block booking if slot is in the past or within the lead window
+    if slot_is_in_past_or_too_soon(slot.date, slot.start_time):
+      return JsonResponse({"error": "This slot is no longer available to book."}, status=400)
 
     # Prevent double booking
     if hasattr(slot, "booking"):
@@ -526,16 +429,11 @@ def create_booking(request):
       if profile.profile_picture:
         try:
           avatar_url = profile.profile_picture.url
-
-          # Optional check for production; skip in dev
           is_dev = settings.DEBUG and settings.MEDIA_URL in avatar_url
-
           if is_dev or default_storage.exists(profile.profile_picture.name):
             teacher_avatar = avatar_url
-
         except Exception as img_err:
           print("⚠️ Avatar resolution error:", img_err)
-
     except TeacherProfile.DoesNotExist:
       pass
 

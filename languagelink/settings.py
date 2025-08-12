@@ -97,9 +97,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
+# Block slots that start in the past or too soon (minutes)
+BOOKING_LEAD_MINUTES = 60  # set 0 if you only want to block past, not "soon"
+TIME_ZONE = "Europe/London"  # (ensure this is set)
 USE_TZ = True
+
+USE_I18N = True
+
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
