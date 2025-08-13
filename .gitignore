@@ -28,3 +28,7 @@ node_modules/
 media/
 
 dev_passwords.txt
+
+#so test emails don’t get committed:
+tmp_emails/
+*.eml

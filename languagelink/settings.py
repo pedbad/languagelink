@@ -9,11 +9,17 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load variables from .env (local development convenience)
+# This makes os.getenv(...) pick up values from the file advising-team/advising-team/.env
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -63,7 +69,6 @@ TEMPLATES = [
         'django.template.context_processors.request',
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
-        'django.template.context_processors.request',
       ],
     },
   },
@@ -150,3 +155,46 @@ CSRF_TRUSTED_ORIGINS = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
 ]
+
+
+
+# -------------------------------
+# Email configuration
+# Purpose:
+#  - In development, use a safe backend (console/file) so no real emails are sent.
+#  - In production, flip to University SMTP via environment variables only.
+#  - Keep a single source for From address and a site URL for links in emails.
+# -------------------------------
+
+# Who the email appears to be from (adjust the address if needed)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "LanguageLink <no-reply@langcen.cam.ac.uk>")
+
+# Optional: prefix subjects to spot app emails in inbox/search
+EMAIL_SUBJECT_PREFIX = os.getenv("EMAIL_SUBJECT_PREFIX", "[LanguageLink] ")
+
+# Sender for Django's internal error emails (defaults to DEFAULT_FROM_EMAIL)
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+
+# Choose the email backend by environment variable.
+# Dev default: console backend prints full emails to the runserver console.
+EMAIL_BACKEND = os.getenv(
+  "EMAIL_BACKEND",
+  "django.core.mail.backends.console.EmailBackend"
+)
+
+# Path used by the file-based email backend (only if you enable that backend)
+EMAIL_FILE_PATH = os.getenv("EMAIL_FILE_PATH", str(BASE_DIR / "tmp_emails"))
+
+
+# SMTP settings are only used if EMAIL_BACKEND is set to the SMTP backend.
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "false").lower() == "true"
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))
+
+# Base URL used to build absolute links inside emails when no request is available.
+# Dev default points at your local server.
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
