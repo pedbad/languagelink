@@ -256,12 +256,13 @@ def student_booking_view(request):
     for minute in (0, 30)
   ]
 
-  # === Include teachers who have at least one available slot on the SELECTED DAY ===
+  # === Include slots that are AVAILABLE or already BOOKED on the selected day ===
   day_slots = (
-  TeacherAvailability.objects
-    .filter(date=selected_date, is_available=True, booking__isnull=True)
-    .select_related("teacher")
-)
+      TeacherAvailability.objects
+        .filter(date=selected_date)
+        .filter(Q(is_available=True) | Q(booking__isnull=False))  # <- key change
+        .select_related("teacher", "booking__student")            # bring booking+student
+  )
 
   teacher_availability_by_email = {}
   teacher_profiles = {}

@@ -218,8 +218,6 @@
       });
     }
 
-
-
     // === Toggle Advising Status Dynamically ===
     const checkbox = document.getElementById('is_active_advisor');
     const label = document.getElementById('toggle-label');
@@ -327,6 +325,68 @@
       });
     });
 
+    // ————————————————————————————————————————————————
+    // Student bookings: grey out & block past/too-soon slots
+    // ————————————————————————————————————————————————
+    function reapplyDisabledStudentSlots() {
+      // Only run on the student booking page
+      if (!document.getElementById('student-booking-page')) return;
+
+      const table = document.getElementById('availability-table');
+      if (!table) return;
+
+      const nowDate = table.getAttribute('data-now-date'); // "YYYY-MM-DD"
+      const cutoff  = table.getAttribute('data-cutoff');   // "HH:MM:SS"
+      if (!nowDate || !cutoff) return;
+
+      // Only clickable student buttons
+      const buttons = table.querySelectorAll('.booking-slot');
+
+      buttons.forEach((btn) => {
+        // reset first
+        btn.classList.remove('opacity-50', 'cursor-not-allowed', 'select-none');
+        btn.removeAttribute('aria-disabled');
+        btn.title = '';
+
+        const d = btn.getAttribute('data-date'); // "YYYY-MM-DD"
+        const s = btn.getAttribute('data-start') || btn.getAttribute('data-start-time'); // "HH:MM:SS"
+        if (!d || !s) return;
+
+        // Past days → disable
+        if (d < nowDate) {
+          btn.classList.add('opacity-50', 'cursor-not-allowed', 'select-none');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.classList.remove('hover:bg-green-600', 'cursor-pointer'); // kill hover
+          btn.title = 'Past or within lead time';
+          return;
+        }
+
+        // Today and starts <= cutoff → disable
+        if (d === nowDate && s <= cutoff) {
+          btn.classList.add('opacity-50', 'cursor-not-allowed', 'select-none');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.classList.remove('hover:bg-green-600', 'cursor-pointer'); // kill hover
+          btn.title = 'Past or within lead time';
+        }
+      });
+
+      // Also fade the pink X (unavailable) dots in the past/too soon ---
+      const xDots = table.querySelectorAll('.unavailable-slot');
+      xDots.forEach((dot) => {
+        // reset (in case of re-run)
+        dot.classList.remove('opacity-50', 'select-none');
+
+        const d = dot.getAttribute('data-date');  // "YYYY-MM-DD"
+        const s = dot.getAttribute('data-start'); // "HH:MM:SS"
+        if (!d || !s) return;
+
+        if (d < nowDate || (d === nowDate && s <= cutoff)) {
+          dot.classList.add('opacity-50', 'select-none');
+          if (!dot.title) dot.title = 'Past or within lead time';
+        }
+      });
+    }
+
 
     // ————————————————————————————————————————————————
     // Teacher availability: grey out & block past/too-soon slots
@@ -374,16 +434,17 @@
       });
     }
 
-    // Swallow clicks on disabled teacher buttons (even if other handlers are attached)
-    document.getElementById('availability-table')?.addEventListener('click', (e) => {
-      const btn = e.target.closest('.availability-slot.toggle-slot');
+
+    // Block clicks on ANY disabled slot button (student or teacher)
+    const availabilityTable = document.getElementById('availability-table');
+    availabilityTable?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.availability-slot.toggle-slot, .booking-slot');
       if (!btn) return;
       if (btn.getAttribute('aria-disabled') === 'true') {
         e.preventDefault();
-        e.stopPropagation();
+        e.stopImmediatePropagation(); // stop all other handlers on this click
       }
-    }, true);
-
+    }, true); // capture phase so we catch it early
 
 
     // Function to update the availability UI based on new data from the backend
@@ -436,17 +497,7 @@
       return '';
     }
 
-    // ————————————————————————————————————————————————
-    // HTMX global config: inject CSRF token into every HTMX request
-    // ————————————————————————————————————————————————
-    // Listens for HTMX’s configRequest event and adds the X-CSRFToken header
-    document.body.addEventListener('htmx:configRequest', function(event) {
-      const token = getCSRFToken(); // grab the token from cookies
-      if (token) {
-        // event.detail.headers is the object HTMX will send as HTTP headers
-        event.detail.headers['X-CSRFToken'] = token;
-      }
-    });
+
 
 
 
@@ -797,11 +848,17 @@
 
     // Apply on initial load
     reapplyDisabledTeacherSlots();
+    reapplyDisabledStudentSlots();
 
     document.querySelectorAll(".note-content").forEach(fixNoteLinks);
 
     // Re-run after any HTMX swap (so newly inserted notes get the same treatment):
     document.body.addEventListener("htmx:afterSwap", (evt) => {
+      // Re-apply disabled/lead-time logic to any newly swapped-in slots
+      reapplyDisabledTeacherSlots();
+      reapplyDisabledStudentSlots();
+
+      // keep your existing note link handling
       let t = evt.detail.target;
       if (t.matches?.(".note-content")) {
         fixNoteLinks(t);
@@ -809,6 +866,7 @@
         t.querySelectorAll?.(".note-content").forEach(fixNoteLinks);
       }
     });
+
 
   });
 })();
