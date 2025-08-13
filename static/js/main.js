@@ -9,7 +9,6 @@
       });
     }
 
-
     // === Hamburger menu toggle ===
     const hamburger = document.getElementById('hamburger');
     if (hamburger) {
@@ -140,7 +139,6 @@
     }
 
 
-
     // === Toggle In-Person Hosting Availability Dynamically ===
     const inPersonCheckbox = document.getElementById('can_host_in_person');
     const inPersonLabel = document.getElementById('in-person-toggle-label');
@@ -264,6 +262,11 @@
 
     availabilityButtons.forEach(button => {
       button.addEventListener('click', async function () {
+        // Don’t allow toggling if our helper marked it disabled
+        if (this.getAttribute('aria-disabled') === 'true') {
+          return;
+        }
+
         const date = this.getAttribute('data-date');
         const startTime = this.getAttribute('data-start-time');
         const endTime = this.getAttribute('data-end-time');
@@ -298,14 +301,14 @@
               this.classList.remove('bg-pink-400', 'hover:bg-pink-500');
               this.classList.add('bg-green-500', 'hover:bg-green-600');
               this.innerHTML = `
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 12l5 5L20 7"/>
                 </svg>`;
             } else {
               this.classList.remove('bg-green-500', 'hover:bg-green-600');
               this.classList.add('bg-pink-400', 'hover:bg-pink-500');
               this.innerHTML = `
-                <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M6 6l12 12M18 6l-12 12"/>
                 </svg>`;
             }
@@ -323,6 +326,65 @@
         }
       });
     });
+
+
+    // ————————————————————————————————————————————————
+    // Teacher availability: grey out & block past/too-soon slots
+    // ————————————————————————————————————————————————
+    function reapplyDisabledTeacherSlots() {
+      // Only run on the teacher availability page
+      if (!document.getElementById('teacher-availability-page')) return;
+
+      const table = document.getElementById('availability-table');
+      if (!table) return;
+
+      const nowDate = table.getAttribute('data-now-date'); // "YYYY-MM-DD"
+      const cutoff  = table.getAttribute('data-cutoff');   // "HH:MM:SS"
+      if (!nowDate || !cutoff) return;
+
+      // Only target toggleable buttons (available/unavailable), not booked (clock) buttons
+      const buttons = table.querySelectorAll('.availability-slot.toggle-slot');
+
+      buttons.forEach((btn) => {
+        // Reset any previous state (so toggles re-evaluate cleanly)
+        btn.classList.remove('opacity-50', 'pointer-events-none', 'cursor-not-allowed', 'select-none');
+        btn.removeAttribute('aria-disabled');
+        btn.title = '';
+
+        const d = btn.getAttribute('data-date'); // "YYYY-MM-DD"
+        const s = btn.getAttribute('data-start') || btn.getAttribute('data-start-time'); // "HH:MM:SS"
+        if (!d || !s) return;
+
+        // Past days → disable
+        if (d < nowDate) {
+          btn.classList.add('opacity-50', 'cursor-not-allowed', 'select-none');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.classList.remove('hover:bg-green-600', 'hover:bg-pink-500');
+          btn.title = 'Past or within lead time';
+          return;
+        }
+
+        // Today and starts <= cutoff → disable
+        if (d === nowDate && s <= cutoff) {
+          btn.classList.add('opacity-50', 'cursor-not-allowed', 'select-none');
+          btn.setAttribute('aria-disabled', 'true');
+          btn.classList.remove('hover:bg-green-600', 'hover:bg-pink-500');
+          btn.title = 'Past or within lead time';
+        }
+      });
+    }
+
+    // Swallow clicks on disabled teacher buttons (even if other handlers are attached)
+    document.getElementById('availability-table')?.addEventListener('click', (e) => {
+      const btn = e.target.closest('.availability-slot.toggle-slot');
+      if (!btn) return;
+      if (btn.getAttribute('aria-disabled') === 'true') {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, true);
+
+
 
     // Function to update the availability UI based on new data from the backend
     function updateAvailabilityUI(availabilityDict) {
@@ -349,6 +411,9 @@
             </svg>`;
         }
       });
+
+      // Re-apply disabled rule after any visual update
+      reapplyDisabledTeacherSlots();
     }
 
     
@@ -729,6 +794,10 @@
 
 
     // Run once on initial page load:
+
+    // Apply on initial load
+    reapplyDisabledTeacherSlots();
+
     document.querySelectorAll(".note-content").forEach(fixNoteLinks);
 
     // Re-run after any HTMX swap (so newly inserted notes get the same treatment):

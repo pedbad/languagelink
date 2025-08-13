@@ -92,21 +92,28 @@ module.exports = {
 
     // form-field and form-control *base* styles
     function({ addComponents }) {
-        addComponents({
-          '.form-field': { '@apply mb-6 relative': {} },
-          '.form-field + .form-field': { '@apply border-t border-primary-dark-teal border-opacity-30 pt-6': {} },
-          '.floating-input': { '@apply relative': {} },
+      addComponents({
+        '.form-field': { '@apply mb-6 relative': {} },
+        '.form-field + .form-field': { '@apply border-t border-primary-dark-teal border-opacity-30 pt-6': {} },
+        '.floating-input': { '@apply relative': {} },
 
-          // 👇 THIS is the important fix
-          '.form-control': {
-            '@apply block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:border-primary-dark-teal': {}
-          },
-          'textarea.form-control': {
-            '@apply min-h-[120px]': {}
-          },
-        })
-      },
+        '.form-control': {
+          '@apply block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-dark-teal focus:border-primary-dark-teal': {}
+        },
+        'textarea.form-control': {
+          '@apply min-h-[120px]': {}
+        },
+      })
+    },
 
+    function ({ addComponents }) {
+      addComponents({
+        /* Disabled teacher slot: show not-allowed on the button AND its children (SVG) */
+        '#availability-table .availability-slot[aria-disabled="true"], #availability-table .availability-slot[aria-disabled="true"] *': {
+          cursor: 'not-allowed'
+        },
+      });
+    },
 
     // all your existing btn / badge / toggle components…
     function ({ addComponents }) {

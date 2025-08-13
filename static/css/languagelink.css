@@ -1228,6 +1228,10 @@ textarea.form-control {
   min-height: 120px;
 }
 
+#availability-table .availability-slot[aria-disabled="true"], #availability-table .availability-slot[aria-disabled="true"] * {
+  cursor: not-allowed;
+}
+
 .btn-primary {
   display: inline-flex;
   cursor: pointer;
@@ -2482,6 +2486,12 @@ textarea.form-control {
   cursor: pointer;
 }
 
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+}
+
 .list-disc {
   list-style-type: disc;
 }
@@ -3178,10 +3188,6 @@ textarea.form-control {
 
 .opacity-50 {
   opacity: 0.5;
-}
-
-.opacity-60 {
-  opacity: 0.6;
 }
 
 .shadow {

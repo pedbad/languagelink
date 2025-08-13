@@ -69,7 +69,12 @@
       
       <!-- Availability Table -->
       <div class="overflow-x-auto">
-        <table id="availability-table" class="w-full border-collapse border border-gray-300 text-sm sm:text-base mb-10">
+        <table
+          id="availability-table"
+          data-now-date="{{ now_date|date:'Y-m-d' }}"
+          data-cutoff="{{ cutoff_time|time:'H:i:s' }}"
+          class="w-full border-collapse border border-gray-300 text-sm sm:text-base mb-10"
+        >
           <thead>
             <!-- AM / PM Header Row -->
             <tr>
@@ -100,7 +105,7 @@
             {% for day in month_dates %}
               <tr class="text-center 
                 {% if day|date:'Y-m-d' == today|date:'Y-m-d' %} border-l-4 border-deep-teal {% endif %}
-                {% if day < today %} bg-gray-200 opacity-60 {% endif %}">
+                {% if day < today %} bg-gray-100 {% endif %}">
           
                 <!-- Date Column -->
                 <td class="border border-gray-300 px-4 py-2 font-semibold 
@@ -118,13 +123,14 @@
                           {% if slot and slot.has_booking %}
                             <!-- Slot is BOOKED -->
                             <button 
-                              class="booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
+                              class="availability-slot booked-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-dark-orange text-white mx-auto cursor-pointer" 
                               title="Already booked"
                               data-user-name="{{ slot.student_name }}"
                               data-user-email="{{ slot.student_email }}"
                               data-avatar="{{ slot.student_avatar }}"
                               data-date="{{ date_str }}"
                               data-start="{{ time_str }}"
+                              data-start-time="{{ time_str }}"
                               data-end="{{ end_time|time:'H:i:s' }}"
                               data-message="{{ slot.student_message|default:''|escape }}"
                             >
@@ -134,17 +140,18 @@
                               </svg>                                
                             </button>
 
-
-
                           {% elif slot and slot.is_available %}
                             <!-- Slot is AVAILABLE -->
-                            <button 
-                              data-date="{{ date_str }}" 
-                              data-start-time="{{ time_str }}" 
+                            <button
+                              data-date="{{ date_str }}"
+                              data-start="{{ time_str }}"
+                              data-start-time="{{ time_str }}"
                               data-end-time="{{ end_time|time:'H:i:s' }}"
-                              class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-green-500 text-white hover:bg-green-600 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
+                              {% if day < today %} aria-disabled="true" {% endif %}
+                              class="availability-slot toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-green-500 text-white
+                                    {% if day >= today %} hover:bg-green-600 {% endif %}
+                                    {% if day < today %} cursor-not-allowed opacity-50 select-none {% endif %}"
                             >
-                              <!-- Check Icon -->
                               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 12l5 5L20 7"/>
                               </svg>
@@ -152,27 +159,28 @@
 
                           {% else %}
                             <!-- Slot is UNAVAILABLE (either False or slot doesn't exist) -->
-                            <button 
-                              data-date="{{ date_str }}" 
-                              data-start-time="{{ time_str }}" 
-                              data-end-time="{{ end_time|time:'H:i:s' }}"
-                              class="toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-pink-400 text-white hover:bg-pink-500 {% if day < today %} cursor-not-allowed opacity-50 {% endif %}"
-                            >
-                              <!-- X Icon -->
-                              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M6 6l12 12M18 6l-12 12"/>
-                              </svg>
-                            </button>
+                             <button
+                                data-date="{{ date_str }}"
+                                data-start="{{ time_str }}"
+                                data-start-time="{{ time_str }}"
+                                data-end-time="{{ end_time|time:'H:i:s' }}"
+                                {% if day < today %} aria-disabled="true" {% endif %}
+                                class="availability-slot toggle-slot flex items-center justify-center w-6 h-6 rounded-full shadow-md bg-pink-400 text-white
+                                      {% if day >= today %} hover:bg-pink-500 {% endif %}
+                                      {% if day < today %} cursor-not-allowed opacity-50 select-none {% endif %}"
+                              >
+                                <!-- X Icon -->
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                  <path d="M6 6l12 12M18 6l-12 12"/>
+                                </svg>
+                              </button>
                           {% endif %}
-
                         </td>
                       {% endwith %}
                     {% endwith %}
                   {% endwith %}
                 {% endfor %}
-
-              </tr>
-          
+              </tr>          
               <!-- Optional spacer row after Fridays -->
               {% if day|date:"D" == "Fri" %}
                 <tr>
