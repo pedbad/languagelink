@@ -206,7 +206,6 @@ def toggle_availability(request):
   return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-
 @login_required
 def student_booking_view(request):
   if request.user.role == 'student' and not has_completed_questionnaire(request.user):

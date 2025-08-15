@@ -39,7 +39,14 @@ from .models import (
 # -----------------------------------------------------------------------------
 # Notifications (local app)
 # -----------------------------------------------------------------------------
-from notifications.services import notify_password_changed, notify_user_invited, notify_admins_user_invited
+# Notifications (local app)
+from notifications.services import (
+  notify_password_changed,
+  notify_user_invited,
+  notify_admins_user_invited,
+  notify_resource_note_created,
+)
+
 
 
 # Registration View
@@ -78,7 +85,6 @@ def register(request):
   # GET: show blank form (optionally prefill role from querystring)
   form = CustomUserCreationForm()  # or CustomUserCreationForm(initial={'role': request.GET.get('role')})
   return render(request, 'users/register.html', {'form': form})
-
 
 
 # Login View
@@ -387,6 +393,7 @@ def student_resource_view(request):
         note.student_profile = student_profile
         note.author = user
         note.save()
+        notify_resource_note_created(note)   # ← send emails for this new note
         # avoid double-POST: build URL + query and redirect
         base_url = reverse('student_resource')
         return redirect(f"{base_url}?student_id={student_profile.user.id}")

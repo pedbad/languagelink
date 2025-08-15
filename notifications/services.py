@@ -17,6 +17,7 @@ from django.db import transaction
 from django.urls import reverse  # build reset-confirm URL
 from django.utils.encoding import force_bytes  # encode user pk
 from django.utils.http import urlsafe_base64_encode  # safe uid in URLs
+from django.utils.text import Truncator
 
 # -----------------------------------------------------------------------------
 # Local app imports
@@ -245,5 +246,35 @@ def notify_admins_user_invited(user):
   transaction.on_commit(lambda: send_plain_email(
     subject=subject,
     to=admins,
+    body_text=body,
+  ))
+
+
+# ---- Teacher note notifications ----
+def notify_resource_note_created(note):
+  """
+  Notify the student when a new resource note is created for them.
+  Sends to: student only (no admin copy).
+  """
+  from django.urls import reverse  # already imported at top; safe to re-import
+
+  student = note.student_profile.user
+  author  = note.author
+
+  # Build a student-friendly link to their resources page
+  student_notes_url = abs_url(reverse("student_resource"))
+
+  author_name = getattr(author, "first_name", "") or "your advisor"
+  subject = "New note from your advisor"
+  body = (
+    f"Hi {getattr(student, 'first_name', '') or 'there'},\n\n"
+    f"{author_name} added a new note to your LanguageLink resources.\n\n"
+    f"View it here: {student_notes_url}\n"
+  )
+
+  # Send after DB commit only
+  transaction.on_commit(lambda: send_plain_email(
+    subject=subject,
+    to=[student.email],
     body_text=body,
   ))
