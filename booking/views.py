@@ -13,6 +13,7 @@ from html import escape
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
+from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.http import JsonResponse 
 from django.shortcuts import render, redirect, get_object_or_404  # get_object_or_404 for advisor filter
@@ -211,7 +212,8 @@ def student_booking_view(request):
   if request.user.role == 'student' and not has_completed_questionnaire(request.user):
     return redirect('questionnaire')  # or HttpResponseForbidden("Please complete the questionnaire first")
   
-  # --- Advisor filter (optional: /booking/bookings/?advisor=123) ---
+  # Advisor hint (optional: /booking/bookings/?advisor=123)
+  # We only validate/highlight; we do NOT filter the grid by this ID.
   advisor_id = request.GET.get("advisor")
   teacher_user = None
   if advisor_id:
@@ -382,73 +384,80 @@ def get_available_slots(request):
 @require_POST
 @login_required
 def create_booking(request):
-  # block bookings until questionnaire is complete
-  if getattr(request.user, "role", None) == "student" and not has_completed_questionnaire(request.user):
-      return JsonResponse({"error": "Please complete the questionnaire first."}, status=403)
-  
-  """
-  Creates a booking for the current student, given a valid availability slot.
+  """Creates a booking for the current student, given a valid availability slot.
   Prevents double-booking and enforces only one booking per day.
   Returns teacher metadata and booking ID for frontend updates.
   """
+  # Block bookings until questionnaire is complete
+  if getattr(request.user, "role", None) == "student" and not has_completed_questionnaire(request.user):
+    return JsonResponse({"error": "Please complete the questionnaire first."}, status=403)
+
   try:
     data = json.loads(request.body)
     teacher_email = data.get("teacher")
-    date_str = data.get("date")
+    date_str       = data.get("date")
     start_time_str = data.get("start")
-    end_time_str = data.get("end")
-    message = data.get("message", "").strip()[:300]  # Enforce length defensively
+    end_time_str   = data.get("end")
+    message        = (data.get("message", "") or "").strip()[:300]  # defensive cap
 
     if not all([teacher_email, date_str, start_time_str, end_time_str]):
       return JsonResponse({"error": "Missing required data"}, status=400)
 
-    # Optional: ensure only students can create bookings
+    # Only students can create bookings
     if getattr(request.user, "role", None) != "student":
       return JsonResponse({"error": "Unauthorized access"}, status=403)
 
-    # Parse string inputs
-    slot_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    # Parse inputs
+    slot_date  = datetime.strptime(date_str, "%Y-%m-%d").date()
     start_time = datetime.strptime(start_time_str, "%H:%M:%S").time()
-    end_time = datetime.strptime(end_time_str, "%H:%M:%S").time()
+    end_time   = datetime.strptime(end_time_str,   "%H:%M:%S").time()
 
-    # Enforce 1 booking per student per day
-    if Booking.objects.filter(student=request.user, teacher_availability__date=slot_date).exists():
-      return JsonResponse({
-        "error": "You already have a booking on this day."
-      }, status=400)
+    # Use a transaction and lock the slot row to avoid races
+    with transaction.atomic():
+      # Lock just the candidate slot
+      try:
+        slot = (
+          TeacherAvailability.objects
+          .select_for_update()
+          .get(
+            teacher__email=teacher_email,
+            date=slot_date,
+            start_time=start_time,
+            end_time=end_time,
+            is_available=True
+          )
+        )
+      except TeacherAvailability.DoesNotExist:
+        return JsonResponse({"error": "This slot is not available"}, status=404)
 
-    # Get the available slot
-    try:
-      slot = TeacherAvailability.objects.get(
-        teacher__email=teacher_email,
-        date=slot_date,
-        start_time=start_time,
-        end_time=end_time,
-        is_available=True
-      )
-    except TeacherAvailability.DoesNotExist:
-      return JsonResponse({"error": "This slot is not available"}, status=404)
+      # Block past/too-soon bookings (do this inside the txn in case time advanced)
+      if slot_is_in_past_or_too_soon(slot.date, slot.start_time):
+        return JsonResponse({"error": "This slot is no longer available to book."}, status=400)
 
-    # NEW: Block booking if slot is in the past or within the lead window
-    if slot_is_in_past_or_too_soon(slot.date, slot.start_time):
-      return JsonResponse({"error": "This slot is no longer available to book."}, status=400)
+      # Enforce 1 booking per student per day (check inside the txn to avoid races)
+      if Booking.objects.filter(student=request.user, teacher_availability__date=slot_date).exists():
+        return JsonResponse({"error": "You already have a booking on this day."}, status=400)
 
-    # Prevent double booking
-    if hasattr(slot, "booking"):
-      return JsonResponse({"error": "Slot already booked"}, status=409)
+      # Double-booking guard (in case a Booking row already exists)
+      if Booking.objects.filter(teacher_availability=slot).exists():
+        return JsonResponse({"error": "Slot already booked"}, status=409)
 
-    # Create booking with message
-    booking = Booking.objects.create(
-      student=request.user,
-      teacher_availability=slot,
-      message=message
-    )
+      # Create the booking
+      try:
+        booking = Booking.objects.create(
+          student=request.user,
+          teacher_availability=slot,
+          message=message
+        )
+      except IntegrityError:
+        # In case of DB uniqueness constraints, surface as conflict
+        return JsonResponse({"error": "Slot already booked"}, status=409)
 
-    # Mark slot as unavailable
-    slot.is_available = False
-    slot.save(update_fields=["is_available"])
+      # Mark the slot as no longer available
+      slot.is_available = False
+      slot.save(update_fields=["is_available"])
 
-    # Prepare teacher metadata
+    # Prepare teacher metadata (outside the lock)
     teacher = slot.teacher
     teacher_name = f"{teacher.first_name} {teacher.last_name}".strip()
     default_avatar = "/static/core/img/default-profile.png"
@@ -481,12 +490,14 @@ def create_booking(request):
       "teacher_email": teacher.email,
       "teacher_avatar": teacher_avatar,
       "student_message": escape(booking.message),
-      "advisor_id": teacher.id,  # preserve advisor param for links
+      "advisor_id": teacher.id,  # preserve advisor context for links
     })
 
   except Exception as e:
     print("❌ Unexpected error during booking:", str(e))
     return JsonResponse({"error": "An unexpected error occurred."}, status=500)
+
+
 
 
 @login_required
