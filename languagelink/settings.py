@@ -44,6 +44,7 @@ INSTALLED_APPS = [
   'core',
   'users',
   'booking',
+  'notifications',
 ]
 
 MIDDLEWARE = [
@@ -156,6 +157,14 @@ CSRF_TRUSTED_ORIGINS = [
   'http://127.0.0.1:3000',
 ]
 
+
+LOGIN_URL = "/users/login/"
+LOGIN_REDIRECT_URL = "/users/student/profile/"  # optional: where to go after login if a view uses LoginRequired
+LOGOUT_REDIRECT_URL = "/"                      # optional: already done via LogoutView(next_page='/')
+
+
+# 3 days (seconds); Django’s default is already ~72h
+PASSWORD_RESET_TIMEOUT = int(os.getenv("PASSWORD_RESET_TIMEOUT", 60 * 60 * 72))
 
 
 # -------------------------------

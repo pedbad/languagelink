@@ -17,7 +17,7 @@
             Previous Week
           </span>
         {% else %}
-          <a href="?date={{ prev_week }}" class="btn-secondary-sm">
+          <a href="?date={{ prev_week }}{% if advisor_id %}&advisor={{ advisor_id }}{% endif %}" class="btn-secondary-sm">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             Previous Week
           </a>
@@ -30,7 +30,7 @@
                 {{ day|date:"l jS" }}
               </span>
             {% else %}
-            <a href="?date={{ day|date:'Y-m-d' }}"
+            <a href="?date={{ day|date:'Y-m-d' }}{% if advisor_id %}&advisor={{ advisor_id }}{% endif %}"
                 class="px-4 py-2 rounded-lg text-sm font-medium shadow-lg transition duration-150 ease-in-out 
                   {% if day == selected_date %}
                     bg-deep-teal text-white font-bold
@@ -46,7 +46,7 @@
           {% endfor %}
         </div>
 
-        <a href="?date={{ next_week }}" class="btn-secondary-sm">
+        <a href="?date={{ next_week }}{% if advisor_id %}&advisor={{ advisor_id }}{% endif %}" class="btn-secondary-sm">
           Next Week
           <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
@@ -90,7 +90,12 @@
                   {% with teacher=teacher_profiles|get_item:teacher_email %}
                     <tr class="text-center">
                       <!-- Teacher Info -->
-                      <td class="border border-gray-300 px-2 py-2 text-center">
+                      <td class="border border-gray-300 px-2 py-2 text-center relative">
+                        {% if advisor_id and teacher.user.id == advisor_id %}
+                          <span aria-hidden="true"
+                                class="absolute left-0 top-0 bottom-0 w-1 bg-deep-teal z-10"></span>
+                        {% endif %}
+
                         {% if teacher and teacher.profile_picture %}
                           <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
                         {% else %}

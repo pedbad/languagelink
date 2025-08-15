@@ -1,24 +1,27 @@
 # -----------------------------------------------------------------------------
-# 1) Standard library
+# Standard library
 # -----------------------------------------------------------------------------
 import re
 from datetime import datetime
 
 # -----------------------------------------------------------------------------
-# 2) Django imports
+# Django imports
 # -----------------------------------------------------------------------------
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.views import PasswordChangeView  # subclassed below
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator
-from django.db.models import BooleanField, Case, Exists, OuterRef, Q, Value as V, When
-from django.http import HttpResponse, HttpResponseForbidden
+from django.db.models import Exists, OuterRef, Q
+from django.http import Http404, HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_http_methods
 
 # -----------------------------------------------------------------------------
-# 3) Local application imports
+# Local application imports
 # -----------------------------------------------------------------------------
+from users.utils import has_completed_questionnaire
 from .forms import (
   CustomUserCreationForm,
   QuestionnaireForm,
@@ -30,33 +33,52 @@ from .models import (
   CustomUser,
   Questionnaire,
   ResourceNote,
-  StudentProfile,
   TeacherProfile,
 )
 
+# -----------------------------------------------------------------------------
+# Notifications (local app)
+# -----------------------------------------------------------------------------
+from notifications.services import notify_password_changed, notify_user_invited, notify_admins_user_invited
+
 
 # Registration View
+@login_required
+@user_passes_test(lambda u: u.role in ('admin', 'teacher'))
 def register(request):
   """
-  Handles user registration. Admins can register students or teachers.
+  Create a new user (student or teacher), send a secure invite email,
+  and ALWAYS redirect after a successful POST to avoid resubmits.
   """
   if request.method == 'POST':
     form = CustomUserCreationForm(request.POST)
     if form.is_valid():
       user = form.save()
 
-      # Redirect based on the user's role
-      if request.user.is_authenticated and request.user.role == 'admin':
-        if user.role == 'student':
-          return redirect('teacher_student_list')
-        elif user.role == 'teacher':
-          return redirect('advisors')
-    else:
-      return render(request, 'users/register.html', {'form': form})
-  else:
-    form = CustomUserCreationForm()
-  
+      # Force the new user to set their own password via email link
+      user.set_unusable_password()
+      user.save(update_fields=['password'])
+
+      # Notify: invite the user + inform admins
+      notify_user_invited(user)
+      notify_admins_user_invited(user)
+
+      # Choose a sensible redirect based on the *created* user's role
+      # (adjust targets if you prefer different destinations)
+      if user.role == 'student':
+        return redirect('teacher_student_list')   # e.g., the list teachers/admins manage
+      elif user.role == 'teacher':
+        return redirect('advisors')               # or a staff list page if you have one
+      else:
+        return redirect('admin_dashboard')        # fallback
+
+    # Invalid form → re-render with errors
+    return render(request, 'users/register.html', {'form': form}, status=400)
+
+  # GET: show blank form (optionally prefill role from querystring)
+  form = CustomUserCreationForm()  # or CustomUserCreationForm(initial={'role': request.GET.get('role')})
   return render(request, 'users/register.html', {'form': form})
+
 
 
 # Login View
@@ -200,11 +222,17 @@ def teacher_profile_view(request, teacher_id = None):
   else:
     form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing and teacher_profile else None
 
+  can_student_book = True
+  if request.user.role == 'student':
+    can_student_book = has_completed_questionnaire(request.user)
+  
   return render(request, 'users/teacher_profile.html', {
     'teacher_profile': teacher_profile,
     'is_editing': is_editing,
     'can_edit': is_teacher or is_admin,
     'form': form,
+    'can_student_book': can_student_book,
+    'is_student': is_student,
   })
   
   
@@ -648,3 +676,22 @@ def delete_student(request, student_id):
 
   # Redirect to the student list page
   return redirect('teacher_student_list')
+
+
+
+class NotifyingPasswordChangeView(PasswordChangeView):
+  """
+  Wraps Django's PasswordChangeView to send a confirmation email
+  after a successful password change.
+  """
+  # Keep your existing redirect target
+  success_url = reverse_lazy("password_change_done")
+
+  # Keep your existing template by passing it in urls.py (below),
+  # or set a default here:
+  # template_name = "users/password_change.html"
+
+  def form_valid(self, form):
+    response = super().form_valid(form)
+    notify_password_changed(self.request.user)
+    return response

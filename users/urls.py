@@ -1,6 +1,8 @@
 # Import Django utilities
 from django.urls import path
-from django.contrib.auth.views import LogoutView, PasswordChangeView, PasswordChangeDoneView
+from django.contrib.auth.views import LogoutView, PasswordChangeDoneView
+from django.contrib.auth import views as auth_views  # for password reset URLs
+
 
 # Import app views
 from .views import (
@@ -20,6 +22,7 @@ from .views import (
   delete_resource_note,        # HTMX endpoint: delete a ResourceNote
   edit_resource_note,          # HTMX endpoint: edit a ResourceNote
   view_resource_note,          # HTMX endpoint: view a ResourceNote
+  NotifyingPasswordChangeView,  # add this import at the top
 )
 
 # URL patterns for the app
@@ -50,8 +53,45 @@ urlpatterns = [
   path('admin/dashboard/', admin_dashboard_view, name='admin_dashboard'),
 
   # Password Management URLs
-  path('password-change/', PasswordChangeView.as_view(template_name='users/password_change.html'), name='password_change'),
-  path('password-change/done/', PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'), name='password_change_done'),
+  path(
+    'password-change/',
+    NotifyingPasswordChangeView.as_view(template_name='users/password_change.html'),
+    name='password_change'
+  ),
+  path(
+    'password-change/done/',
+    PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'),
+    name='password_change_done'
+  ),
+  # Initiate reset (not strictly needed for invites, but useful)
+  path(
+    "password-reset/",
+    auth_views.PasswordResetView.as_view(
+      template_name="users/password_reset_form.html"
+    ),
+    name="password_reset",
+  ),
+  path(
+    "password-reset/done/",
+    auth_views.PasswordResetDoneView.as_view(
+      template_name="users/password_reset_done.html"
+    ),
+    name="password_reset_done",
+  ),
+  path(
+    "reset/<uidb64>/<token>/",
+    auth_views.PasswordResetConfirmView.as_view(
+      template_name="users/password_reset_confirm.html"
+    ),
+    name="password_reset_confirm",
+  ),
+  path(
+    "reset/done/",
+    auth_views.PasswordResetCompleteView.as_view(
+      template_name="users/password_reset_complete.html"
+    ),
+    name="password_reset_complete",
+  ),
   
   # HTMX-friendly delete endpoint for a ResourceNote
   path('notes/<int:pk>/delete/', delete_resource_note, name='delete_resource_note'),

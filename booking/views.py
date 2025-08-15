@@ -1,25 +1,32 @@
-# Python stdlib
+# -----------------------------------------------------------------------------
+# 1) Standard library
+# -----------------------------------------------------------------------------
+import calendar
 import json
-import re, calendar
-from datetime import datetime, timedelta, date
+import re
+from datetime import date, datetime, timedelta
 from html import escape
-from urllib.parse import urlparse
 
-# Django core
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, Http404
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+# -----------------------------------------------------------------------------
+# 2) Django imports
+# -----------------------------------------------------------------------------
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import default_storage
 from django.db.models import Q
+from django.http import JsonResponse 
+from django.shortcuts import render, redirect, get_object_or_404  # get_object_or_404 for advisor filter
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-# Local app
+# -----------------------------------------------------------------------------
+# 3) Local application imports
+# -----------------------------------------------------------------------------
 from .models import TeacherAvailability, Booking
 from .utils import slot_is_in_past_or_too_soon
-from users.models import TeacherProfile
+from users.utils import has_completed_questionnaire
+from users.models import CustomUser, TeacherProfile  # CustomUser for advisor lookup
 
 
 @login_required
@@ -201,6 +208,22 @@ def toggle_availability(request):
 
 @login_required
 def student_booking_view(request):
+  if request.user.role == 'student' and not has_completed_questionnaire(request.user):
+    return redirect('questionnaire')  # or HttpResponseForbidden("Please complete the questionnaire first")
+  
+  # --- Advisor filter (optional: /booking/bookings/?advisor=123) ---
+  advisor_id = request.GET.get("advisor")
+  teacher_user = None
+  if advisor_id:
+      teacher_user = get_object_or_404(CustomUser, pk=advisor_id, role="teacher")
+      # Only allow active advisors to be viewed/filtered
+      try:
+          tprof = teacher_user.teacherprofile
+          if not tprof.is_active_advisor:
+              return redirect("advisors")
+      except TeacherProfile.DoesNotExist:
+          return redirect("advisors")  
+  
   # Get today's date
   today = timezone.localdate()
 
@@ -258,10 +281,10 @@ def student_booking_view(request):
 
   # === Include slots that are AVAILABLE or already BOOKED on the selected day ===
   day_slots = (
-      TeacherAvailability.objects
-        .filter(date=selected_date)
-        .filter(Q(is_available=True) | Q(booking__isnull=False))  # <- key change
-        .select_related("teacher", "booking__student")            # bring booking+student
+    TeacherAvailability.objects
+      .filter(date=selected_date)
+      .filter(Q(is_available=True) | Q(booking__isnull=False))
+      .select_related("teacher", "booking__student")
   )
 
   teacher_availability_by_email = {}
@@ -309,6 +332,8 @@ def student_booking_view(request):
   now_local = timezone.localtime()
   context["now_date"] = now_local.date()
   context["cutoff_time"] = (now_local + timedelta(minutes=settings.BOOKING_LEAD_MINUTES)).time().replace(microsecond=0)
+  # expose the current advisor filter to the template
+  context["advisor_id"] = teacher_user.id if teacher_user else None
 
   return render(request, "booking/student_booking_view.html", context)
 
@@ -357,6 +382,10 @@ def get_available_slots(request):
 @require_POST
 @login_required
 def create_booking(request):
+  # block bookings until questionnaire is complete
+  if getattr(request.user, "role", None) == "student" and not has_completed_questionnaire(request.user):
+      return JsonResponse({"error": "Please complete the questionnaire first."}, status=403)
+  
   """
   Creates a booking for the current student, given a valid availability slot.
   Prevents double-booking and enforces only one booking per day.
@@ -452,6 +481,7 @@ def create_booking(request):
       "teacher_email": teacher.email,
       "teacher_avatar": teacher_avatar,
       "student_message": escape(booking.message),
+      "advisor_id": teacher.id,  # preserve advisor param for links
     })
 
   except Exception as e:
