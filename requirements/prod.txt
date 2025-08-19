@@ -1,0 +1,8 @@
+-r base.txt
+mysqlclient==2.2.4
+# gunicorn==22.0.0        # if using Gunicorn
+# whitenoise==6.7.0       # if serving static from app
+
+
+# production
+# pip install -r requirements/prod.txt

@@ -1,0 +1,6 @@
+-r base.txt
+# dev-only helpers could go here (optional), e.g.:
+# django-debug-toolbar==4.4.6
+
+# default dev (SQLite)
+# pip install -r requirements/dev-sqlite.txt

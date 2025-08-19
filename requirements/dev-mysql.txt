@@ -1,0 +1,13 @@
+-r base.txt
+# choose ONE of these drivers:
+
+# (Recommended, faster; needs C libs present)
+mysqlclient==2.2.4
+
+# OR (pure-Python fallback; easier to install but slower)
+# PyMySQL==1.1.1
+
+# dev with MySQL/MariaDB
+# pip install -r requirements/dev-mysql.txt
+
+
