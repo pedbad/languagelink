@@ -11,14 +11,17 @@ ALLOWED_HOSTS = ["*"]
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "languagelink"),
+        "NAME": os.getenv("DB_NAME", "languagelink_dev"),
         "USER": os.getenv("DB_USER", "languagelink_user"),
         "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+        # Leave HOST empty to prefer the unix socket below
+        "HOST": os.getenv("DB_HOST", ""),
         "PORT": int(os.getenv("DB_PORT", "3306")),
         "OPTIONS": {
             "charset": "utf8mb4",
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            # Homebrew’s default socket:
+            "unix_socket": os.getenv("DB_SOCKET", "/tmp/mysql.sock"),
+            # Helpful for dev to avoid hard failures on missing PKs during quick iterations
         },
     }
 }
