@@ -1,12 +1,13 @@
 # users/utils.py
 from .models import StudentProfile
 
+def _get_student_profile(user):
+    # tolerate both historical names
+    return getattr(user, "student_profile", None) or getattr(user, "studentprofile", None)
+
 def has_completed_questionnaire(user) -> bool:
-  """Return True if the given user (student) has at least one completed questionnaire."""
-  if getattr(user, "role", None) != "student":
-    return True  # non-students aren't blocked by this rule
-  try:
-    sp = user.studentprofile
-  except StudentProfile.DoesNotExist:
-    return False
-  return sp.questionnaires.filter(completed=True).exists()
+    sp = _get_student_profile(user)
+    if not sp:
+        return False
+    return sp.questionnaires.filter(completed=True).exists()
+

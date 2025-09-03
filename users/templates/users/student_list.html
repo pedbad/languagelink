@@ -171,12 +171,7 @@
             <!-- Avatar Column -->
             <td class="whitespace-nowrap py-4 px-4 text-sm font-medium text-gray-900 text-center">
               <div class="flex items-center justify-center">
-                {% if student.studentprofile.profile_picture %}
-                <img src="{{ student.studentprofile.profile_picture.url }}" alt="{{ student.email }}" class="h-10 w-10 rounded-full">
-                {% else %}
-                  <!-- Display Placeholder Image -->
-                  <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full">
-                {% endif %}
+                <img src="{{ student.avatar_url }}" alt="{{ student.email }}" class="h-10 w-10 rounded-full object-cover" loading="lazy">
               </div>
             </td>
         

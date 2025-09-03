@@ -12,6 +12,7 @@ from html import escape
 # -----------------------------------------------------------------------------
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.storage import default_storage
 from django.db import transaction, IntegrityError
 from django.db.models import Q
@@ -82,21 +83,16 @@ def teacher_availability_view(request):
     if hasattr(slot, "booking"):
       student = slot.booking.student
       slot_info["has_booking"] = True
-      slot_info["student_name"] = f"{student.first_name} {student.last_name}".strip()
+      slot_info["student_name"]  = f"{student.first_name} {student.last_name}".strip()
       slot_info["student_email"] = student.email
       slot_info["student_message"] = slot.booking.message or ""
 
-      try:
-        profile = student.studentprofile
-        if profile.profile_picture:
-          avatar_url = profile.profile_picture.url
-          if avatar_url.startswith("/"):
-            avatar_url = request.build_absolute_uri(avatar_url)
-          slot_info["student_avatar"] = avatar_url
-        else:
-          slot_info["student_avatar"] = request.build_absolute_uri("/static/core/img/default-profile.png")
-      except:
-        slot_info["student_avatar"] = request.build_absolute_uri("/static/core/img/default-profile.png")
+      # Safer: use the user-level helper (falls back to static default)
+      avatar_url = student.avatar_url
+      if avatar_url.startswith("/"):
+          avatar_url = request.build_absolute_uri(avatar_url)
+      slot_info["student_avatar"] = avatar_url
+
 
     availability_dict[key] = slot_info
 
@@ -219,7 +215,7 @@ def student_booking_view(request):
       teacher_user = get_object_or_404(CustomUser, pk=advisor_id, role="teacher")
       # Only allow active advisors to be viewed/filtered
       try:
-          tprof = teacher_user.teacherprofile
+          tprof = teacher_user.teacher_profile
           if not tprof.is_active_advisor:
               return redirect("advisors")
       except TeacherProfile.DoesNotExist:
@@ -293,7 +289,7 @@ def student_booking_view(request):
 
   for slot in day_slots:
     try:
-      profile = slot.teacher.teacherprofile
+      profile = slot.teacher.teacher_profile
       if not profile.is_active_advisor:
         continue  # Skip inactive advisors
 
@@ -459,25 +455,9 @@ def create_booking(request):
     # Prepare teacher metadata (outside the lock)
     teacher = slot.teacher
     teacher_name = f"{teacher.first_name} {teacher.last_name}".strip()
-    default_avatar = "/static/core/img/default-profile.png"
-    teacher_avatar = default_avatar
-
-    try:
-      profile = teacher.teacherprofile
-      if profile.profile_picture:
-        try:
-          avatar_url = profile.profile_picture.url
-          is_dev = settings.DEBUG and settings.MEDIA_URL in avatar_url
-          if is_dev or default_storage.exists(profile.profile_picture.name):
-            teacher_avatar = avatar_url
-        except Exception as img_err:
-          print("⚠️ Avatar resolution error:", img_err)
-    except TeacherProfile.DoesNotExist:
-      pass
-
-    # Normalize to absolute URL
+    teacher_avatar = teacher.avatar_url
     if teacher_avatar.startswith("/"):
-      teacher_avatar = request.build_absolute_uri(teacher_avatar)
+        teacher_avatar = request.build_absolute_uri(teacher_avatar)
 
     print("📸 Avatar sent to frontend:", teacher_avatar)
 
@@ -495,7 +475,6 @@ def create_booking(request):
   except Exception as e:
     print("❌ Unexpected error during booking:", str(e))
     return JsonResponse({"error": "An unexpected error occurred."}, status=500)
-
 
 
 
@@ -537,20 +516,9 @@ def student_bookings_list(request):
     teacher = booking.teacher_availability.teacher
 
     # Pick either the teacher’s profile picture or the default:
-    try:
-      profile = teacher.teacherprofile
-      if profile.profile_picture:
-        avatar_url = profile.profile_picture.url
-      else:
-        avatar_url = "/static/core/img/default-profile.png"
-    except TeacherProfile.DoesNotExist:
-      avatar_url = "/static/core/img/default-profile.png"
-
-    # Compute a “final” URL string:
-    if avatar_url.startswith("/"):
-      avatar_full_url = request.build_absolute_uri(avatar_url)
-    else:
-      avatar_full_url = avatar_url
+    avatar_full_url = teacher.avatar_url
+    if avatar_full_url.startswith("/"):
+        avatar_full_url = request.build_absolute_uri(avatar_full_url)
 
     booking_items.append({
       "date": booking.teacher_availability.date,
@@ -591,7 +559,7 @@ def teacher_bookings_list(request):
       teacher_availability__teacher=request.user,
       teacher_availability__date__gte=today
     ) \
-    .select_related("teacher_availability", "student", "student__studentprofile")
+    .select_related("teacher_availability", "student", "student__student_profile")
 
   if search_query:
     # name/email
@@ -651,13 +619,10 @@ def teacher_bookings_list(request):
   for booking in upcoming:
     student = booking.student
     # avatar logic...
-    try:
-      pic = student.studentprofile.profile_picture
-      avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except:
-      avatar = "/static/core/img/default-profile.png"
+    avatar = student.avatar_url
     if avatar.startswith("/"):
-      avatar = request.build_absolute_uri(avatar)
+        avatar = request.build_absolute_uri(avatar)
+
 
     booking_items.append({
       "date":            booking.teacher_availability.date,
@@ -704,10 +669,11 @@ def admin_bookings_list(request):
     ).select_related(
       "teacher_availability",
       "teacher_availability__teacher",
-      "teacher_availability__teacher__teacherprofile",
+      "teacher_availability__teacher__teacher_profile",
       "student",
-      "student__studentprofile",
+      "student__student_profile",
     )
+
 
   # 3) “Smart” search
   if q_text:
@@ -794,23 +760,14 @@ def admin_bookings_list(request):
     s = b.student
     t = b.teacher_availability.teacher
 
-    # student avatar
-    try:
-      pic = s.studentprofile.profile_picture
-      stu_avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except:
-      stu_avatar = "/static/core/img/default-profile.png"
+    #  avatars
+    stu_avatar = s.avatar_url
+    adv_avatar = t.avatar_url
     if stu_avatar.startswith("/"):
-      stu_avatar = request.build_absolute_uri(stu_avatar)
-
-    # advisor avatar
-    try:
-      pic = t.teacherprofile.profile_picture
-      adv_avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except:
-      adv_avatar = "/static/core/img/default-profile.png"
+        stu_avatar = request.build_absolute_uri(stu_avatar)
     if adv_avatar.startswith("/"):
-      adv_avatar = request.build_absolute_uri(adv_avatar)
+        adv_avatar = request.build_absolute_uri(adv_avatar)
+
 
     items.append({
       "date": b.teacher_availability.date,
@@ -875,12 +832,10 @@ def student_bookings_past(request):
   for b in past_qs:
     t = b.teacher_availability.teacher
     # same avatar logic…
-    try:
-      pic = t.teacherprofile.profile_picture
-      avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except TeacherProfile.DoesNotExist:
-      avatar = "/static/core/img/default-profile.png"
-    avatar = request.build_absolute_uri(avatar) if avatar.startswith("/") else avatar
+    avatar = t.avatar_url
+    if avatar.startswith("/"):
+        avatar = request.build_absolute_uri(avatar)
+
 
     booking_items.append({
       "date":        b.teacher_availability.date,
@@ -926,7 +881,7 @@ def teacher_bookings_past(request):
   ).select_related(
     "teacher_availability",
     "student",
-    "student__studentprofile"
+    "student__student_profile"
   ).order_by(
     "-teacher_availability__date",
     "-teacher_availability__start_time"
@@ -937,13 +892,10 @@ def teacher_bookings_past(request):
   for b in past_qs:
     student = b.student
     # avatar logic …
-    try:
-      pic = student.studentprofile.profile_picture
-      avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except:
-      avatar = "/static/core/img/default-profile.png"
-    avatar = (request.build_absolute_uri(avatar)
-            if avatar.startswith("/") else avatar)
+    avatar = student.avatar_url
+    if avatar.startswith("/"):
+        avatar = request.build_absolute_uri(avatar)
+
 
     booking_items.append({
       "date":           b.teacher_availability.date,
@@ -996,10 +948,11 @@ def admin_bookings_past(request):
   ).select_related(
     "teacher_availability",
     "teacher_availability__teacher",
-    "teacher_availability__teacher__teacherprofile",
+    "teacher_availability__teacher__teacher_profile",
     "student",
-    "student__studentprofile"
+    "student__student_profile"
   )
+
 
   # apply search filters
   if search_query:
@@ -1043,23 +996,13 @@ def admin_bookings_past(request):
     student = booking.student
     teacher = booking.teacher_availability.teacher
 
-    # student avatar URL
-    try:
-      pic = student.studentprofile.profile_picture
-      student_avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except:
-      student_avatar = "/static/core/img/default-profile.png"
+    student_avatar = student.avatar_url
+    teacher_avatar = teacher.avatar_url
     if student_avatar.startswith("/"):
-      student_avatar = request.build_absolute_uri(student_avatar)
-
-    # teacher avatar URL
-    try:
-      pic = teacher.teacherprofile.profile_picture
-      teacher_avatar = pic.url if pic else "/static/core/img/default-profile.png"
-    except:
-      teacher_avatar = "/static/core/img/default-profile.png"
+        student_avatar = request.build_absolute_uri(student_avatar)
     if teacher_avatar.startswith("/"):
-      teacher_avatar = request.build_absolute_uri(teacher_avatar)
+        teacher_avatar = request.build_absolute_uri(teacher_avatar)
+
 
     items.append({
       "date": booking.teacher_availability.date,

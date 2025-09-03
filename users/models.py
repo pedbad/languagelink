@@ -1,7 +1,19 @@
+"""Users app models: custom user + Student/Teacher profiles and related objects."""
+
+# ── Django imports ─────────────────────────────────────────────────────────────
 from django.conf import settings
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, PermissionsMixin
+)
+from django.core.files.storage import default_storage
 from django.db import models
+from django.db.models import Q                      # optional: nicer than models.Q
+from django.templatetags.static import static
 from django.utils.timezone import now
+
+# ── Project imports ────────────────────────────────────────────────────────────
+# (none)
+
 
 '''
 The following code creates a custom user model that inherits from 
@@ -55,13 +67,29 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
   objects = CustomUserManager()
 
   USERNAME_FIELD = 'email'
-  REQUIRED_FIELDS = []  # Email is the primary field
+  REQUIRED_FIELDS = ["first_name", "last_name"]  # Email is the primary field
   
   def get_full_name(self):
       return f"{self.first_name} {self.last_name}".strip()
 
   def get_short_name(self):
       return self.first_name
+  
+  @property
+  def avatar_url(self) -> str:
+    """
+    Return a safe avatar URL by delegating to the related profile,
+    falling back to a static default.
+    Works whether you set related_name or not.
+    """
+    for rel_name in ("teacher_profile", "teacherprofile", "student_profile", "studentprofile"):
+        profile = getattr(self, rel_name, None)
+        if profile:
+            try:
+                return profile.avatar_url  # uses the safe property you added
+            except Exception:
+                pass
+    return static("core/img/default-profile.png")
 
   def __str__(self):
     return self.email
@@ -88,26 +116,67 @@ class LanguageCompetency(models.Model):
   def __str__(self):
     return f"{self.language} - {self.competency_level}"
 
+
 class StudentProfile(models.Model):
-  user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+  user = models.OneToOneField(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name="student_profile"
+  ) 
   biography = models.TextField(blank=True, null=True)
   languages_of_interest = models.CharField(max_length=255, blank=True, null=True)
-  profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
+  profile_picture = models.ImageField(upload_to="profile_pictures/students/", blank=True, null=True)
+
+  @property
+  def avatar_url(self) -> str:
+      """
+      Always return a usable URL for the student's avatar.
+      If the file is unset or missing in storage, fall back to a static default.
+      """
+      f = self.profile_picture
+      if f and getattr(f, "name", ""):
+          try:
+              if default_storage.exists(f.name):
+                  return f.url
+          except Exception:
+              pass
+      return static("core/img/default-profile.png")
 
   def __str__(self):
-    return f"{self.user.email} - Student Profile"
+      return f"{self.user.email} - Student Profile"
+
 
 class TeacherProfile(models.Model):
-  user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-  biography = models.TextField(blank=True, null=True)
-  profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
-  can_host_in_person = models.BooleanField(default=False)
-  can_host_online = models.BooleanField(default=False)
-  bookings_link = models.URLField(max_length=250, blank=True, null=True)
-  is_active_advisor = models.BooleanField(default=True)  # NEW FIELD for activation/deactivation
+    user = models.OneToOneField(
+      settings.AUTH_USER_MODEL,
+      on_delete=models.CASCADE,
+      related_name="teacher_profile"
+    )
+    biography = models.TextField(blank=True, null=True)
+    profile_picture = models.ImageField(upload_to="profile_pictures/teachers/", blank=True, null=True)
+    can_host_in_person = models.BooleanField(default=False)
+    can_host_online = models.BooleanField(default=False)
+    bookings_link = models.URLField(max_length=250, blank=True, null=True)
+    is_active_advisor = models.BooleanField(default=True)
 
-  def __str__(self):
-    return f"{self.user.email} - {'Active' if self.is_active_advisor else 'Inactive'} Teacher Profile"
+    @property
+    def avatar_url(self) -> str:
+        """
+        Always return a usable URL for the teacher's avatar.
+        If the file is unset or missing in storage, fall back to a static default.
+        """
+        f = self.profile_picture
+        if f and getattr(f, "name", ""):
+            try:
+                if default_storage.exists(f.name):
+                    return f.url
+            except Exception:
+                pass
+        return static("core/img/default-profile.png")
+
+    def __str__(self):
+        status = "Active" if self.is_active_advisor else "Inactive"
+        return f"{self.user.email} - {status} Teacher Profile"
 
 
 '''

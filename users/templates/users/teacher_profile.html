@@ -10,17 +10,17 @@
 
   <div class="flex items-start space-x-6">
     <!-- Profile Picture -->
-    <div class="bg-white shadow-md rounded-lg p-4 w-40 mt-2">
-      {% if teacher_profile.profile_picture %}
+     <div class="bg-white shadow-md rounded-lg p-4 w-40 mt-2">
+      {% if teacher_profile %}
         <img
-          src="{{ teacher_profile.profile_picture.url }}"
-          alt="Profile Picture"
+          src="{{ teacher_profile.avatar_url }}"
+          alt="{{ teacher_user.get_full_name }} profile photo"
           class="h-32 w-32 object-cover rounded-full mx-auto"
         />
       {% else %}
         <img
           src="{% static 'core/img/default-profile.png' %}"
-          alt="Default Profile"
+          alt="Default profile"
           class="h-32 w-32 object-cover rounded-full mx-auto"
         />
       {% endif %}
@@ -30,7 +30,7 @@
     <div class="flex-1">
       <!-- Profile View Mode -->
       {% if not is_editing %}
-        {% if request.user.role == 'teacher' and request.user.id == teacher_profile.user.id %}
+        {% if request.user.role == 'teacher' and request.user.id == teacher_user.id %}
           <div class="mt-2 flex space-x-4">
             <!-- Left button -->
             <a href="{% url 'teacher_availability' %}"
@@ -62,45 +62,35 @@
         <!-- Book a Meeting button to be shown if student is viewwing the profile -->
         {% if is_student %}
           <div class="mt-2">
-            {# Gate: student must complete questionnaire first #}
-            {% if not can_student_book %}
+            {% if not teacher_profile %}
+              <button disabled class="btn-primary-alt-lg w-full opacity-50 cursor-not-allowed">
+                Meetings Unavailable (advisor hasn’t set up a profile yet)
+              </button>
+
+            {% elif not can_student_book %}
               <a href="{% url 'questionnaire' %}"
                 class="btn-primary-alt-lg w-full opacity-90"
                 title="Please complete the questionnaire first">
-                <!-- icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                  <path fill-rule="evenodd" d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 3A1.5 1.5 0 0 0 12 4.5h4.5A1.5 1.5 0 0 0 15 3h-1.5Z" clip-rule="evenodd" />
-                  <path fill-rule="evenodd" d="M3 9.375C3 8.339 3.84 7.5 4.875 7.5h9.75c1.036 0 1.875.84 1.875 1.875v11.25c0 1.035-.84 1.875-1.875 1.875h-9.75A1.875 1.875 0 0 1 3 20.625V9.375ZM6 12a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V12Zm2.25 0a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM6 15a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V15Zm2.25 0a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75ZM6 18a.75.75 0 0 1 .75-.75h.008a.75.75 0 0 1 .75.75v.008a.75.75 0 0 1-.75.75H6.75a.75.75 0 0 1-.75-.75V18Zm2.25 0a.75.75 0 0 1 .75-.75h3.75a.75.75 0 0 1 0 1.5H9a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
-                </svg>
+                ... (unchanged icon) ...
                 Complete your questionnaire before you can book a meeting.
               </a>
 
             {% elif teacher_profile.is_active_advisor %}
               {% if teacher_profile.can_host_online or teacher_profile.can_host_in_person %}
-                <a href="{% url 'student_booking_view' %}?advisor={{ teacher_profile.user.id }}"
-                  class="btn-primary-alt-lg w-full">
-                  <!-- icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 0 0 0-1.5h-3.75V6Z" clip-rule="evenodd" />
-                  </svg>
-                  Book a Meeting with {{ teacher_profile.user.first_name }} {{ teacher_profile.user.last_name }}
+                <a href="{% url 'student_booking_view' %}?advisor={{ teacher_user.id }}" class="btn-primary-alt-lg w-full">
+                  ... (unchanged icon/text) ...
+                  Book a Meeting with {{ teacher_user.first_name }} {{ teacher_user.last_name }}
                 </a>
               {% else %}
                 <button disabled class="btn-primary-alt-lg w-full opacity-50 cursor-not-allowed">
-                  <!-- icon -->
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                    <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
-                  </svg>
+                  ... (unchanged icon) ...
                   Meetings Unavailable
                 </button>
               {% endif %}
 
             {% else %}
               <button disabled class="btn-primary-alt-lg w-full opacity-50 cursor-not-allowed">
-                <!-- icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 mr-2">
-                  <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
-                </svg>
+                ... (unchanged icon) ...
                 Meetings Unavailable
               </button>
             {% endif %}
@@ -112,56 +102,69 @@
 
 
 
-        <p class="text-lg"><strong>Name:</strong> {{ teacher_profile.user.first_name }} {{ teacher_profile.user.last_name }}</p>
-        <p class="text-lg"><strong>Email:</strong> {{ teacher_profile.user.email }}</p>
+
+        <p class="text-lg"><strong>Name:</strong> {{ teacher_user.first_name }} {{ teacher_user.last_name }}</p>
+        <p class="text-lg"><strong>Email:</strong> {{ teacher_user.email }}</p>
         <hr class="page-divider">
 
         <p class="text-lg"><strong>Biography:</strong></p>
-        {% if teacher_profile.biography %}
-          <p class="text-gray-800">{{ teacher_profile.biography }}</p>
+        {% if teacher_profile %}
+          {% if teacher_profile.biography %}
+            <p class="text-gray-800">{{ teacher_profile.biography }}</p>
+          {% else %}
+            <p class="text-gray-500 italic">Not provided yet. You can edit your profile to add this information.</p>
+          {% endif %}
         {% else %}
-          <p class="text-gray-500 italic">Not provided yet. You can edit your profile to add this information.</p>
+          <p class="text-gray-500 italic">This advisor hasn’t set up a profile yet.</p>
         {% endif %}
         <hr class="page-divider">
 
         <!-- Hosting Availability -->
         <p class="text-lg"><strong>Hosting Availability:</strong></p>
-        {% if teacher_profile.can_host_online or teacher_profile.can_host_in_person %}
-          <p class="text-gray-800">
-            {% if teacher_profile.can_host_online %}
-              ✅ Available for online meetings
-            {% endif %}
-            {% if teacher_profile.can_host_in_person %}
-              {% if teacher_profile.can_host_online %} | {% endif %}
-              ✅ Available for In-Person Meetings
-            {% endif %}
-          </p>
+        {% if teacher_profile %}
+          {% if teacher_profile.can_host_online or teacher_profile.can_host_in_person %}
+            <p class="text-gray-800">
+              {% if teacher_profile.can_host_online %} ✅ Available for online meetings {% endif %}
+              {% if teacher_profile.can_host_in_person %}{% if teacher_profile.can_host_online %} | {% endif %} ✅ Available for In-Person Meetings {% endif %}
+            </p>
+          {% else %}
+            <p class="text-red-600 font-semibold">❌ Not available for meetings</p>
+          {% endif %}
         {% else %}
-          <p class="text-red-600 font-semibold">❌ Not available for meetings</p>
+          <p class="text-gray-500 italic">This advisor hasn’t set up a profile yet.</p>
         {% endif %}
+
         <hr class="page-divider">
 
         <!-- Advising Status -->
         <p class="text-lg"><strong>Advising Status:</strong></p>
-        <div class="flex items-center space-x-2 {% if teacher_profile.is_active_advisor %}text-green-600{% else %}text-red-600{% endif %} font-semibold">
-          {% if teacher_profile.is_active_advisor %}
-            <!-- Heroicon Check Circle -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"/>
-            </svg>
-            <span>Active</span>
-          {% else %}
-            <!-- Heroicon X Circle -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"/>
-            </svg>
-            <span>Inactive</span>
-          {% endif %}
-        </div>
+        {% if teacher_profile %}
+          <div class="flex items-center space-x-2 {% if teacher_profile.is_active_advisor %}text-green-600{% else %}text-red-600{% endif %} font-semibold">
+            {% if teacher_profile.is_active_advisor %}
+              <!-- Heroicon Check Circle -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"/>
+              </svg>
+              <span>Active</span>
+            {% else %}
+              <!-- Heroicon X Circle -->
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12M21 12A9 9 0 1 1 12 3a9 9 0 0 1 9 9z"/>
+              </svg>
+              <span>Inactive</span>
+            {% endif %}
+          </div>
+        {% else %}
+          <p class="text-gray-500 italic">This advisor hasn’t set up a profile yet.</p>
+        {% endif %}
+
+
+
+
         <hr class="page-divider">
 
         <!-- Edit Button -->
-        {% if request.user.role == 'teacher' and request.user.id == teacher_profile.user.id %}
+        {% if request.user.role == 'teacher' and request.user.id == teacher_user.id %}
           <a href="?edit=true" class="btn-primary w-full mt-4 mb-20">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5 mr-2">
               <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"></path>
@@ -284,10 +287,10 @@
             <div class="flex items-center space-x-4">
               <!-- Profile Picture Thumbnail -->
               <div class="w-16 h-16 rounded-full overflow-hidden border border-gray-300">
-                <img id="profile-picture-preview" 
-                  src="{% if teacher_profile.profile_picture %}{{ teacher_profile.profile_picture.url }}{% else %}{% static 'core/img/default-profile.png' %}{% endif %}" 
-                  data-default-src="{% static 'core/img/default-profile.png' %}" 
-                  alt="Current Profile Picture" 
+                <img id="profile-picture-preview"
+                  src="{% if teacher_profile %}{{ teacher_profile.avatar_url }}{% else %}{% static 'core/img/default-profile.png' %}{% endif %}"
+                  data-default-src="{% static 'core/img/default-profile.png' %}"
+                  alt="Current Profile Picture"
                   class="object-cover w-full h-full">
               </div>
 
@@ -308,7 +311,7 @@
 
                 <!-- Display File Name -->
                 <p id="file-name" class="text-sm text-gray-500 mt-1">
-                  {% if teacher_profile.profile_picture %}
+                  {% if teacher_profile and teacher_profile.profile_picture %}
                     {{ teacher_profile.profile_picture.name }}
                   {% else %}
                     No file chosen
@@ -318,7 +321,7 @@
             </div>
 
             <!-- Clear Current Picture -->
-            {% if teacher_profile.profile_picture %}
+            {% if teacher_profile and teacher_profile.profile_picture %}
               <div class="mt-4 flex items-center space-x-2">
                 <input type="checkbox" id="clear_id_profile_picture" name="profile_picture-clear" class="form-checkbox h-5 w-5 text-deep-teal border-gray-300 rounded focus:ring-deep-teal">
                 <label for="clear_id_profile_picture" class="text-sm text-gray-700">Clear Current Picture</label>

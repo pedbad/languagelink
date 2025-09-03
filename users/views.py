@@ -106,9 +106,9 @@ def login_view(request):
         request.session.set_expiry(0)  # Session expires on browser close
 
       if user.role == 'student':
-        student_profile = user.studentprofile
-        has_completed_questionnaire = student_profile.questionnaires.filter(completed=True).exists()
-        if not has_completed_questionnaire:
+        student_profile = getattr(user, "student_profile", None)
+        completed = student_profile and student_profile.questionnaires.filter(completed=True).exists()
+        if not completed:
           return redirect('questionnaire')
         return redirect('student_profile')
 
@@ -144,7 +144,7 @@ def student_profile_view(request, student_id = None):
 
   # Try fetching the student's profile, handle missing profile
   try:
-    student_profile = student.studentprofile
+    student_profile = student.student_profile
   except ObjectDoesNotExist:
     raise Http404("This student does not have a profile.")
 
@@ -198,7 +198,7 @@ def teacher_profile_view(request, teacher_id = None):
 
   # Get the teacher's profile, or return 404 if not found
   try:
-    teacher_profile = teacher_user.teacherprofile
+    teacher_profile = teacher_user.teacher_profile
   except TeacherProfile.DoesNotExist:
     if is_admin:
       teacher_profile = None
@@ -234,6 +234,7 @@ def teacher_profile_view(request, teacher_id = None):
   
   return render(request, 'users/teacher_profile.html', {
     'teacher_profile': teacher_profile,
+    'teacher_user': teacher_user,
     'is_editing': is_editing,
     'can_edit': is_teacher or is_admin,
     'form': form,
@@ -250,7 +251,7 @@ def toggle_can_host_in_person(request):
   if request.user.role != 'teacher':
     return redirect('teacher_profile')  # Only teachers can perform this action
 
-  teacher_profile = request.user.teacherprofile
+  teacher_profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
   teacher_profile.can_host_in_person = not teacher_profile.can_host_in_person  # Toggle status
   teacher_profile.save()
 
@@ -265,7 +266,7 @@ def toggle_can_host_online(request):
   if request.user.role != 'teacher':
     return redirect('teacher_profile')  # Only teachers can perform this action
 
-  teacher_profile = request.user.teacherprofile
+  teacher_profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
   teacher_profile.can_host_online = not teacher_profile.can_host_online  # Toggle status
   teacher_profile.save()
 
@@ -281,7 +282,7 @@ def toggle_advising_status(request):
   if request.user.role != 'teacher':
     return redirect('teacher_profile')  # Only teachers can perform this action
 
-  teacher_profile = request.user.teacherprofile
+  teacher_profile, _ = TeacherProfile.objects.get_or_create(user=request.user)
   teacher_profile.is_active_advisor = not teacher_profile.is_active_advisor  # Toggle status
   teacher_profile.save()
 
@@ -302,7 +303,7 @@ def questionnaire_view(request, student_id=None):
       return HttpResponseForbidden("Not allowed")
 
     student = get_object_or_404(CustomUser, id=student_id, role='student')
-    student_profile = getattr(student, 'studentprofile', None)
+    student_profile = getattr(student, 'student_profile', None)
     if not student_profile:
       return render(request, '404.html', status=404)
 
@@ -311,7 +312,7 @@ def questionnaire_view(request, student_id=None):
   else:
     # Student viewing their own
     student = request.user
-    student_profile = student.studentprofile
+    student_profile = student.student_profile
     is_owner = True
     is_editing = request.GET.get('edit', 'false').lower() == 'true'
 
@@ -378,7 +379,7 @@ def student_resource_view(request):
     # A student viewing their own page
     student_user = user
 
-  student_profile = student_user.studentprofile
+  student_profile = student_user.student_profile
 
   # 2) Grab all notes (Model.Meta.ordering handles newest-first)
   notes = student_profile.resource_notes.select_related('author').all()
@@ -579,11 +580,11 @@ def teacher_student_list_view(request):
   # 3) Base queryset: only active students, annotate questionnaire status
   students = (
     CustomUser.objects.filter(role='student', is_active=True)
-    .select_related('studentprofile')
+    .select_related('student_profile')
     .annotate(
       questionnaire_completed=Exists(
         Questionnaire.objects.filter(
-          student_profile=OuterRef('studentprofile'),
+          student_profile__user=OuterRef('pk'),
           completed=True
         )
       )

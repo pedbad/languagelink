@@ -11,15 +11,13 @@
   <!-- Flex Container for Profile Image and Info -->
   <div class="flex items-start space-x-6">
     <!-- Profile Image Placeholder or Uploaded Image -->
-    <div class="bg-white shadow-md rounded-lg p-4 w-40 
-      {% if is_student and has_completed_questionnaire and not is_editing %}
-        mt-2
-      {% endif %}">
-      {% if student_profile.profile_picture %}
-        <img src="{{ student_profile.profile_picture.url }}" alt="Profile Picture" class="h-32 w-32 object-cover rounded-full mx-auto">
-      {% else %}
-        <img src="{% static 'core/img/default-profile.png' %}" alt="Default Profile" class="h-32 w-32 object-cover rounded-full mx-auto">
-      {% endif %}
+     <div class="bg-white shadow-md rounded-lg p-4 w-40 
+      {% if is_student and has_completed_questionnaire and not is_editing %}mt-2{% endif %}">
+      <img
+        src="{{ student_profile.avatar_url }}"
+        alt="{{ student_profile.user.get_full_name }} profile photo"
+        class="h-32 w-32 object-cover rounded-full mx-auto"
+      >
     </div>
 
     <!-- Profile Details -->

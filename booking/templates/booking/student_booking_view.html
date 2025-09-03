@@ -96,11 +96,8 @@
                                 class="absolute left-0 top-0 bottom-0 w-1 bg-deep-teal z-10"></span>
                         {% endif %}
 
-                        {% if teacher and teacher.profile_picture %}
-                          <img src="{{ teacher.profile_picture.url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
-                        {% else %}
-                          <img src="{% static 'core/img/default-profile.png' %}" alt="Default Avatar" class="h-10 w-10 rounded-full mx-auto">
-                        {% endif %}
+                        <img src="{{ teacher.avatar_url }}" alt="Avatar" class="h-10 w-10 rounded-full mx-auto">
+
                         <p class="text-xs text-gray-700 mt-1">{{ teacher.user.first_name }} {{ teacher.user.last_name }}</p>
                         <p class="text-xs text-gray-700 mt-1">{{ teacher_email }}</p>
                       </td>
@@ -123,7 +120,7 @@
                                           data-date = "{{ date_str }}"
                                           data-start = "{{ start_time|time:'H:i:s' }}"
                                           data-end   = "{{ end_time|time:'H:i:s' }}"
-                                          data-avatar = "{{ teacher.profile_picture.url|default:'/static/core/img/default-profile.png' }}"
+                                          data-avatar="{{ teacher.avatar_url }}"
                                           data-message = "{{ availability.booking.message|default:''|escape }}"
                                         >
                                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
@@ -144,7 +141,7 @@
                                       <span class="booking-slot inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white mx-auto cursor-pointer hover:bg-green-600 transition"
                                             data-teacher="{{ teacher_email }}"
                                             data-teacher-name="{{ teacher.user.first_name }} {{ teacher.user.last_name }}"
-                                            data-avatar="{{ teacher.profile_picture.url|default_if_none:'' }}"
+                                            data-avatar="{{ teacher.avatar_url }}"
                                             data-date="{{ date_str }}"
                                             data-start="{{ start_time|time:'H:i:s' }}"
                                             data-end="{{ end_time|time:'H:i:s' }}"
