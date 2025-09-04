@@ -167,12 +167,19 @@ def notify_user_invited(user):
 
   if role == "student":
     after = abs_url("/users/student/questionnaire/")
+    booking_policy = (
+        "After you submit your questionnaire, you can book with an advisor. "
+        "Please select your slot responsibly—bookings can’t be canceled online. "
+        "To cancel or reschedule, contact the advising team in advance."
+    )
     body = (
-      f"Hi {name},\n\n"
-      "Your LanguageLink account has been created.\n"
-      f"Set your password using this secure link (expires in ~{hours} hours):\n"
-      f"{link}\n\n"
-      f"After setting your password, please complete the compulsory questionnaire:\n{after}\n"
+        f"Hi {name},\n\n"
+        "Your LanguageLink account has been created.\n"
+        f"Set your password using this secure link (expires in ~{hours} hours):\n"
+        f"{link}\n\n"
+        "After setting your password, please complete the compulsory questionnaire:\n"
+        f"{after}\n\n"
+        f"{booking_policy}\n"
     )
     subject = "Welcome to LanguageLink – Set your password"
   elif role == "teacher":

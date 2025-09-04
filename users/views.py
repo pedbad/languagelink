@@ -177,70 +177,84 @@ def student_profile_view(request, student_id = None):
 
 # Teacher Profile View
 @login_required
-def teacher_profile_view(request, teacher_id = None):
+def teacher_profile_view(request, teacher_id=None):
   """
   Displays and allows editing of the teacher's profile.
   - Teachers can edit their own profile.
   - Admins can view and edit any teacher's profile.
   - Students can only view advisors.
   """
-  is_admin = request.user.role == 'admin'
+  is_admin   = request.user.role == 'admin'
   is_teacher = request.user.role == 'teacher'
   is_student = request.user.role == 'student'
 
-  # If teacher_id is None, assume the logged-in teacher is accessing their own profile
+  # Whose profile are we looking at?
   if teacher_id is None:
-    if not is_teacher:
-      return redirect('advisors')  # Redirect students to the advisor list
-    teacher_user = request.user  # Teacher views their own profile
+      # Only teachers (their own page) or admins should reach here; others go to advisors
+      if not (is_teacher or is_admin):
+          return redirect('advisors')
+      # If admin hits the self URL with no id, you can choose to redirect them elsewhere
+      if is_teacher:
+          teacher_user = request.user
+      else:
+          return redirect('advisors')  # or wherever your admin starts from
   else:
-    teacher_user = get_object_or_404(CustomUser, id=teacher_id, role='teacher')
+      teacher_user = get_object_or_404(CustomUser, id=teacher_id, role='teacher')
 
-  # Get the teacher's profile, or return 404 if not found
+  # Edit permissions
+  can_edit_self = (is_teacher and request.user.id == teacher_user.id)
+
+  # IMPORTANT: For POST, don't rely on ?edit=true (which won't be present).
+  if request.method == 'POST':
+      is_editing = (is_admin or can_edit_self)
+  else:
+      wants_edit = request.GET.get('edit', 'false').lower() == 'true'
+      is_editing = wants_edit and (is_admin or can_edit_self)
+
+  # Fetch profile without 404
   try:
-    teacher_profile = teacher_user.teacher_profile
+      teacher_profile = teacher_user.teacher_profile
   except TeacherProfile.DoesNotExist:
-    if is_admin:
       teacher_profile = None
-    else:
-      return render(request, "users/404.html", status=404)
 
-  # Determine if the user is in edit mode
-  is_editing = request.GET.get('edit', 'false').lower() == 'true' and (is_admin or is_teacher)
+  # If editing, ensure there's a profile instance to bind the form to
+  if is_editing and teacher_profile is None:
+      teacher_profile, _ = TeacherProfile.objects.get_or_create(user=teacher_user)
 
+  # Form handling
   if request.method == 'POST' and is_editing:
-    form = TeacherProfileForm(
-      request.POST, request.FILES, 
-      instance=teacher_profile, 
-      user=teacher_user
-    )
+      form = TeacherProfileForm(
+          request.POST, request.FILES,
+          instance=teacher_profile,
+          user=teacher_user
+      )
+      if form.is_valid():
+          updated_profile = form.save()
 
-    if form.is_valid():
-      # Save user & profile in one shot
-      updated_profile = form.save()
+          # If is_active_advisor is NOT a form field, keep the toggle; otherwise remove these two lines.
+          updated_profile.is_active_advisor = (request.POST.get('is_active_advisor') == 'on')
+          updated_profile.save()
 
-      # Handle the toggle for advising availability
-      updated_profile.is_active_advisor = (request.POST.get('is_active_advisor') == 'on')
-      updated_profile.save()
-
-      return redirect('teacher_profile')
-
+          # Redirect appropriately
+          if teacher_id is not None:
+              return redirect('teacher_profile_admin', teacher_id=teacher_user.id)  # <- adjust to your URL name
+          return redirect('teacher_profile')
   else:
-    form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing and teacher_profile else None
+      form = TeacherProfileForm(instance=teacher_profile, user=teacher_user) if is_editing else None
 
-  can_student_book = True
-  if request.user.role == 'student':
-    can_student_book = has_completed_questionnaire(request.user)
-  
+  # Student booking gate
+  can_student_book = has_completed_questionnaire(request.user) if is_student else True
+
   return render(request, 'users/teacher_profile.html', {
-    'teacher_profile': teacher_profile,
-    'teacher_user': teacher_user,
-    'is_editing': is_editing,
-    'can_edit': is_teacher or is_admin,
-    'form': form,
-    'can_student_book': can_student_book,
-    'is_student': is_student,
+      'teacher_profile': teacher_profile,
+      'teacher_user': teacher_user,
+      'is_editing': is_editing,
+      'can_edit': (is_admin or can_edit_self),
+      'form': form,
+      'can_student_book': can_student_book,
+      'is_student': is_student,
   })
+
   
   
 @login_required

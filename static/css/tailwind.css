@@ -92,3 +92,6 @@ footer {
   /* default 1.5em works well for most fonts */
   padding-left: 1.5em;
 }
+
+/* make sure labels are visible on the reset page */
+.reset-password-page label { display: inline-block !important; color: #0f172a; font-weight: 500; }

@@ -4,6 +4,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, SetPasswordForm
 from django.forms import modelformset_factory, TextInput
+from django.forms.utils import ErrorList
+from django.utils.html import format_html, format_html_join
 from django.forms.widgets import ClearableFileInput
 from django.utils.translation import gettext_lazy as _
 
@@ -19,6 +21,26 @@ from .models import (
     Questionnaire,
     ResourceNote,
 )
+
+
+# ────────────────────────────────────────────────────────────────────────────────
+# RegCustom error list class
+# If you want to be 100% sure nothing prints when there are no errors, 
+# add this small subclass and use it
+# ────────────────────────────────────────────────────────────────────────────────
+
+class TailwindErrorList(ErrorList):
+    def as_ul(self):
+        if not self:
+            return ""
+        return format_html(
+            '<ul class="errorlist text-red-600 mt-1">{}</ul>',
+            format_html_join("", "<li>{}</li>", ((e,) for e in self)),
+        )
+    
+    # belt-and-suspenders: ensure string conversion never prints "[]"
+    def __str__(self):
+        return self.as_ul()
 
 
 # ────────────────────────────────────────────────────────────────────────────────
@@ -255,6 +277,9 @@ TAILWIND_INPUT = "w-full border rounded-lg px-3 py-2 focus:outline-none focus:ri
 
 # users/forms.py
 class SetPasswordFormStyled(SetPasswordForm):
+    # make sure errors render as proper ErrorList (empty -> "")
+    error_class = TailwindErrorList
+
     def __init__(self, user, *args, **kwargs):
         super().__init__(user, *args, **kwargs)
         for field in self.fields.values():
