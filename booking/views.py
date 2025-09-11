@@ -12,8 +12,6 @@ from html import escape
 # -----------------------------------------------------------------------------
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.files.storage import default_storage
 from django.db import transaction, IntegrityError
 from django.db.models import Q
 from django.http import JsonResponse 
@@ -27,7 +25,7 @@ from django.views.decorators.http import require_POST
 # -----------------------------------------------------------------------------
 from .models import TeacherAvailability, Booking
 from .utils import slot_is_in_past_or_too_soon
-from users.utils import has_completed_questionnaire
+from users.utils import has_completed_questionnaire, absolute_avatar_url
 from users.models import CustomUser, TeacherProfile  # CustomUser for advisor lookup
 
 
@@ -86,12 +84,7 @@ def teacher_availability_view(request):
       slot_info["student_name"]  = f"{student.first_name} {student.last_name}".strip()
       slot_info["student_email"] = student.email
       slot_info["student_message"] = slot.booking.message or ""
-
-      # Safer: use the user-level helper (falls back to static default)
-      avatar_url = student.avatar_url
-      if avatar_url.startswith("/"):
-          avatar_url = request.build_absolute_uri(avatar_url)
-      slot_info["student_avatar"] = avatar_url
+      slot_info["student_avatar"] = absolute_avatar_url(request, student)
 
 
     availability_dict[key] = slot_info
@@ -216,7 +209,7 @@ def student_booking_view(request):
       # Only allow active advisors to be viewed/filtered
       try:
           tprof = teacher_user.teacher_profile
-          if not tprof.is_active_advisor:
+          if not (tprof.is_active_advisor and (tprof.can_host_online or tprof.can_host_in_person)):
               return redirect("advisors")
       except TeacherProfile.DoesNotExist:
           return redirect("advisors")  
@@ -281,25 +274,33 @@ def student_booking_view(request):
     TeacherAvailability.objects
       .filter(date=selected_date)
       .filter(Q(is_available=True) | Q(booking__isnull=False))
-      .select_related("teacher", "booking__student")
+      .filter(
+          teacher__role='teacher',
+          teacher__teacher_profile__is_active_advisor=True,
+      )
+      .filter(
+          Q(teacher__teacher_profile__can_host_online=True) |
+          Q(teacher__teacher_profile__can_host_in_person=True)
+      )
+      .select_related("teacher", "booking__student", "teacher__teacher_profile")
   )
+
 
   teacher_availability_by_email = {}
   teacher_profiles = {}
 
   for slot in day_slots:
-    try:
-      profile = slot.teacher.teacher_profile
-      if not profile.is_active_advisor:
-        continue  # Skip inactive advisors
+    # thanks to select_related, this doesn't hit the DB again
+    profile = slot.teacher.teacher_profile
 
-      teacher_email = slot.teacher.email
-      key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
-      teacher_availability_by_email.setdefault(teacher_email, {})[key] = slot
-      teacher_profiles[teacher_email] = profile
+    # optional belt-and-braces; your queryset already filters to bookable
+    if not profile.is_bookable:
+        continue
 
-    except TeacherProfile.DoesNotExist:
-      continue  # Skip teachers without profiles
+    teacher_email = slot.teacher.email
+    key = f"{slot.date.strftime('%Y-%m-%d')},{slot.start_time.strftime('%H:%M:%S')}"
+    teacher_availability_by_email.setdefault(teacher_email, {})[key] = slot
+    teacher_profiles[teacher_email] = profile
 
   # Ensure every time slot exists (even if not in DB) for the teachers we kept — for SELECTED DAY ONLY
   date_str = selected_date.strftime('%Y-%m-%d')
@@ -337,42 +338,47 @@ def student_booking_view(request):
 
 @login_required
 def get_available_slots(request):
-  """
-  Returns available teachers and their time slots for a given date.
-  """
+    """
+    Returns available teachers and their time slots for a given date.
+    Only includes teachers who are currently bookable:
+      - active advisor
+      - offers at least one meeting mode (online or in-person)
+    """
+    if request.method != "GET":
+        return JsonResponse({"error": "Invalid request"}, status=400)
 
-  # Ensure the request is a GET request
-  if request.method != "GET":
-    return JsonResponse({"error": "Invalid request"}, status=400)
+    date_str = request.GET.get("date")
+    if not date_str:
+        return JsonResponse({"error": "Missing date parameter"}, status=400)
 
-  # Get the date parameter from the request
-  date_str = request.GET.get("date")
-  if not date_str:
-    return JsonResponse({"error": "Missing date parameter"}, status=400)
+    try:
+        selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return JsonResponse({"error": "Invalid date format"}, status=400)
 
-  try:
-    selected_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-  except ValueError:
-    return JsonResponse({"error": "Invalid date format"}, status=400)
+    #  Filter to bookable teachers
+    available_slots = (
+        TeacherAvailability.objects
+        .filter(date=selected_date, is_available=True)
+        .filter(teacher__role="teacher")
+        .filter(teacher__teacher_profile__is_active_advisor=True)
+        .filter(
+            Q(teacher__teacher_profile__can_host_online=True) |
+            Q(teacher__teacher_profile__can_host_in_person=True)
+        )
+        .select_related("teacher", "teacher__teacher_profile")
+    )
 
-  # Fetch available slots for the selected date
-  available_slots = TeacherAvailability.objects.filter(
-    date=selected_date, is_available=True
-  ).select_related("teacher")
+    if not available_slots.exists():
+        return JsonResponse({"success": True, "slots": {}})
 
-  if not available_slots.exists():
-    return JsonResponse({"success": True, "slots": {}})  # Return empty slots if none exist
+    # Keep the same payload structure: { "HH:MM:SS": [teacher_email, ...], ... }
+    slots_dict = {}
+    for slot in available_slots:
+        time_key = slot.start_time.strftime("%H:%M:%S")
+        slots_dict.setdefault(time_key, []).append(slot.teacher.email)
 
-  # Convert the queryset into a structured dictionary
-  slots_dict = {}
-  for slot in available_slots:
-    time_key = slot.start_time.strftime("%H:%M:%S")
-    if time_key not in slots_dict:
-      slots_dict[time_key] = []
-
-    slots_dict[time_key].append(slot.teacher.email)
-
-  return JsonResponse({"success": True, "slots": slots_dict})
+    return JsonResponse({"success": True, "slots": slots_dict})
 
 
 @csrf_exempt
@@ -414,8 +420,10 @@ def create_booking(request):
         slot = (
           TeacherAvailability.objects
           .select_for_update()
+          .select_related("teacher", "teacher__teacher_profile")
           .get(
             teacher__email=teacher_email,
+            teacher__role="teacher",
             date=slot_date,
             start_time=start_time,
             end_time=end_time,
@@ -424,6 +432,11 @@ def create_booking(request):
         )
       except TeacherAvailability.DoesNotExist:
         return JsonResponse({"error": "This slot is not available"}, status=404)
+      
+      # ✅ Bookable gate: advisor must be active AND offer at least one meeting mode
+      prof = getattr(slot.teacher, "teacher_profile", None)
+      if prof is None or not prof.is_active_advisor or not (prof.can_host_online or prof.can_host_in_person):
+        return JsonResponse({"error": "This advisor is not currently available to book."}, status=400)
 
       # Block past/too-soon bookings (do this inside the txn in case time advanced)
       if slot_is_in_past_or_too_soon(slot.date, slot.start_time):
@@ -455,9 +468,8 @@ def create_booking(request):
     # Prepare teacher metadata (outside the lock)
     teacher = slot.teacher
     teacher_name = f"{teacher.first_name} {teacher.last_name}".strip()
-    teacher_avatar = teacher.avatar_url
-    if teacher_avatar.startswith("/"):
-        teacher_avatar = request.build_absolute_uri(teacher_avatar)
+    teacher_avatar = absolute_avatar_url(request, teacher)
+
 
     print("📸 Avatar sent to frontend:", teacher_avatar)
 
@@ -475,7 +487,6 @@ def create_booking(request):
   except Exception as e:
     print("❌ Unexpected error during booking:", str(e))
     return JsonResponse({"error": "An unexpected error occurred."}, status=500)
-
 
 
 @login_required
@@ -516,9 +527,7 @@ def student_bookings_list(request):
     teacher = booking.teacher_availability.teacher
 
     # Pick either the teacher’s profile picture or the default:
-    avatar_full_url = teacher.avatar_url
-    if avatar_full_url.startswith("/"):
-        avatar_full_url = request.build_absolute_uri(avatar_full_url)
+    avatar_full_url = absolute_avatar_url(request, teacher)
 
     booking_items.append({
       "date": booking.teacher_availability.date,
@@ -618,10 +627,7 @@ def teacher_bookings_list(request):
   booking_items = []
   for booking in upcoming:
     student = booking.student
-    # avatar logic...
-    avatar = student.avatar_url
-    if avatar.startswith("/"):
-        avatar = request.build_absolute_uri(avatar)
+    avatar = absolute_avatar_url(request, student)
 
 
     booking_items.append({
@@ -761,12 +767,8 @@ def admin_bookings_list(request):
     t = b.teacher_availability.teacher
 
     #  avatars
-    stu_avatar = s.avatar_url
-    adv_avatar = t.avatar_url
-    if stu_avatar.startswith("/"):
-        stu_avatar = request.build_absolute_uri(stu_avatar)
-    if adv_avatar.startswith("/"):
-        adv_avatar = request.build_absolute_uri(adv_avatar)
+    stu_avatar = absolute_avatar_url(request, s)
+    adv_avatar = absolute_avatar_url(request, t)
 
 
     items.append({
@@ -831,11 +833,7 @@ def student_bookings_past(request):
   booking_items = []
   for b in past_qs:
     t = b.teacher_availability.teacher
-    # same avatar logic…
-    avatar = t.avatar_url
-    if avatar.startswith("/"):
-        avatar = request.build_absolute_uri(avatar)
-
+    avatar = absolute_avatar_url(request, t)
 
     booking_items.append({
       "date":        b.teacher_availability.date,
@@ -891,10 +889,7 @@ def teacher_bookings_past(request):
   booking_items = []
   for b in past_qs:
     student = b.student
-    # avatar logic …
-    avatar = student.avatar_url
-    if avatar.startswith("/"):
-        avatar = request.build_absolute_uri(avatar)
+    avatar = absolute_avatar_url(request, student)
 
 
     booking_items.append({
@@ -996,13 +991,8 @@ def admin_bookings_past(request):
     student = booking.student
     teacher = booking.teacher_availability.teacher
 
-    student_avatar = student.avatar_url
-    teacher_avatar = teacher.avatar_url
-    if student_avatar.startswith("/"):
-        student_avatar = request.build_absolute_uri(student_avatar)
-    if teacher_avatar.startswith("/"):
-        teacher_avatar = request.build_absolute_uri(teacher_avatar)
-
+    student_avatar = absolute_avatar_url(request, student)
+    teacher_avatar = absolute_avatar_url(request, teacher)
 
     items.append({
       "date": booking.teacher_availability.date,

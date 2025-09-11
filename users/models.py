@@ -173,6 +173,12 @@ class TeacherProfile(models.Model):
             except Exception:
                 pass
         return static("core/img/default-profile.png")
+    
+    @property
+    def is_bookable(self) -> bool:
+        """Only bookable if active AND offers at least one meeting mode."""
+        return self.is_active_advisor and (self.can_host_online or self.can_host_in_person)
+
 
     def __str__(self):
         status = "Active" if self.is_active_advisor else "Inactive"
